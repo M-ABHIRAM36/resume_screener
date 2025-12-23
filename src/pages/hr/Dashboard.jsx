@@ -9,7 +9,7 @@ export default function HRDashboard(){
   const [filters, setFilters] = useState({skill:"", location:"", college:"", minMatch:0, experience:""})
   const [sortBy, setSortBy] = useState("")
   const [view, setView] = useState('cards')
-  const [selectedRoleName, setSelectedRoleName] = useState('')
+  const [selectedRoleId, setSelectedRoleId] = useState('')
   const [currentJob, setCurrentJob] = useState(null)
   const [jobTitle, setJobTitle] = useState('')
   const [jobLocation, setJobLocation] = useState('')
@@ -19,7 +19,7 @@ export default function HRDashboard(){
 
   useEffect(()=>{
     // load predefined jobs from backend
-    get('/hr/jobs').then(setJobRoles).catch(err=> console.warn('jobs load', err))
+    get('/hr/jobs').then(jobs=>{ setJobRoles(jobs); if(jobs && jobs.length) setSelectedRoleId(jobs[0].id); }).catch(err=> console.warn('jobs load', err))
     // initial candidates: empty until job selected
     setCandidatesList([])
   },[])
@@ -42,15 +42,9 @@ export default function HRDashboard(){
     }
   }
 
-  useEffect(()=>{
-    if(currentJob){
-      computeMatchesForJob(currentJob)
-    }
-  },[currentJob, filters])
-
   async function handleCreateJob(){
     // If a predefined role is selected, use it; otherwise create via backend
-    const found = jobRoles.find(j => j.name === selectedRoleName)
+    const found = jobRoles.find(j => j.name === selectedRoleId)
     if(found){
       setCurrentJob(found)
     } else {
@@ -63,6 +57,19 @@ export default function HRDashboard(){
       }catch(e){ console.error('create job', e) }
     }
   }
+
+  useEffect(()=>{
+    if(selectedRoleId){
+      const found = jobRoles.find(j => j.id === selectedRoleId);
+      if(found){
+        setCurrentJob(found);
+        setJobTitle(found.name);
+        setJobLocation(found.location || '');
+        setJobDesc((found.roadmapSteps||[]).join('; '));
+        computeMatchesForJob(found);
+      }
+    }
+  },[selectedRoleId, jobRoles])
 
   const filtered = useMemo(()=>{
     let list = candidatesList.slice()
@@ -124,9 +131,9 @@ export default function HRDashboard(){
           <div className="bg-white rounded shadow p-4">
             <h4 className="font-semibold mb-2">Create / Select Job</h4>
             <label className="text-sm text-gray-600">Predefined Roles</label>
-            <select value={selectedRoleName} onChange={e=>setSelectedRoleName(e.target.value)} className="w-full border p-2 rounded mb-2">
+            <select value={selectedRoleId} onChange={e=>setSelectedRoleId(e.target.value)} className="w-full border p-2 rounded mb-2">
               <option value="">-- Select role --</option>
-              {jobRoles.map(j=> <option key={j.id} value={j.name}>{j.name}</option>)}
+              {jobRoles.map(j=> <option key={j.id} value={j.id}>{j.name}</option>)}
             </select>
 
             <div className="text-sm text-gray-600 mb-1">Or enter custom job title</div>
@@ -135,7 +142,7 @@ export default function HRDashboard(){
             <textarea value={jobDesc} onChange={e=>setJobDesc(e.target.value)} placeholder="Short description" className="w-full border p-2 rounded mb-2" rows={3} />
             <div className="flex gap-2">
               <button onClick={handleCreateJob} className="px-3 py-2 bg-indigo-600 text-white rounded">Create Job / Apply Role</button>
-              <button onClick={()=>{setSelectedRoleName(''); setJobTitle(''); setJobDesc(''); setJobLocation(''); setCurrentJob(null); setCandidatesList([])}} className="px-3 py-2 bg-gray-200 rounded">Reset</button>
+              <button onClick={()=>{setSelectedRoleId(''); setJobTitle(''); setJobDesc(''); setJobLocation(''); setCurrentJob(null); setCandidatesList([])}} className="px-3 py-2 bg-gray-200 rounded">Reset</button>
             </div>
 
             {currentJob && (
@@ -152,7 +159,7 @@ export default function HRDashboard(){
           <div className="bg-white rounded shadow p-4">
             <h4 className="font-semibold mb-2">Upload Resumes</h4>
             <ResumeUpload single={false} currentJob={currentJob} filters={filters} onUploaded={(res)=>{ console.log('uploaded',res); if(res && res.analyzed){ setCandidatesList(res.analyzed); } }} />
-            <p className="text-xs text-gray-500 mt-2">Supports 1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“200 files (UI-only)</p>
+            <p className="text-xs text-gray-500 mt-2">Supports 1�200 files (UI-only)</p>
           </div>
 
           <div className="bg-white rounded shadow p-4">

@@ -338,5 +338,33 @@
     "requiredSkills": [],
     "experienceRange": "",
     "location": ""
+  },
+  {
+    "id": "job_1766516256457",
+    "name": "Frontend Developer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "Bangalore"
+  },
+  {
+    "id": "job_1766516277423",
+    "name": "Frontend Developer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "Bangalore"
+  },
+  {
+    "id": "job_1766516278544",
+    "name": "Frontend Developer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "Bangalore"
+  },
+  {
+    "id": "job_1766516279520",
+    "name": "Frontend Developer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "Bangalore"
   }
 ]
