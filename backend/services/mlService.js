@@ -1,44 +1,43 @@
-const http = require('http');
-const https = require('https');
-const { URL } = require('url');
+const fs = require('fs');
+const path = require('path');
+const FormData = require('form-data');
+const fetch = require('node-fetch');
 
 const ML_URL = process.env.ML_URL || 'http://localhost:8000/analyze';
 
-function postJson(urlStr, body){
-  const url = new URL(urlStr);
-  const data = JSON.stringify(body);
-  const opts = {
-    hostname: url.hostname,
-    port: url.port || (url.protocol === 'https:' ? 443 : 80),
-    path: url.pathname + (url.search || ''),
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(data)
-    }
-  };
-  const lib = url.protocol === 'https:' ? https : http;
-  return new Promise((resolve, reject)=>{
-    const req = lib.request(opts, (res)=>{
-      let raw = '';
-      res.on('data', (chunk)=> raw += chunk);
-      res.on('end', ()=>{
-        try{ const parsed = JSON.parse(raw); resolve(parsed); }catch(e){ reject(e); }
-      });
-    });
-    req.on('error', reject);
-    req.write(data);
-    req.end();
-  });
-}
-
 async function analyze(job, files){
+  // If files available, send multipart/form-data to ML server
+  if(files && files.length){
+    const form = new FormData();
+    form.append('job', JSON.stringify(job || {}));
+    files.forEach((f, idx)=>{
+      try{
+        const stream = fs.createReadStream(f.path);
+        form.append('resumes', stream, { filename: f.originalname || path.basename(f.path) });
+      }catch(e){ console.warn('mlService: could not attach file', f.path, e && e.message); }
+    });
+
+    const headers = form.getHeaders();
+    try{
+      const resp = await fetch(ML_URL, { method: 'POST', body: form, headers });
+      if(!resp.ok) throw new Error('ML server responded ' + resp.status);
+      const data = await resp.json();
+      return data;
+    }catch(e){
+      console.warn('mlService.analyze multipart failed', e && e.message ? e.message : e);
+      throw e;
+    }
+  }
+
+  // fallback: send minimal json (older behavior)
   const body = { job, filesMeta: { count: (files && files.length) || 5 } };
   try{
-    const data = await postJson(ML_URL, body);
+    const resp = await fetch(ML_URL, { method:'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } });
+    if(!resp.ok) throw new Error('ML server responded ' + resp.status);
+    const data = await resp.json();
     return data;
   }catch(e){
-    console.warn('mlService.analyze failed', e && e.message ? e.message : e);
+    console.warn('mlService.analyze json fallback failed', e && e.message ? e.message : e);
     throw e;
   }
 }
