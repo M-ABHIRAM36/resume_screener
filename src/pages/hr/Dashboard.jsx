@@ -1,5 +1,4 @@
 import React, { useMemo, useState, useEffect } from "react"
-import candidatesData from "../../data/candidates.json"
 import FilterPanel from "../../components/FilterPanel"
 import CandidateCard from "../../components/CandidateCard"
 import ResumeUpload from "../../components/ResumeUpload"
@@ -153,11 +152,11 @@ export default function HRDashboard(){
           <div className="bg-white rounded shadow p-4">
             <h4 className="font-semibold mb-2">Upload Resumes</h4>
             <ResumeUpload single={false} currentJob={currentJob} filters={filters} onUploaded={(res)=>{ console.log('uploaded',res); if(res && res.analyzed){ setCandidatesList(res.analyzed); } }} />
-            <p className="text-xs text-gray-500 mt-2">Supports 1Ã¢â‚¬â€œ200 files (UI-only)</p>
+            <p className="text-xs text-gray-500 mt-2">Supports 1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“200 files (UI-only)</p>
           </div>
 
           <div className="bg-white rounded shadow p-4">
-            <FilterPanel filters={filters} setFilters={setFilters} setSortBy={setSortBy} currentJob={currentJob} />
+            <FilterPanel filters={filters} setFilters={setFilters} setSortBy={setSortBy} currentJob={currentJob} candidatesList={candidatesList} />
           </div>
         </div>
 

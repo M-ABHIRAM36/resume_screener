@@ -1,7 +1,7 @@
 import React from 'react'
-import candidates from '../data/candidates.json'
 
-export default function FilterPanel({filters, setFilters, setSortBy, currentJob}){
+export default function FilterPanel({filters, setFilters, setSortBy, currentJob, candidatesList=[]}){
+  const candidates = candidatesList || []
   const skills = Array.from(new Set(candidates.flatMap(c=>c.skills))).slice(0,30)
   const locations = Array.from(new Set(candidates.map(c=>c.location)))
   const colleges = Array.from(new Set(candidates.map(c=>c.college)))
