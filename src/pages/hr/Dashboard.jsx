@@ -1,10 +1,10 @@
 import React, { useMemo, useState, useEffect } from "react"
 import candidatesData from "../../data/candidates.json"
-import jobRoles from "../../data/job_roles.json"
 import FilterPanel from "../../components/FilterPanel"
 import CandidateCard from "../../components/CandidateCard"
 import ResumeUpload from "../../components/ResumeUpload"
 import ScoreBadge from "../../components/ScoreBadge"
+import { get, post } from "../../api"
 
 export default function HRDashboard(){
   const [filters, setFilters] = useState({skill:"", location:"", college:"", minMatch:0, experience:""})
@@ -15,17 +15,32 @@ export default function HRDashboard(){
   const [jobTitle, setJobTitle] = useState('')
   const [jobLocation, setJobLocation] = useState('')
   const [jobDesc, setJobDesc] = useState('')
-  const [candidatesList, setCandidatesList] = useState(candidatesData)
+  const [candidatesList, setCandidatesList] = useState([])
+  const [jobRoles, setJobRoles] = useState([])
 
-  function computeMatchesForJob(job){
-    const req = job.requiredSkills || []
-    const list = candidatesData.map(c => {
-      const matches = req.filter(s => c.skills.map(x=>x.toLowerCase()).includes(s.toLowerCase())).length
-      const matchPercent = req.length>0 ? Math.round((matches / req.length) * 100) : 0
-      const newScore = Math.round(((c.score||0) + matchPercent)/2)
-      return {...c, matchPercent, score: newScore}
-    })
-    setCandidatesList(list)
+  useEffect(()=>{
+    // load predefined jobs from backend
+    get('/hr/jobs').then(setJobRoles).catch(err=> console.warn('jobs load', err))
+    // initial candidates: empty until job selected
+    setCandidatesList([])
+  },[])
+
+  async function computeMatchesForJob(job){
+    if(!job || !job.id) return;
+    const params = new URLSearchParams();
+    if(filters.skill) params.append('skill', filters.skill)
+    if(filters.location) params.append('location', filters.location)
+    if(filters.college) params.append('college', filters.college)
+    if(filters.experience) params.append('experience', filters.experience)
+    if(filters.minMatch) params.append('minMatchPercentage', filters.minMatch)
+
+    const url = `/hr/dashboard/${job.id}?` + params.toString()
+    try{
+      const list = await get(url)
+      setCandidatesList(list)
+    }catch(e){
+      console.error('computeMatchesForJob', e)
+    }
   }
 
   useEffect(()=>{
@@ -34,27 +49,29 @@ export default function HRDashboard(){
     }
   },[currentJob, filters])
 
-  function handleCreateJob(){
+  async function handleCreateJob(){
+    // If a predefined role is selected, use it; otherwise create via backend
     const found = jobRoles.find(j => j.name === selectedRoleName)
     if(found){
       setCurrentJob(found)
-      setJobTitle(found.name)
-      setJobDesc(found.roadmapSteps && found.roadmapSteps.join('; '))
-      computeMatchesForJob(found)
     } else {
-      const custom = {name: jobTitle || 'Custom Job', requiredSkills: []}
-      setCurrentJob(custom)
-      setCandidatesList(candidatesData.map(c=> ({...c, matchPercent:0, score:c.score})))
+      try{
+        const created = await post('/hr/jobs', { jobTitle: jobTitle || 'Custom Job', requiredSkills: [], experienceRange:'', location: jobLocation })
+        setCurrentJob(created)
+        // refresh jobs
+        const all = await get('/hr/jobs')
+        setJobRoles(all)
+      }catch(e){ console.error('create job', e) }
     }
   }
 
   const filtered = useMemo(()=>{
     let list = candidatesList.slice()
-    if(filters.skill) list = list.filter(c => c.skills.includes(filters.skill))
-    if(filters.location) list = list.filter(c => c.location === filters.location)
-    if(filters.college) list = list.filter(c => c.college === filters.college)
+    if(filters.skill) list = list.filter(c => c.skills.map(s=>s.toLowerCase()).includes(filters.skill.toLowerCase()))
+    if(filters.location) list = list.filter(c => c.location.toLowerCase() === filters.location.toLowerCase())
+    if(filters.college) list = list.filter(c => c.college.toLowerCase() === filters.college.toLowerCase())
     if(filters.experience) list = list.filter(c => c.experience >= Number(filters.experience))
-    if(filters.minMatch) list = list.filter(c => c.matchPercent >= Number(filters.minMatch))
+    if(filters.minMatch) list = list.filter(c => c.matchPercentage >= Number(filters.minMatch))
 
     if(sortBy === 'highest_score') list.sort((a,b)=>b.score-a.score)
     if(sortBy === 'most_experience') list.sort((a,b)=>b.experience-a.experience)
@@ -68,7 +85,7 @@ export default function HRDashboard(){
     const avgScore = Math.round((candidatesList.reduce((s,c)=>s+c.score,0)/total)||0)
     const avgExp = Math.round((candidatesList.reduce((s,c)=>s+c.experience,0)/total)||0)
     const topSkills = Object.entries(candidatesList.flatMap(c=>c.skills).reduce((acc,s)=>{acc[s]=(acc[s]||0)+1;return acc},{}) ).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0])
-    const matchedCount = candidatesList.filter(c=>c.matchPercent>=70).length
+    const matchedCount = candidatesList.filter(c=>c.matchPercentage>=70).length
     return {total, avgScore, avgExp, topSkills, matchedCount}
   },[candidatesList])
 
@@ -110,7 +127,7 @@ export default function HRDashboard(){
             <label className="text-sm text-gray-600">Predefined Roles</label>
             <select value={selectedRoleName} onChange={e=>setSelectedRoleName(e.target.value)} className="w-full border p-2 rounded mb-2">
               <option value="">-- Select role --</option>
-              {jobRoles.map(j=> <option key={j.name} value={j.name}>{j.name}</option>)}
+              {jobRoles.map(j=> <option key={j.id} value={j.name}>{j.name}</option>)}
             </select>
 
             <div className="text-sm text-gray-600 mb-1">Or enter custom job title</div>
@@ -119,7 +136,7 @@ export default function HRDashboard(){
             <textarea value={jobDesc} onChange={e=>setJobDesc(e.target.value)} placeholder="Short description" className="w-full border p-2 rounded mb-2" rows={3} />
             <div className="flex gap-2">
               <button onClick={handleCreateJob} className="px-3 py-2 bg-indigo-600 text-white rounded">Create Job / Apply Role</button>
-              <button onClick={()=>{setSelectedRoleName(''); setJobTitle(''); setJobDesc(''); setJobLocation(''); setCurrentJob(null); setCandidatesList(candidatesData)}} className="px-3 py-2 bg-gray-200 rounded">Reset</button>
+              <button onClick={()=>{setSelectedRoleName(''); setJobTitle(''); setJobDesc(''); setJobLocation(''); setCurrentJob(null); setCandidatesList([])}} className="px-3 py-2 bg-gray-200 rounded">Reset</button>
             </div>
 
             {currentJob && (
@@ -135,7 +152,7 @@ export default function HRDashboard(){
 
           <div className="bg-white rounded shadow p-4">
             <h4 className="font-semibold mb-2">Upload Resumes</h4>
-            <ResumeUpload single={false} />
+            <ResumeUpload single={false} onUploaded={(res)=>console.log('uploaded',res)} />
             <p className="text-xs text-gray-500 mt-2">Supports 1–200 files (UI-only)</p>
           </div>
 
@@ -165,7 +182,7 @@ export default function HRDashboard(){
 
           {view === 'cards' && (
             <div className="space-y-3">
-              {filtered.map(c => <CandidateCard key={c.id} candidate={c} />)}
+              {filtered.map(c => <CandidateCard key={c.candidateId} candidate={c} />)}
               {filtered.length===0 && <p className="text-gray-500">No candidates match the filters.</p>}
             </div>
           )}
@@ -186,13 +203,13 @@ export default function HRDashboard(){
                 </thead>
                 <tbody>
                   {filtered.map(c=> (
-                    <tr key={c.id} className="border-t hover:bg-gray-50">
+                    <tr key={c.candidateId} className="border-t hover:bg-gray-50">
                       <td className="px-4 py-3">{c.name}</td>
                       <td className="px-4 py-3">{c.location}</td>
                       <td className="px-4 py-3">{c.college}</td>
                       <td className="px-4 py-3">{c.experience} yrs</td>
                       <td className="px-4 py-3"><ScoreBadge score={c.score} /></td>
-                      <td className="px-4 py-3">{c.matchPercent}%</td>
+                      <td className="px-4 py-3">{c.matchPercentage}%</td>
                       <td className="px-4 py-3"><div className="flex flex-wrap">{c.skills.slice(0,6).map(s=> <span key={s} className="bg-gray-100 text-sm px-2 py-1 rounded mr-2 mb-2">{s}</span>)}</div></td>
                     </tr>
                   ))}
