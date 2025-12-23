@@ -1,10 +1,12 @@
-import React from "react"
-import candidates from "../data/candidates.json"
+import React from 'react'
+import candidates from '../data/candidates.json'
 
-export default function FilterPanel({filters, setFilters, setSortBy}){
+export default function FilterPanel({filters, setFilters, setSortBy, currentJob}){
   const skills = Array.from(new Set(candidates.flatMap(c=>c.skills))).slice(0,30)
   const locations = Array.from(new Set(candidates.map(c=>c.location)))
   const colleges = Array.from(new Set(candidates.map(c=>c.college)))
+
+  const minMatchDisabled = !currentJob
 
   return (
     <div className="bg-white rounded shadow p-4">
@@ -36,7 +38,8 @@ export default function FilterPanel({filters, setFilters, setSortBy}){
 
         <div>
           <label className="text-sm">Minimum Match %</label>
-          <input type="number" value={filters.minMatch} onChange={e=>setFilters({...filters, minMatch:e.target.value})} className="w-full border p-2 rounded mt-1" />
+          <input type="number" value={filters.minMatch} onChange={e=>setFilters({...filters, minMatch:e.target.value})} className={`w-full border p-2 rounded mt-1 ${minMatchDisabled? 'bg-gray-100 cursor-not-allowed':''}`} disabled={minMatchDisabled} />
+          {minMatchDisabled && <div className="text-xs text-gray-500 mt-1">Activate a job to enable match filters.</div>}
         </div>
 
         <div>

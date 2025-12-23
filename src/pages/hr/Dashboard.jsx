@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import candidatesData from "../../data/candidates.json"
 import jobRoles from "../../data/job_roles.json"
 import FilterPanel from "../../components/FilterPanel"
@@ -22,15 +22,19 @@ export default function HRDashboard(){
     const list = candidatesData.map(c => {
       const matches = req.filter(s => c.skills.map(x=>x.toLowerCase()).includes(s.toLowerCase())).length
       const matchPercent = req.length>0 ? Math.round((matches / req.length) * 100) : 0
-      // Set score to combined metric (simple average of original score and matchPercent)
       const newScore = Math.round(((c.score||0) + matchPercent)/2)
       return {...c, matchPercent, score: newScore}
     })
     setCandidatesList(list)
   }
 
+  useEffect(()=>{
+    if(currentJob){
+      computeMatchesForJob(currentJob)
+    }
+  },[currentJob, filters])
+
   function handleCreateJob(){
-    // If a predefined role is selected, use it; otherwise use the title/desc to form a job with default empty skills
     const found = jobRoles.find(j => j.name === selectedRoleName)
     if(found){
       setCurrentJob(found)
@@ -136,7 +140,7 @@ export default function HRDashboard(){
           </div>
 
           <div className="bg-white rounded shadow p-4">
-            <FilterPanel filters={filters} setFilters={setFilters} setSortBy={setSortBy} />
+            <FilterPanel filters={filters} setFilters={setFilters} setSortBy={setSortBy} currentJob={currentJob} />
           </div>
         </div>
 
