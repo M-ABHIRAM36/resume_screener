@@ -3,6 +3,8 @@ import { Routes, Route, Link } from "react-router-dom"
 import Landing from "./pages/landing"
 import CandidateDashboard from "./pages/candidate/Dashboard"
 import ResumeScore from "./pages/candidate/ResumeScore"
+import SkillGap from "./pages/candidate/SkillGap"
+import Roadmap from "./pages/candidate/Roadmap"
 import HRDashboard from "./pages/hr/Dashboard"
 import Login from "./pages/auth/Login"
 import Signup from "./pages/auth/Signup"
@@ -26,6 +28,8 @@ export default function App(){
           <Route path="/" element={<Landing/>} />
           <Route path="/candidate" element={<CandidateDashboard/>} />
           <Route path="/candidate/score" element={<ResumeScore/>} />
+          <Route path="/candidate/skill-gap" element={<SkillGap/>} />
+          <Route path="/candidate/roadmap" element={<Roadmap/>} />
           <Route path="/hr" element={<HRDashboard/>} />
           <Route path="/auth/login" element={<Login/>} />
           <Route path="/auth/signup" element={<Signup/>} />

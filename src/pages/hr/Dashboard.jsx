@@ -123,7 +123,7 @@ export default function HRDashboard(){
                 <div className="font-semibold">Active Job:</div>
                 <div>{currentJob.name}</div>
                 <div className="text-xs text-gray-500 mt-1">Required Skills: {(currentJob.requiredSkills||[]).join(', ')}</div>
-                <div className="text-xs text-gray-500 mt-1">Matched candidates (>=70%): {stats.matchedCount}</div>
+                <div className="text-xs text-gray-500 mt-1">Matched candidates (greater than 70%): {stats.matchedCount}</div>
               </div>
             )}
 
