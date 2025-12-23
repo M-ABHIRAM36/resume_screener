@@ -9,6 +9,7 @@ export default function Login(){
   const nav = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState('candidate')
   const [touched, setTouched] = useState({})
   const [errors, setErrors] = useState({})
 
@@ -23,8 +24,9 @@ export default function Login(){
   function handleLogin(){
     setTouched({email:true,password:true})
     if(Object.keys(errors).length === 0){
-      // UI-only: simulate login, route to candidate dashboard
-      nav('/candidate')
+      // UI-only: route based on selected role
+      if(role === 'hr') nav('/hr')
+      else nav('/candidate')
     }
   }
 
@@ -36,6 +38,12 @@ export default function Login(){
     <div className="max-w-md bg-white p-6 rounded shadow">
       <h2 className="text-xl font-semibold mb-4">Login</h2>
       <div className="space-y-3">
+        <label className="text-sm">Role</label>
+        <select value={role} onChange={e=>setRole(e.target.value)} className="w-full border p-2 rounded">
+          <option value="candidate">Candidate</option>
+          <option value="hr">HR / Organization</option>
+        </select>
+
         <div>
           <label className="text-sm">Email</label>
           <input value={email} onChange={e=>setEmail(e.target.value)} onBlur={()=>setTouched(t=>({...t,email:true}))} placeholder="Email" className="w-full border p-2 rounded mt-1" />
