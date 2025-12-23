@@ -17,9 +17,21 @@ export default function HRDashboard(){
   const [candidatesList, setCandidatesList] = useState([])
   const [jobRoles, setJobRoles] = useState([])
 
+  // Only treat these as "predefined" roles
+  function isPredefinedRole(job){
+    if(!job || !job.name) return false
+    const n = job.name.toLowerCase()
+    return n.includes('front') || n.includes('back') || n.includes('data') || n.includes('data scientist')
+  }
+
   useEffect(()=>{
     // load predefined jobs from backend
-    get('/hr/jobs').then(jobs=>{ setJobRoles(jobs); if(jobs && jobs.length) setSelectedRoleId(jobs[0].id); }).catch(err=> console.warn('jobs load', err))
+    get('/hr/jobs').then(jobs=>{
+      setJobRoles(jobs || [])
+      // pick first predefined role if available
+      const firstPre = (jobs||[]).find(isPredefinedRole)
+      if(firstPre) setSelectedRoleId(firstPre.id)
+    }).catch(err=> console.warn('jobs load', err))
     // initial candidates: empty until job selected
     setCandidatesList([])
   },[])
@@ -43,9 +55,9 @@ export default function HRDashboard(){
   }
 
   async function handleCreateJob(){
-    // If a predefined role is selected, use it; otherwise create via backend
-    const found = jobRoles.find(j => j.name === selectedRoleId)
-    if(found){
+    // If a predefined role (by id) is selected, use it; otherwise create via backend
+    const found = jobRoles.find(j => j.id === selectedRoleId)
+    if(found && isPredefinedRole(found)){
       setCurrentJob(found)
     } else {
       try{
@@ -95,6 +107,9 @@ export default function HRDashboard(){
     return {total, avgScore, avgExp, topSkills, matchedCount}
   },[candidatesList])
 
+  // only show predefined roles in the select
+  const predefinedOptions = jobRoles.filter(isPredefinedRole)
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded shadow p-6 flex items-center justify-between">
@@ -133,7 +148,7 @@ export default function HRDashboard(){
             <label className="text-sm text-gray-600">Predefined Roles</label>
             <select value={selectedRoleId} onChange={e=>setSelectedRoleId(e.target.value)} className="w-full border p-2 rounded mb-2">
               <option value="">-- Select role --</option>
-              {jobRoles.map(j=> <option key={j.id} value={j.id}>{j.name}</option>)}
+              {predefinedOptions.map(j=> <option key={j.id} value={j.id}>{j.name}</option>)}
             </select>
 
             <div className="text-sm text-gray-600 mb-1">Or enter custom job title</div>
