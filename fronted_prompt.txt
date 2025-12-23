@@ -1,0 +1,184 @@
+You are a senior frontend engineer. Build a complete frontend application using ReactJS and TailwindCSS for a Resume Screening and Career Guidance Platform. Do NOT connect any backend yet. Use ONLY dummy/static JSON data. The goal is to finalize UI, flows, filters, and dashboards.
+
+SYSTEM OVERVIEW
+The application supports TWO user roles:
+1. Candidate (single user)
+2. HR / Organization
+
+There must be role-based navigation and pages.
+
+-------------------------------------
+TECH STACK
+- ReactJS (Vite or CRA)
+- TailwindCSS
+- React Router
+- Dummy JSON data only
+- No backend calls
+- No authentication logic, just UI flow
+
+-------------------------------------
+PAGES TO CREATE
+
+1. LANDING PAGE
+- Brief description of platform
+- Buttons:
+  - Login as Candidate
+  - Login as HR / Organization
+
+-------------------------------------
+AUTH PAGES (UI only)
+- Login Page
+- Signup Page
+- Role selection (Candidate / HR)
+- Company Name field ONLY for HR signup
+
+-------------------------------------
+CANDIDATE SIDE PAGES
+
+1. Candidate Dashboard
+- Select Job Role (Dropdown with 50+ job roles)
+- Upload Resume (Single file UI only)
+- Button: "Analyze My Resume"
+
+2. Resume Score Page
+- Show resume match percentage
+- Progress bar UI
+- Job role selected
+
+3. Skill Gap Analysis Page
+- Matched Skills (green)
+- Missing Skills (red)
+- Skill gap percentage
+
+4. Roadmap Recommendation Page
+- Display step-by-step learning roadmap
+- Highlight completed skills
+- Highlight pending skills
+- Roadmap must change based on job role selected
+
+-------------------------------------
+JOB ROLES REQUIREMENT
+Create a static file job_roles.json with AT LEAST 50 job roles such as:
+- Backend Developer
+- Frontend Developer
+- Full Stack Developer
+- Machine Learning Engineer
+- Data Scientist
+- DevOps Engineer
+- Cloud Engineer
+- Android Developer
+- iOS Developer
+- Cyber Security Analyst
+- Blockchain Developer
+- UI/UX Designer
+- Game Developer
+- QA Engineer
+- Data Analyst
+- Business Analyst
+- AI Engineer
+- NLP Engineer
+- Robotics Engineer
+- Embedded Systems Engineer
+(and more until at least 50)
+
+Each job role must have:
+- requiredSkills[]
+- roadmapSteps[]
+
+-------------------------------------
+HR / ORGANIZATION SIDE PAGES
+
+1. HR Dashboard
+- Company name display
+- Job creation section (UI only)
+- Upload Resumes (Multiple file UI, 1–200 files)
+
+2. Resume Results Dashboard
+Display a table with dummy candidates containing:
+- Name
+- Score
+- Skills
+- Location
+- College
+- Experience
+- Job Match %
+
+-------------------------------------
+FILTERS (VERY IMPORTANT)
+
+Implement multi-filter UI on HR dashboard:
+- Filter by Skill
+- Filter by Location
+- Filter by College
+- Filter by Experience
+- Filter by Minimum Match Percentage
+- Sort by:
+  - Top 5
+  - Highest score
+  - Most experience
+
+Filtering must work on dummy JSON data.
+
+-------------------------------------
+DUMMY DATA REQUIREMENTS
+
+Create dummy JSON data for:
+- Candidates (20–30 records)
+- Skills
+- Locations
+- Colleges
+- Experience years
+- Resume scores
+
+Filtering logic must be functional on frontend only.
+
+-------------------------------------
+COMPONENTS TO BUILD
+- ResumeUpload component
+- SkillBadge component
+- ProgressBar
+- FilterPanel
+- CandidateCard
+- RoadmapTimeline
+- ScoreBadge
+
+-------------------------------------
+UI REQUIREMENTS
+- Clean professional UI
+- Responsive design
+- Tailwind utility classes
+- Use cards, tables, badges, progress bars
+
+-------------------------------------
+FOLDER STRUCTURE
+
+src/
+ ├── pages/
+ │   ├── auth/
+ │   ├── candidate/
+ │   ├── hr/
+ │   ├── landing.jsx
+ ├── components/
+ ├── data/
+ │   ├── job_roles.json
+ │   ├── roadmaps.json
+ │   ├── candidates.json
+ ├── App.jsx
+ ├── main.jsx
+
+-------------------------------------
+IMPORTANT NOTES
+- Do NOT implement backend calls
+- Do NOT use APIs
+- Do NOT implement authentication logic
+- Focus on UI flow, filters, and user experience
+- Use React Router for navigation
+- Code should be modular and readable
+
+Start by generating:
+1. Folder structure
+2. job_roles.json with 50+ roles
+3. Landing page
+4. Candidate dashboard
+5. HR dashboard
+6. Filtering logic

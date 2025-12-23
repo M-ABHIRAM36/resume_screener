@@ -1,0 +1,29 @@
+# Node
+node_modules/
+# Vite / build
+dist/
+build/
+out/
+.vite/
+public/build/
+# Dependencies
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+# Env files
+.env
+.env.local
+.env.*.local
+# Editor folders
+.vscode/
+.idea/
+# OS files
+.DS_Store
+Thumbs.db
+# Testing / coverage
+coverage/
+# Misc
+.cache/
+*.tgz
+*.zip
+*.log
