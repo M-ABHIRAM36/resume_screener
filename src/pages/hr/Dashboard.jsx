@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react"
 import candidatesData from "../../data/candidates.json"
+import jobRoles from "../../data/job_roles.json"
 import FilterPanel from "../../components/FilterPanel"
 import CandidateCard from "../../components/CandidateCard"
 import ResumeUpload from "../../components/ResumeUpload"
@@ -9,12 +10,42 @@ export default function HRDashboard(){
   const [filters, setFilters] = useState({skill:"", location:"", college:"", minMatch:0, experience:""})
   const [sortBy, setSortBy] = useState("")
   const [view, setView] = useState('cards')
+  const [selectedRoleName, setSelectedRoleName] = useState('')
+  const [currentJob, setCurrentJob] = useState(null)
   const [jobTitle, setJobTitle] = useState('')
   const [jobLocation, setJobLocation] = useState('')
   const [jobDesc, setJobDesc] = useState('')
+  const [candidatesList, setCandidatesList] = useState(candidatesData)
+
+  function computeMatchesForJob(job){
+    const req = job.requiredSkills || []
+    const list = candidatesData.map(c => {
+      const matches = req.filter(s => c.skills.map(x=>x.toLowerCase()).includes(s.toLowerCase())).length
+      const matchPercent = req.length>0 ? Math.round((matches / req.length) * 100) : 0
+      // Set score to combined metric (simple average of original score and matchPercent)
+      const newScore = Math.round(((c.score||0) + matchPercent)/2)
+      return {...c, matchPercent, score: newScore}
+    })
+    setCandidatesList(list)
+  }
+
+  function handleCreateJob(){
+    // If a predefined role is selected, use it; otherwise use the title/desc to form a job with default empty skills
+    const found = jobRoles.find(j => j.name === selectedRoleName)
+    if(found){
+      setCurrentJob(found)
+      setJobTitle(found.name)
+      setJobDesc(found.roadmapSteps && found.roadmapSteps.join('; '))
+      computeMatchesForJob(found)
+    } else {
+      const custom = {name: jobTitle || 'Custom Job', requiredSkills: []}
+      setCurrentJob(custom)
+      setCandidatesList(candidatesData.map(c=> ({...c, matchPercent:0, score:c.score})))
+    }
+  }
 
   const filtered = useMemo(()=>{
-    let list = candidatesData.slice()
+    let list = candidatesList.slice()
     if(filters.skill) list = list.filter(c => c.skills.includes(filters.skill))
     if(filters.location) list = list.filter(c => c.location === filters.location)
     if(filters.college) list = list.filter(c => c.college === filters.college)
@@ -26,15 +57,16 @@ export default function HRDashboard(){
     if(sortBy === 'top5') list = list.slice(0,5)
 
     return list
-  },[filters, sortBy])
+  },[filters, sortBy, candidatesList])
 
   const stats = useMemo(()=>{
-    const total = candidatesData.length
-    const avgScore = Math.round((candidatesData.reduce((s,c)=>s+c.score,0)/total)||0)
-    const avgExp = Math.round((candidatesData.reduce((s,c)=>s+c.experience,0)/total)||0)
-    const topSkills = Object.entries(candidatesData.flatMap(c=>c.skills).reduce((acc,s)=>{acc[s]=(acc[s]||0)+1;return acc},{}) ).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0])
-    return {total, avgScore, avgExp, topSkills}
-  },[])
+    const total = candidatesList.length
+    const avgScore = Math.round((candidatesList.reduce((s,c)=>s+c.score,0)/total)||0)
+    const avgExp = Math.round((candidatesList.reduce((s,c)=>s+c.experience,0)/total)||0)
+    const topSkills = Object.entries(candidatesList.flatMap(c=>c.skills).reduce((acc,s)=>{acc[s]=(acc[s]||0)+1;return acc},{}) ).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0])
+    const matchedCount = candidatesList.filter(c=>c.matchPercent>=70).length
+    return {total, avgScore, avgExp, topSkills, matchedCount}
+  },[candidatesList])
 
   return (
     <div className="space-y-6">
@@ -70,14 +102,31 @@ export default function HRDashboard(){
           </div>
 
           <div className="bg-white rounded shadow p-4">
-            <h4 className="font-semibold mb-2">Create Job (UI only)</h4>
+            <h4 className="font-semibold mb-2">Create / Select Job</h4>
+            <label className="text-sm text-gray-600">Predefined Roles</label>
+            <select value={selectedRoleName} onChange={e=>setSelectedRoleName(e.target.value)} className="w-full border p-2 rounded mb-2">
+              <option value="">-- Select role --</option>
+              {jobRoles.map(j=> <option key={j.name} value={j.name}>{j.name}</option>)}
+            </select>
+
+            <div className="text-sm text-gray-600 mb-1">Or enter custom job title</div>
             <input value={jobTitle} onChange={e=>setJobTitle(e.target.value)} placeholder="Job Title" className="w-full border p-2 rounded mb-2" />
             <input value={jobLocation} onChange={e=>setJobLocation(e.target.value)} placeholder="Location" className="w-full border p-2 rounded mb-2" />
             <textarea value={jobDesc} onChange={e=>setJobDesc(e.target.value)} placeholder="Short description" className="w-full border p-2 rounded mb-2" rows={3} />
             <div className="flex gap-2">
-              <button className="px-3 py-2 bg-indigo-600 text-white rounded">Create Job</button>
-              <button className="px-3 py-2 bg-gray-200 rounded">Reset</button>
+              <button onClick={handleCreateJob} className="px-3 py-2 bg-indigo-600 text-white rounded">Create Job / Apply Role</button>
+              <button onClick={()=>{setSelectedRoleName(''); setJobTitle(''); setJobDesc(''); setJobLocation(''); setCurrentJob(null); setCandidatesList(candidatesData)}} className="px-3 py-2 bg-gray-200 rounded">Reset</button>
             </div>
+
+            {currentJob && (
+              <div className="mt-3 border-t pt-3 text-sm text-gray-700">
+                <div className="font-semibold">Active Job:</div>
+                <div>{currentJob.name}</div>
+                <div className="text-xs text-gray-500 mt-1">Required Skills: {(currentJob.requiredSkills||[]).join(', ')}</div>
+                <div className="text-xs text-gray-500 mt-1">Matched candidates (>=70%): {stats.matchedCount}</div>
+              </div>
+            )}
+
           </div>
 
           <div className="bg-white rounded shadow p-4">
