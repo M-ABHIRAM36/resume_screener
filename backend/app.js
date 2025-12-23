@@ -21,6 +21,8 @@ app.use('/hr/auth', hrAuthRoutes);
 app.use('/hr/jobs', hrJobRoutes);
 app.use('/hr/resumes', hrResumeRoutes);
 app.use('/hr/dashboard', hrDashboardRoutes);
+const hrDebugRoutes = require('./routes/hrDebugRoutes');
+app.use('/hr/debug', hrDebugRoutes);
 
 // Placeholder root
 app.get('/', (req, res) => res.json({message: 'Resume Screening Backend (HR)'}));
