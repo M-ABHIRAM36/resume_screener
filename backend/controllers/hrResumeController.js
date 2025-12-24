@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const mock = require('../services/mockMlService');
 const jobsFile = path.join(__dirname, '..', 'data', 'jobs.json');
 
 function readJobs(){ try{ return JSON.parse(fs.readFileSync(jobsFile)); }catch(e){ return []; } }
@@ -25,13 +24,14 @@ exports.uploadResumes = async (req, res) => {
   const jobs = readJobs();
   const job = jobId ? jobs.find(j=>j.id===jobId) : (jobs[0] || { requiredSkills: [] });
 
-  // Try calling external ML service (Flask mock). If it fails, fall back to internal mock.
+  // Call external ML service (FastAPI). Return 500 if ML fails.
   let analyzed = []
   try{
     const ml = require('../services/mlService');
     analyzed = await ml.analyze(job, files);
   }catch(e){
-    analyzed = mock.generateFromFiles(job, files);
+    console.error('ML service failed', e);
+    return res.status(500).json({ error: 'ML service error' });
   }
 
   // read filters from form fields

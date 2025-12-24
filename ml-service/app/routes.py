@@ -1,6 +1,13 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import List
 from . import resume_parser, skill_extractor, scorer
+
+# spaCy NER
+try:
+    import spacy
+    nlp = spacy.load('en_core_web_sm')
+except Exception:
+    nlp = None
 from .schemas import AnalyzeResponse
 from io import BytesIO
 import re
@@ -10,6 +17,27 @@ router = APIRouter()
 
 email_re = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
 exp_re = re.compile(r"(\d+)\s*(?:\+?\s*years|yrs|year|y)", re.IGNORECASE)
+
+
+def extract_ner(text: str):
+    name = None
+    college = None
+    location = None
+    if not text or nlp is None:
+        return name, college, location
+    try:
+        doc = nlp(text[:10000])
+        for ent in doc.ents:
+            if ent.label_ == 'PERSON' and not name:
+                name = ent.text.strip()
+            if ent.label_ == 'ORG' and not college:
+                if any(k.lower() in ent.text.lower() for k in ['university','college','institute','iit','iiit','nit','school','academy']):
+                    college = ent.text.strip()
+            if ent.label_ in ('GPE','LOC') and not location:
+                location = ent.text.strip()
+    except Exception:
+        pass
+    return name, college, location
 
 @router.post('/analyze-resumes', response_model=List[AnalyzeResponse])
 async def analyze_resumes(
@@ -25,7 +53,8 @@ async def analyze_resumes(
     for i, f in enumerate(resumes):
         content = await f.read()
         text = resume_parser.extract_text_from_bytes(content, f.filename or '')
-        # name via simple heuristics: first PERSON-like by spaCy omitted here, use filename fallback
+        # use spaCy NER to extract name/college/location if available
+        name_ner, college_ner, location_ner = extract_ner(text)
         # attempt extract email
         email_m = email_re.search(text)
         email = email_m.group(0) if email_m else (f.filename or '')
@@ -51,9 +80,9 @@ async def analyze_resumes(
         score = score_int
         resumeStrength = 'Strong' if score > 75 else ('Average' if score > 50 else 'Weak')
         jobFitLevel = 'High' if matchPercentage > 80 else ('Medium' if matchPercentage > 70 else 'Low')
-        name = (f.filename or f'candidate_{i}').rsplit('.',1)[0]
-        college = None
-        location = None
+        name = name_ner or (f.filename or f'candidate_{i}').rsplit('.',1)[0]
+        college = college_ner
+        location = location_ner
         candidate = {
             'candidateId': f'cand_{int(time.time())}_{i}',
             'name': name,

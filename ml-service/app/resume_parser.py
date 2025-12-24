@@ -12,16 +12,14 @@ def extract_text_from_bytes(data: bytes, filename: str) -> str:
             try:
                 with pdfplumber.open(BytesIO(data)) as pdf:
                     pages = [p.extract_text() or '' for p in pdf.pages]
-                    text = '
-'.join(pages)
+                    text = "".join(pages)
             except Exception:
                 text = ''
         elif name.endswith('.docx'):
             try:
                 bio = BytesIO(data)
                 d = docx.Document(bio)
-                text = '
-'.join([p.text for p in d.paragraphs])
+                text = "".join([p.text for p in d.paragraphs])
             except Exception:
                 text = ''
         else:

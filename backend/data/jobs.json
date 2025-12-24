@@ -366,5 +366,12 @@
     "requiredSkills": [],
     "experienceRange": "",
     "location": "Bangalore"
+  },
+  {
+    "id": "job_1766584683826",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
   }
 ]
