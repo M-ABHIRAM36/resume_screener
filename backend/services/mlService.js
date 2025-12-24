@@ -15,14 +15,17 @@ async function analyze(job, files){
     reqSkills.forEach(s => form.append('required_skills', typeof s === 'string' ? s : String(s)));
   }
 
-  // attach resume files
+  let attached = false;
   if(files && files.length){
     files.forEach((f, idx) => {
       try{
-        const stream = fs.createReadStream(f.path);
-        form.append('resumes', stream, { filename: f.originalname || path.basename(f.path) });
+        if(f && f.path && fs.existsSync(f.path)){
+          const stream = fs.createReadStream(f.path);
+          form.append('resumes', stream, { filename: f.originalname || path.basename(f.path) });
+          attached = true;
+        }
       }catch(e){
-        console.warn('mlService: could not attach file', f.path, e && e.message);
+        console.warn('mlService: could not attach file', f && f.path, e && e.message);
       }
     });
   }
@@ -30,11 +33,33 @@ async function analyze(job, files){
   const headers = form.getHeaders();
   try{
     const resp = await fetch(ML_URL, { method: 'POST', body: form, headers });
+    if(resp.status === 422){
+      const body = await resp.text();
+      console.warn('mlService.analyze: validation error from ML service (422):', body);
+      // fallback to JSON endpoint with filesMeta
+      const bodyJson = { job, filesMeta: { count: (files && files.length) || 0 } };
+      const resp2 = await fetch(ML_URL, { method:'POST', body: JSON.stringify(bodyJson), headers: { 'Content-Type': 'application/json' } });
+      if(!resp2.ok) throw new Error('ML server responded ' + resp2.status + ' (fallback)');
+      const data2 = await resp2.json();
+      return data2;
+    }
     if(!resp.ok) throw new Error('ML server responded ' + resp.status);
     const data = await resp.json();
     return data;
   }catch(e){
     console.warn('mlService.analyze failed', e && e.message ? e.message : e);
+    // If multipart failed and we didn't attach files, try JSON fallback
+    if(!attached){
+      try{
+        const bodyJson = { job, filesMeta: { count: (files && files.length) || 0 } };
+        const resp = await fetch(ML_URL, { method:'POST', body: JSON.stringify(bodyJson), headers: { 'Content-Type': 'application/json' } });
+        if(!resp.ok) throw new Error('ML server responded ' + resp.status + ' (json fallback)');
+        const data = await resp.json();
+        return data;
+      }catch(e2){
+        console.warn('mlService.json fallback failed', e2 && e2.message ? e2.message : e2);
+      }
+    }
     throw e;
   }
 }
