@@ -20,8 +20,10 @@ export default function HRDashboard(){
   // Only treat these as "predefined" roles
   function isPredefinedRole(job){
     if(!job || !job.name) return false
-    const n = job.name.toLowerCase()
-    return n.includes('front') || n.includes('back') || n.includes('data') || n.includes('data scientist')
+    const name = job.name.toLowerCase()
+    if(name.includes('custom job')) return false
+    const keywords = ['front','frontend','back','backend','data scientist','data','ml','machine learning','devops','engineer','software','qa','tester','mobile','android','ios','product manager','product']
+    return keywords.some(k => name.includes(k))
   }
 
   useEffect(()=>{
@@ -115,7 +117,7 @@ export default function HRDashboard(){
       <div className="bg-white rounded shadow p-6 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">HR Dashboard</h2>
-          <p className="text-sm text-gray-600">Company: <strong>Demo Corp</strong></p>
+          <p className="text-sm text-gray-600">Company: <strong>Demo abhi Corp</strong></p>
         </div>
         <div className="flex gap-4">
           <div className="text-sm text-gray-600">Logged in as <strong>HR</strong></div>
@@ -174,7 +176,7 @@ export default function HRDashboard(){
           <div className="bg-white rounded shadow p-4">
             <h4 className="font-semibold mb-2">Upload Resumes</h4>
             <ResumeUpload single={false} currentJob={currentJob} filters={filters} onUploaded={(res)=>{ console.log('uploaded',res); if(res && res.analyzed){ setCandidatesList(res.analyzed); } }} />
-            <p className="text-xs text-gray-500 mt-2">Supports 1–200 files (UI-only)</p>
+            <p className="text-xs text-gray-500 mt-2">Supports 1ï¿½200 files (UI-only)</p>
           </div>
 
           <div className="bg-white rounded shadow p-4">

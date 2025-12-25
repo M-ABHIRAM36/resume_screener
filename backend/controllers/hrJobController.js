@@ -17,9 +17,30 @@ exports.createJob = (req, res) => {
 }
 
 exports.listJobs = (req, res) => {
-  res.json(readJobs());
+  const jobs = readJobs();
+  const desired = 50;
+  if (Array.isArray(jobs) && jobs.length >= desired) {
+    return res.json(jobs);
+  }
+  // synthesize additional mock jobs to reach `desired` count (do not modify file)
+  const poolSkills = [
+    'JavaScript','TypeScript','React','Node.js','Express','Python','Django','Flask','Pandas','NumPy',
+    'scikit-learn','TensorFlow','PyTorch','SQL','Postgres','MongoDB','AWS','Docker','Kubernetes','Golang',
+    'C++','Java','Spring','Kotlin','Swift','Objective-C','HTML','CSS','Tailwind','Bootstrap','GraphQL'
+  ];
+  const generated = Array.from({length: Math.max(0, desired - (jobs?jobs.length:0))}).map((_,idx)=>{
+    const n = (jobs?jobs.length:0) + idx + 1;
+    const id = 'job_gen_' + (10000 + n);
+    const nameTypes = ['Software Engineer','Frontend Developer','Backend Developer','Data Scientist','ML Engineer','DevOps Engineer','Mobile Developer','QA Engineer','Product Manager','Technical Lead'];
+    const name = nameTypes[n % nameTypes.length] + ' ' + n;
+    const skills = [];
+    for(let i=0;i<4;i++){
+      skills.push(poolSkills[(n*i + i) % poolSkills.length]);
+    }
+    return { id, name, requiredSkills: skills, experienceRange: '1-4', location: 'Remote', roadmapSteps: [] };
+  });
+  return res.json((jobs||[]).concat(generated));
 }
-
 exports.getJob = (req, res) => {
   const id = req.params.id;
   const jobs = readJobs();
