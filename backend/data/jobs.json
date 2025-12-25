@@ -373,5 +373,12 @@
     "requiredSkills": [],
     "experienceRange": "",
     "location": ""
+  },
+  {
+    "id": "job_1766688376539",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
   }
 ]
