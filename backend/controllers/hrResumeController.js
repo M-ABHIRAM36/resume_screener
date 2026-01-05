@@ -21,17 +21,54 @@ exports.uploadResumes = async (req, res) => {
 
   // jobId may be sent as form field or query param
   const jobId = req.body && req.body.jobId ? req.body.jobId : (req.query && req.query.jobId);
+  let job = null;
+  
+  // First try to get job from jobs.json
   const jobs = readJobs();
-  const job = jobId ? jobs.find(j=>j.id===jobId) : (jobs[0] || { requiredSkills: [] });
+  if(jobId) {
+    job = jobs.find(j=>j.id===jobId);
+  }
+  
+  // If job not found in jobs.json, try to use jobData from frontend
+  if(!job && req.body && req.body.jobData) {
+    try {
+      const jobData = typeof req.body.jobData === 'string' ? JSON.parse(req.body.jobData) : req.body.jobData;
+      job = {
+        id: jobId || `role_${Date.now()}`,
+        name: jobData.name || 'Unknown Job',
+        requiredSkills: jobData.requiredSkills || [],
+        description: jobData.description || '',
+        location: jobData.location || ''
+      };
+      console.log('Using job data from frontend:', job.name);
+    } catch(e) {
+      console.warn('Failed to parse jobData:', e);
+    }
+  }
+  
+  // Fallback to first job or empty job
+  if(!job) {
+    job = jobs[0] || { 
+      id: 'default',
+      name: 'Default Job',
+      requiredSkills: [],
+      description: '',
+      location: ''
+    };
+    console.log('Using default/fallback job');
+  }
+
+  console.log('Using job for ML analysis:', job.name, 'Required skills:', job.requiredSkills?.length || 0);
 
   // Call external ML service (FastAPI). Return 500 if ML fails.
   let analyzed = []
   try{
     const ml = require('../services/mlService');
     analyzed = await ml.analyze(job, files);
+    console.log('ML service returned', analyzed?.length || 0, 'candidates');
   }catch(e){
     console.error('ML service failed', e);
-    return res.status(500).json({ error: 'ML service error' });
+    return res.status(500).json({ error: 'ML service error: ' + (e.message || String(e)) });
   }
 
   // read filters from form fields

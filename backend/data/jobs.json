@@ -380,5 +380,33 @@
     "requiredSkills": [],
     "experienceRange": "",
     "location": ""
+  },
+  {
+    "id": "job_1767629425453",
+    "name": "new trainer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "remote"
+  },
+  {
+    "id": "job_1767629486317",
+    "name": "new trainer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "remote"
+  },
+  {
+    "id": "job_1767629541819",
+    "name": "software any role",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "remote"
+  },
+  {
+    "id": "job_1767646225944",
+    "name": "software engineer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
   }
 ]

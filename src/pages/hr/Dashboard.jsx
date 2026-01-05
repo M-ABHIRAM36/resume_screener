@@ -289,7 +289,29 @@ export default function HRDashboard(){
 
           <div className="bg-white rounded shadow p-4">
             <h4 className="font-semibold mb-2">Upload Resumes</h4>
-            <ResumeUpload single={false} currentJob={currentJob} filters={filters} onUploaded={(res)=>{ console.log('uploaded',res); if(res && res.analyzed){ setCandidatesList(res.analyzed); } }} />
+            <ResumeUpload 
+              single={false} 
+              currentJob={currentJob} 
+              filters={filters} 
+              onUploaded={(res)=>{ 
+                console.log('Upload response received:', res); 
+                if(res && res.error){
+                  console.error('Upload error:', res.error);
+                  alert('Error: ' + res.error);
+                  return;
+                }
+                if(res && res.analyzed && Array.isArray(res.analyzed)){
+                  console.log('Setting candidates list:', res.analyzed.length, 'candidates');
+                  setCandidatesList(res.analyzed);
+                  if(res.analyzed.length === 0){
+                    alert('No candidates found. Make sure you have selected a job role and uploaded resume files.');
+                  }
+                } else {
+                  console.warn('Unexpected response format:', res);
+                  alert('Unexpected response format. Check console for details.');
+                }
+              }} 
+            />
             <p className="text-xs text-gray-500 mt-2">Supports 1�200 files (UI-only)</p>
           </div>
 
