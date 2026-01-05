@@ -9,52 +9,62 @@ export default function FilterPanel({filters, setFilters, setSortBy, currentJob,
   const minMatchDisabled = !currentJob
 
   return (
-    <div className="bg-white rounded shadow p-4">
-      <h4 className="font-semibold mb-3">Filters</h4>
-      <div className="space-y-3">
+    <div>
+      <h4 className="font-bold text-lg mb-4 flex items-center gap-2">
+        🔍 Filters
+      </h4>
+      <div className="space-y-4">
         <div>
-          <label className="text-sm">Skill</label>
-          <select value={filters.skill} onChange={e=>setFilters({...filters, skill:e.target.value})} className="w-full border p-2 rounded mt-1">
-            <option value="">Any</option>
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Skill</label>
+          <select value={filters.skill} onChange={e=>setFilters({...filters, skill:e.target.value})} className="input-field">
+            <option value="">Any Skill</option>
             {skills.map(s=> <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
 
         <div>
-          <label className="text-sm">Location</label>
-          <select value={filters.location} onChange={e=>setFilters({...filters, location:e.target.value})} className="w-full border p-2 rounded mt-1">
-            <option value="">Any</option>
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Location</label>
+          <select value={filters.location} onChange={e=>setFilters({...filters, location:e.target.value})} className="input-field">
+            <option value="">Any Location</option>
             {locations.map(l=> <option key={l} value={l}>{l}</option>)}
           </select>
         </div>
 
         <div>
-          <label className="text-sm">College</label>
-          <select value={filters.college} onChange={e=>setFilters({...filters, college:e.target.value})} className="w-full border p-2 rounded mt-1">
-            <option value="">Any</option>
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">College</label>
+          <select value={filters.college} onChange={e=>setFilters({...filters, college:e.target.value})} className="input-field">
+            <option value="">Any College</option>
             {colleges.map(c=> <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
 
         <div>
-          <label className="text-sm">Minimum Match %</label>
-          <input type="number" value={filters.minMatch} onChange={e=>setFilters({...filters, minMatch:e.target.value})} className={`w-full border p-2 rounded mt-1 ${minMatchDisabled? 'bg-gray-100 cursor-not-allowed':''}`} disabled={minMatchDisabled} />
-          {minMatchDisabled && <div className="text-xs text-gray-500 mt-1">Activate a job to enable match filters.</div>}
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Minimum Match %</label>
+          <input 
+            type="number" 
+            value={filters.minMatch} 
+            onChange={e=>setFilters({...filters, minMatch:e.target.value})} 
+            className={`input-field ${minMatchDisabled? 'bg-gray-100 cursor-not-allowed':''}`} 
+            disabled={minMatchDisabled}
+            placeholder="e.g. 70"
+          />
+          {minMatchDisabled && (
+            <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+              <span>⚠️</span>
+              <span>Activate a job to enable match filters.</span>
+            </div>
+          )}
         </div>
 
         <div>
-          <label className="text-sm">Experience (years)</label>
-          <input type="number" value={filters.experience} onChange={e=>setFilters({...filters, experience:e.target.value})} className="w-full border p-2 rounded mt-1" />
-        </div>
-
-        <div>
-          <label className="text-sm">Sort</label>
-          <select onChange={e=>setSortBy(e.target.value)} className="w-full border p-2 rounded mt-1">
-            <option value="">Default</option>
-            <option value="top5">Top 5</option>
-            <option value="highest_score">Highest score</option>
-            <option value="most_experience">Most experience</option>
-          </select>
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">Experience (years)</label>
+          <input 
+            type="number" 
+            value={filters.experience} 
+            onChange={e=>setFilters({...filters, experience:e.target.value})} 
+            className="input-field"
+            placeholder="e.g. 3"
+          />
         </div>
       </div>
     </div>

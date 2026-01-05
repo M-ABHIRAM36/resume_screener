@@ -13,17 +13,19 @@ import RoleSelect from "./pages/auth/RoleSelect"
 export default function App(){
   return (
     <div className="min-h-screen">
-      <header className="bg-white shadow">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="font-bold text-xl">Resume Screening</Link>
-          <nav className="space-x-4 text-sm">
-            <Link to="/candidate" className="text-gray-600 hover:text-gray-900">Candidate</Link>
-            <Link to="/hr" className="text-gray-600 hover:text-gray-900">HR</Link>
-            <Link to="/auth/login" className="text-gray-600 hover:text-gray-900">Login</Link>
+      <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link to="/" className="font-bold text-2xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            Resume Screening
+          </Link>
+          <nav className="space-x-6 text-sm">
+            <Link to="/candidate" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Candidate</Link>
+            <Link to="/hr" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">HR</Link>
+            <Link to="/auth/login" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Login</Link>
           </nav>
         </div>
       </header>
-      <main className="max-w-6xl mx-auto p-4">
+      <main className="max-w-7xl mx-auto p-4 md:p-6">
         <Routes>
           <Route path="/" element={<Landing/>} />
           <Route path="/candidate" element={<CandidateDashboard/>} />
