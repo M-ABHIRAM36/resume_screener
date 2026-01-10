@@ -34,9 +34,17 @@ def keyword_similarity(text1: str, text2: str) -> float:
 
 
 def compute_score(bert_sim: float, tfidf_sim: float, skill_ratio: float) -> float:
-    # inputs in range [-1,1] for bert_sim, but semantic sim expected positive; clip to [0,1]
+    """
+    Compute final score with improved weighting.
+    Weights: BERT 40%, TF-IDF 15%, Skills 45%
+    Skills are now more important in the scoring.
+    """
+    # Normalize BERT similarity to [0,1] range
     bs = max(0.0, min(1.0, (bert_sim + 1.0) / 2.0)) if bert_sim < 0 else max(0.0, min(1.0, bert_sim))
     ts = max(0.0, min(1.0, tfidf_sim))
     sr = max(0.0, min(1.0, skill_ratio))
-    final = 0.6 * bs + 0.3 * ts + 0.1 * sr
+    
+    # Improved weights: Skills are more important (45%), BERT for semantic (40%), TF-IDF for keywords (15%)
+    final = 0.40 * bs + 0.15 * ts + 0.45 * sr
+    
     return float(final)

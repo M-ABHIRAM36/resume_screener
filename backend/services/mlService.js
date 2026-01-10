@@ -7,13 +7,46 @@ const ML_URL = process.env.ML_URL || 'http://localhost:8000/analyze-resumes';
 
 async function analyze(job, files){
   const form = new FormData();
-  // Map job fields expected by FastAPI
-  form.append('job_title', job && (job.name || job.title) ? (job.name || job.title) : '');
-  form.append('job_description', job && (job.description || job.jobDescription) ? (job.description || job.jobDescription) : '');
-  const reqSkills = job && (job.requiredSkills || job.required_skills) ? (job.requiredSkills || job.required_skills) : [];
-  if(Array.isArray(reqSkills)){
-    reqSkills.forEach(s => form.append('required_skills', typeof s === 'string' ? s : String(s)));
+  
+  // Build comprehensive job description
+  const jobTitle = job && (job.name || job.title) ? (job.name || job.title) : '';
+  form.append('job_title', jobTitle);
+  
+  // Build job description from multiple sources
+  let jobDescription = '';
+  if(job) {
+    // Priority: description > roadmapSteps > title
+    if(job.description) {
+      jobDescription = job.description;
+    } else if(job.jobDescription) {
+      jobDescription = job.jobDescription;
+    } else if(job.roadmapSteps && Array.isArray(job.roadmapSteps) && job.roadmapSteps.length > 0) {
+      jobDescription = jobTitle + '. ' + job.roadmapSteps.join('. ');
+    } else if(jobTitle) {
+      jobDescription = jobTitle;
+    }
+    
+    // Add required skills to description for better matching
+    const reqSkills = job.requiredSkills || job.required_skills || [];
+    if(reqSkills.length > 0) {
+      const skillsText = 'Required skills: ' + reqSkills.join(', ');
+      jobDescription = jobDescription ? (jobDescription + '. ' + skillsText) : skillsText;
+    }
   }
+  
+  form.append('job_description', jobDescription || jobTitle || 'Software Developer Position');
+  
+  // Send required skills
+  const reqSkills = job && (job.requiredSkills || job.required_skills) ? (job.requiredSkills || job.required_skills) : [];
+  if(Array.isArray(reqSkills) && reqSkills.length > 0){
+    reqSkills.forEach(s => {
+      if(s && typeof s === 'string' && s.trim()) {
+        form.append('required_skills', s.trim());
+      }
+    });
+  }
+  
+  console.log('ML Service: Sending job data - Title:', jobTitle, 'Skills:', reqSkills.length, 'Description length:', jobDescription.length);
 
   let attached = false;
   if(files && files.length){
