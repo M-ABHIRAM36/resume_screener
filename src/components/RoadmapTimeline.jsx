@@ -20,6 +20,7 @@ export default function RoadmapTimeline({steps, completed=[]}){
                 {done && <span className="text-white text-xs">✓</span>}
               </div>
               
+              
               {/* Content */}
               <div className={`flex-1 p-4 rounded-lg border-2 transition-all duration-300 ${
                 done 

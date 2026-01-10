@@ -383,46 +383,120 @@ export default function HRDashboard(){
                 <table className="min-w-full table-auto">
                   <thead className="bg-gradient-to-r from-indigo-50 to-purple-50">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Location</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">College</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Experience</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Score</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Match %</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Skills</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Name & Contact</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Location</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">College</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Experience</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Internships</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Score</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Match %</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Skills</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Portfolio</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {filtered.length > 0 ? (
                       filtered.map(c=> (
                         <tr key={c.candidateId} className="hover:bg-indigo-50 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{c.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">📍 {c.location}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">🏫 {c.college}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-600">{c.experience} yrs</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <ScoreBadge score={c.score} />
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="font-semibold text-indigo-600">{c.matchPercentage}%</span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex flex-wrap gap-1">
-                              {c.skills.slice(0,6).map(s=> (
-                                <span key={s} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">
-                                  {s}
-                                </span>
-                              ))}
-                              {c.skills.length > 6 && (
-                                <span className="text-xs text-gray-500 px-2 py-1">+{c.skills.length - 6}</span>
+                          <td className="px-4 py-4">
+                            <div className="font-semibold text-gray-900 mb-1">{c.name}</div>
+                            <div className="text-xs text-gray-600 space-y-0.5">
+                              {c.email && (
+                                <div className="flex items-center gap-1">
+                                  <span>📧</span>
+                                  <a href={`mailto:${c.email}`} className="text-indigo-600 hover:underline truncate max-w-[200px]" title={c.email}>
+                                    {c.email}
+                                  </a>
+                                </div>
+                              )}
+                              {c.phone && (
+                                <div className="flex items-center gap-1">
+                                  <span>📞</span>
+                                  <a href={`tel:${c.phone}`} className="text-indigo-600 hover:underline">
+                                    {c.phone}
+                                  </a>
+                                </div>
                               )}
                             </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-gray-600">
+                            {c.location && c.location !== 'Not specified' ? (
+                              <span>📍 {c.location}</span>
+                            ) : (
+                              <span className="text-gray-400">—</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-gray-600">
+                            {c.college && c.college !== 'Not specified' ? (
+                              <span>🏫 {c.college}</span>
+                            ) : (
+                              <span className="text-gray-400">—</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-gray-600">
+                            {c.experience > 0 ? `${c.experience} yrs` : <span className="text-gray-400">—</span>}
+                          </td>
+                          <td className="px-4 py-4">
+                            {c.internships && c.internships.length > 0 ? (
+                              <div className="text-xs">
+                                {c.internships.map((intern, idx) => (
+                                  <div key={idx} className="text-indigo-600 mb-1">💼 {intern}</div>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 text-xs">—</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <ScoreBadge score={c.score} />
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <span className="font-semibold text-indigo-600">{c.matchPercentage}%</span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex flex-wrap gap-1 max-w-[300px]">
+                              {c.skills && c.skills.length > 0 ? (
+                                <>
+                                  {c.skills.slice(0,4).map(s=> (
+                                    <span key={s} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">
+                                      {s}
+                                    </span>
+                                  ))}
+                                  {c.skills.length > 4 && (
+                                    <span className="text-xs text-gray-500 px-2 py-1">+{c.skills.length - 4}</span>
+                                  )}
+                                </>
+                              ) : (
+                                <span className="text-gray-400 text-xs">—</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            {c.portfolioLinks && c.portfolioLinks.length > 0 ? (
+                              <div className="space-y-1">
+                                {c.portfolioLinks.slice(0, 3).map((link, idx) => (
+                                  <div key={idx} className="text-xs">
+                                    <a 
+                                      href={link} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-indigo-600 hover:underline truncate block max-w-[150px]"
+                                      title={link}
+                                    >
+                                      🔗 {link.includes('github') ? 'GitHub' : link.includes('linkedin') ? 'LinkedIn' : 'Portfolio'}
+                                    </a>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 text-xs">—</span>
+                            )}
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" className="px-6 py-12 text-center">
+                        <td colSpan="9" className="px-6 py-12 text-center">
                           <div className="text-5xl mb-4">🔍</div>
                           <p className="text-gray-600 font-medium">No candidates match the filters.</p>
                           <p className="text-sm text-gray-500 mt-1">Try adjusting your filter criteria.</p>
