@@ -1,10 +1,54 @@
 import json
+import re
 from typing import List
 from pathlib import Path
 
 SKILLS_PATH = Path(__file__).parent.parent / 'data' / 'skills.json'
 
 _skills = None
+
+# Canonical skill mapping: canonical_name -> [variations]
+SKILL_VARIATIONS = {
+    'JavaScript': ['js', 'javascript', 'ecmascript', 'es6', 'es7', 'node', 'nodejs', 'node.js'],
+    'TypeScript': ['ts', 'typescript'],
+    'React': ['react', 'reactjs', 'react.js'],
+    'Node.js': ['nodejs', 'node.js', 'node'],
+    'Python': ['python', 'py', 'python3', 'python 3'],
+    'Java': ['java', 'j2ee', 'j2se'],
+    'C++': ['c++', 'cpp', 'c plus plus'],
+    'C#': ['c#', 'csharp', 'c sharp', 'dotnet', '.net'],
+    'SQL': ['sql', 'mysql', 'postgresql', 'postgres', 'sql server'],
+    'MongoDB': ['mongodb', 'mongo', 'nosql'],
+    'AWS': ['aws', 'amazon web services', 's3', 'ec2'],
+    'Docker': ['docker', 'dockerfile', 'containers'],
+    'Kubernetes': ['kubernetes', 'k8s', 'kube'],
+    'Git': ['git', 'github', 'gitlab', 'version control'],
+    'HTML': ['html', 'html5'],
+    'CSS': ['css', 'css3', 'styling'],
+    'REST': ['rest', 'restful', 'rest api'],
+    'GraphQL': ['graphql', 'gql'],
+    'Express': ['express', 'expressjs', 'express.js'],
+    'Angular': ['angular', 'angularjs'],
+    'Vue.js': ['vue', 'vuejs', 'vue.js'],
+    'Django': ['django'],
+    'Flask': ['flask'],
+    'Spring Boot': ['spring', 'springboot', 'spring boot'],
+    'Laravel': ['laravel'],
+    'Ruby': ['ruby'],
+    'Ruby on Rails': ['rails', 'ruby on rails', 'ror'],
+    'PHP': ['php'],
+    'Swift': ['swift'],
+    'Kotlin': ['kotlin'],
+    'TensorFlow': ['tensorflow', 'tf'],
+    'PyTorch': ['pytorch'],
+    'Pandas': ['pandas', 'pd'],
+    'NumPy': ['numpy', 'np'],
+    'Scikit-learn': ['scikit-learn', 'sklearn'],
+    'Selenium': ['selenium'],
+    'JIRA': ['jira'],
+    'Agile': ['agile'],
+    'Scrum': ['scrum'],
+}
 
 
 def load_skills():
@@ -18,96 +62,65 @@ def load_skills():
 
 
 def extract_skills(text: str) -> List[str]:
-    """Extract skills from text with improved matching"""
+    """Extract skills from text with canonical naming and word-boundary matching"""
     if not text:
         return []
     
-    text_l = (text or '').lower()
+    text_lower = text.lower()
     skills_list = load_skills()
-    found_skills = []
-    seen = set()
+    found_skills = set()
     
-    # Skill variations mapping
-    skill_variations = {
-        'javascript': ['js', 'javascript', 'ecmascript', 'es6', 'es7', 'nodejs', 'node.js'],
-        'typescript': ['ts', 'typescript'],
-        'react': ['react', 'reactjs', 'react.js', 'reactjs'],
-        'node.js': ['nodejs', 'node.js', 'node', 'nodejs'],
-        'python': ['python', 'py', 'python3'],
-        'java': ['java', 'j2ee', 'j2se'],
-        'c++': ['c++', 'cpp', 'c plus plus'],
-        'c#': ['c#', 'csharp', 'dotnet', '.net'],
-        'sql': ['sql', 'mysql', 'postgresql', 'sql server'],
-        'mongodb': ['mongodb', 'mongo', 'nosql'],
-        'aws': ['aws', 'amazon web services', 's3', 'ec2'],
-        'docker': ['docker', 'dockerfile', 'containers'],
-        'kubernetes': ['kubernetes', 'k8s', 'kube'],
-        'git': ['git', 'github', 'gitlab', 'version control'],
-        'html': ['html', 'html5'],
-        'css': ['css', 'css3', 'styling'],
-        'rest': ['rest', 'restful', 'rest api'],
-        'graphql': ['graphql', 'gql'],
-    }
+    # Step 1: Check canonical variations (with word boundaries)
+    for canonical_name, variations in SKILL_VARIATIONS.items():
+        canonical_lower = canonical_name.lower()
+        # Skip if already found
+        if canonical_lower in found_skills:
+            continue
+        
+        for variant in variations:
+            # Use word-boundary regex for accurate matching
+            pattern = r'\b' + re.escape(variant) + r'\b'
+            if re.search(pattern, text_lower, re.IGNORECASE):
+                found_skills.add(canonical_lower)
+                break
     
-    # Check for exact matches and variations
+    # Step 2: Check skills from skills.json using word boundaries
     for skill in skills_list:
-        if not skill:
+        if not skill or skill.lower() in found_skills:
             continue
         
+        # Use word-boundary regex
+        pattern = r'\b' + re.escape(skill) + r'\b'
+        if re.search(pattern, text_lower, re.IGNORECASE):
+            found_skills.add(skill.lower())
+    
+    # Step 3: Map normalized skills back to canonical display names
+    result = []
+    for skill_lower in found_skills:
+        # Check if it's in our canonical mapping
+        canonical = None
+        for canonical_name, variations in SKILL_VARIATIONS.items():
+            if skill_lower == canonical_name.lower():
+                canonical = canonical_name
+                break
+        
+        if canonical:
+            result.append(canonical)
+        else:
+            # Find original case from skills.json
+            original = next((s for s in skills_list if s.lower() == skill_lower), None)
+            if original:
+                result.append(original)
+            else:
+                result.append(skill_lower.title())
+    
+    # Deduplicate by lowercase version
+    seen = set()
+    final_result = []
+    for skill in result:
         skill_lower = skill.lower()
-        
-        # Direct match
-        if skill_lower in text_l:
-            if skill_lower not in seen:
-                seen.add(skill_lower)
-                found_skills.append(skill)
-            continue
-        
-        # Check variations
-        if skill_lower in skill_variations:
-            for variant in skill_variations[skill_lower]:
-                if variant in text_l:
-                    if skill_lower not in seen:
-                        seen.add(skill_lower)
-                        found_skills.append(skill)
-                    break
-        
-        # Word boundary matching (e.g., "react" should match "react" but not "reaction")
-        import re
-        pattern = r'\b' + re.escape(skill_lower) + r'\b'
-        if re.search(pattern, text_l):
-            if skill_lower not in seen:
-                seen.add(skill_lower)
-                found_skills.append(skill)
+        if skill_lower not in seen:
+            seen.add(skill_lower)
+            final_result.append(skill)
     
-    # Also look for common tech keywords that might not be in skills.json
-    common_tech_keywords = {
-        'express': 'Express',
-        'angular': 'Angular',
-        'vue': 'Vue.js',
-        'django': 'Django',
-        'flask': 'Flask',
-        'spring': 'Spring Boot',
-        'laravel': 'Laravel',
-        'ruby': 'Ruby',
-        'rails': 'Ruby on Rails',
-        'php': 'PHP',
-        'swift': 'Swift',
-        'kotlin': 'Kotlin',
-        'tensorflow': 'TensorFlow',
-        'pytorch': 'PyTorch',
-        'pandas': 'Pandas',
-        'numpy': 'NumPy',
-        'scikit-learn': 'Scikit-learn',
-        'selenium': 'Selenium',
-        'jira': 'JIRA',
-        'agile': 'Agile',
-        'scrum': 'Scrum',
-    }
-    
-    for keyword, display_name in common_tech_keywords.items():
-        if keyword in text_l and display_name.lower() not in seen:
-            seen.add(display_name.lower())
-            found_skills.append(display_name)
-    
-    return found_skills
+    return final_result

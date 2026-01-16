@@ -887,7 +887,7 @@ async def analyze_resumes(
                     if not found:
                         missing_skills.append(req_skill)
                 
-                # Calculate skill ratio
+                # Calculate skill ratio: matched JD skills / total JD skills
                 skill_ratio = len(matched_skills) / max(1, len(req_skills_normalized)) if req_skills_normalized else 0.5
                 
                 # Calculate similarity scores only if job description is meaningful
@@ -1048,10 +1048,13 @@ async def analyze_resumes(
                 if skill_ratio >= 0.9 and score_int < 75:
                     score_int = 75  # Minimum 75% if 90%+ skills match
                 
-                matchPercentage = score_int
-                score = score_int
+                # Round scores to integers
+                matchPercentage = round(final_score * 100)
+                score = round(final_score * 100)
+                
+                # Determine quality and fit levels
                 resumeStrength = 'Strong' if score > 75 else ('Average' if score > 50 else 'Weak')
-                jobFitLevel = 'High' if matchPercentage > 80 else ('Medium' if matchPercentage > 60 else 'Low')
+                jobFitLevel = 'Excellent Fit' if matchPercentage > 80 else ('Good Fit' if matchPercentage > 60 else ('Partial Fit' if matchPercentage > 40 else 'Poor Fit'))
                 
                 # Use original case for skills in response
                 matched_skills_display = []
