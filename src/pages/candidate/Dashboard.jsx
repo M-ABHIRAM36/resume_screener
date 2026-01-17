@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import ResumeUpload from '../../components/ResumeUpload'
 import { useNavigate } from 'react-router-dom'
+import { post } from '../../api'
 import jobRolesData from '../../data/job_roles.json'
 
 export default function CandidateDashboard(){
   const [role, setRole] = useState('')
   const [candidateSkills, setCandidateSkills] = useState('')
+  const [uploadedFiles, setUploadedFiles] = useState([])
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const nav = useNavigate()
 
   // Use static job roles data - remove duplicates by name
@@ -25,14 +28,93 @@ export default function CandidateDashboard(){
     if(jobRoles.length && !role) setRole(jobRoles[0].name)
   },[jobRoles, role])
 
-  function handleAnalyze(){
+  async function handleAnalyze(){
     const job = jobRoles.find(j => j.name === role) || {name:role, requiredSkills:[], roadmapSteps:[]}
+    
+    // If files are uploaded, send to ML backend
+    if(uploadedFiles.length > 0) {
+      setIsAnalyzing(true)
+      try {
+        const formData = new FormData()
+        uploadedFiles.forEach(f => formData.append('resumes', f))
+        formData.append('jobId', job.id || role)
+        formData.append('jobTitle', job.name || role)
+        formData.append('requiredSkills', JSON.stringify(job.requiredSkills || []))
+        
+        // Use the correct endpoint: /hr/resumes (same backend for both HR and candidate)
+        const res = await post('/hr/resumes', formData, true)
+        
+        if(res?.analyzed && res.analyzed.length > 0) {
+          const candidate = res.analyzed[0]
+          nav('/candidate/score', {
+            state: {
+              role,
+              job,
+              candidateSkills: candidate.skills || [],
+              matchedSkills: candidate.matchedSkills || [],
+              matchPercent: candidate.matchPercentage || 0,
+              score: candidate.score || 0,
+              candidateData: candidate
+            }
+          })
+          return
+        } else if(res?.candidates && res.candidates.length > 0) {
+          const candidate = res.candidates[0]
+          nav('/candidate/score', {
+            state: {
+              role,
+              job,
+              candidateSkills: candidate.skills || [],
+              matchedSkills: candidate.matchedSkills || [],
+              matchPercent: candidate.matchPercentage || 0,
+              score: candidate.score || 0,
+              candidateData: candidate
+            }
+          })
+          return
+        }
+      } catch(e) {
+        console.error('ML analysis error:', e)
+        // Fall back to manual skill matching if API fails
+      } finally {
+        setIsAnalyzing(false)
+      }
+    }
+    
+    // Fallback: use manually entered skills
     const parsed = candidateSkills.split(',').map(s=>s.trim()).filter(Boolean)
     const req = job.requiredSkills || []
     const matched = req.filter(s => parsed.map(p=>p.toLowerCase()).includes(s.toLowerCase()))
     const matchPercent = req.length>0? Math.round((matched.length / req.length)*100):0
     const score = Math.floor(60 + Math.random()*35)
     nav('/candidate/score', {state:{role, job, candidateSkills:parsed, matchedSkills:matched, matchPercent, score}})
+  }
+
+  function downloadCSV() {
+    const job = jobRoles.find(j => j.name === role) || { name: role, requiredSkills: [] }
+    const parsed = candidateSkills.split(',').map(s => s.trim()).filter(Boolean)
+    const req = job.requiredSkills || []
+    const matched = req.filter(s => parsed.map(p => p.toLowerCase()).includes(s.toLowerCase()))
+    const missing = req.filter(s => !parsed.map(p => p.toLowerCase()).includes(s.toLowerCase()))
+    const matchPercent = req.length > 0 ? Math.round((matched.length / req.length) * 100) : 0
+
+    const csvContent = [
+      ['Field', 'Value'],
+      ['Selected Role', role],
+      ['Candidate Skills', parsed.join('; ')],
+      ['Required Skills', req.join('; ')],
+      ['Matched Skills', matched.join('; ')],
+      ['Missing Skills', missing.join('; ')],
+      ['Match Percentage', `${matchPercent}%`],
+      ['Export Date', new Date().toLocaleString()]
+    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `resume_analysis_${role.replace(/\s+/g, '_')}_${Date.now()}.csv`
+    link.click()
+    URL.revokeObjectURL(link.href)
   }
 
   return (
@@ -69,7 +151,11 @@ export default function CandidateDashboard(){
             <label className="block text-sm font-semibold text-gray-700 mb-3">
               Upload Resume
             </label>
-            <ResumeUpload single />
+            <ResumeUpload 
+              single 
+              onFilesChange={(files) => setUploadedFiles(files)}
+              hideSubmitButton={true}
+            />
             <p className="text-xs text-gray-500 mt-2">Upload your resume in PDF or DOCX format</p>
           </div>
 
@@ -87,13 +173,22 @@ export default function CandidateDashboard(){
           </div>
 
           <div className="border-t pt-6">
-            <button 
-              onClick={handleAnalyze} 
-              className="btn-primary"
-              disabled={!role}
-            >
-              🔍 Analyze My Resume
-            </button>
+            <div className="flex gap-3">
+              <button 
+                onClick={handleAnalyze} 
+                className="btn-primary"
+                disabled={!role || isAnalyzing}
+              >
+                {isAnalyzing ? '⏳ Analyzing...' : '🔍 Analyze My Resume'}
+              </button>
+              <button 
+                onClick={downloadCSV} 
+                className="btn-primary bg-green-600 hover:bg-green-700"
+                disabled={!role}
+              >
+                📥 Download as CSV
+              </button>
+            </div>
           </div>
         </div>
       </div>

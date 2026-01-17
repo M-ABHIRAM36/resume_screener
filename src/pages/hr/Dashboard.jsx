@@ -16,8 +16,9 @@ export default function HRDashboard(){
   const [jobLocation, setJobLocation] = useState('')
   const [jobDesc, setJobDesc] = useState('')
   const [candidatesList, setCandidatesList] = useState([])
+  const [uploadedFiles, setUploadedFiles] = useState([])
+  const [isProcessing, setIsProcessing] = useState(false)
   
-  // Use static job roles data - remove duplicates by name
   const jobRoles = useMemo(() => {
     const uniqueRoles = []
     const seenNames = new Set()
@@ -30,100 +31,212 @@ export default function HRDashboard(){
     return uniqueRoles.sort((a, b) => a.name.localeCompare(b.name))
   }, [])
 
-  useEffect(()=>{
+  useEffect(() => {
     // initial candidates: empty until job selected
     setCandidatesList([])
-  },[])
+  }, [])
 
-  async function computeMatchesForJob(job){
-    if(!job || !job.id) return;
-    const params = new URLSearchParams();
-    if(filters.skill) params.append('skill', filters.skill)
-    if(filters.location) params.append('location', filters.location)
-    if(filters.college) params.append('college', filters.college)
-    if(filters.experience) params.append('experience', filters.experience)
-    if(filters.minMatch) params.append('minMatchPercentage', filters.minMatch)
+  // Helper function to validate if a string is a valid location
+  function isValidLocation(loc) {
+    if (!loc || loc === 'Not specified' || loc === '—') return false
+    
+    // List of common programming terms/skills that should NOT be locations
+    const invalidLocations = [
+      'c++', 'c#', 'java', 'python', 'javascript', 'html', 'css', 'react', 'node.js',
+      'sql', 'mysql', 'mongodb', 'docker', 'kubernetes', 'git', 'github', 'linux',
+      'scikit', 'numpy', 'pandas', 'tensorflow', 'pytorch', 'jupyter', 'flask',
+      'django', 'express', 'angular', 'vue', 'typescript', 'rust', 'go', 'ruby',
+      'php', 'swift', 'kotlin', 'scala', 'r', 'matlab', 'bash', 'powershell',
+      'aws', 'azure', 'gcp', 'api', 'apis', 'rest', 'graphql', 'json', 'xml',
+      'calculus', 'algebra', 'statistics', 'algorithms', 'data structures',
+      'machine learning', 'deep learning', 'ai', 'ml', 'nlp', 'computer vision'
+    ]
+    
+    const locLower = loc.toLowerCase().trim()
+    
+    // Check if it's in the invalid list
+    if (invalidLocations.includes(locLower)) return false
+    
+    // Check if it's too short (likely not a real location)
+    if (locLower.length < 3) return false
+    
+    // Check if it contains only special characters or numbers
+    if (/^[\d\W]+$/.test(locLower)) return false
+    
+    return true
+  }
+
+  // Clean candidate data when setting candidates list
+  function cleanCandidateData(candidates) {
+    return candidates.map(c => ({
+      ...c,
+      location: isValidLocation(c.location) ? c.location : null,
+      experience: (c.experience && c.experience > 0 && c.experience < 50) ? c.experience : 0
+    }))
+  }
+
+  async function computeMatchesForJob(job) {
+    if (!job || !job.id) return
+    const params = new URLSearchParams()
+    if (filters.skill) params.append('skill', filters.skill)
+    if (filters.location) params.append('location', filters.location)
+    if (filters.college) params.append('college', filters.college)
+    if (filters.experience) params.append('experience', filters.experience)
+    if (filters.minMatch) params.append('minMatchPercentage', filters.minMatch)
 
     const url = `/hr/dashboard/${job.id}?` + params.toString()
-    try{
+    try {
       const list = await get(url)
-      setCandidatesList(list)
-    }catch(e){
+      setCandidatesList(cleanCandidateData(list))
+    } catch (e) {
       console.error('computeMatchesForJob', e)
     }
   }
 
-  async function handleCreateJob(){
-    // If a predefined role (by id) is selected, use it
+  async function handleApplyRoles() {
     const found = jobRoles.find(j => j.id === selectedRoleId)
-    if(found){
+    let activeJob = null
+
+    if (found) {
+      activeJob = found
       setCurrentJob(found)
-      computeMatchesForJob(found)
-    } else if(jobTitle.trim()){
-      // Create custom job via backend if title is provided
-      try{
-        const created = await post('/hr/jobs', { 
-          jobTitle: jobTitle.trim(), 
-          requiredSkills: [], 
-          experienceRange:'', 
-          location: jobLocation 
-        })
-        setCurrentJob(created)
-        computeMatchesForJob(created)
-      }catch(e){ 
-        console.error('create job', e)
-        // Fallback: create local job object
-        const localJob = {
-          id: `custom_${Date.now()}`,
-          name: jobTitle.trim(),
-          requiredSkills: [],
-          roadmapSteps: [],
-          location: jobLocation
-        }
-        setCurrentJob(localJob)
+    } else if (jobTitle.trim()) {
+      const localJob = {
+        id: `custom_${Date.now()}`,
+        name: jobTitle.trim(),
+        requiredSkills: [],
+        roadmapSteps: [],
+        location: jobLocation
       }
+      activeJob = localJob
+      setCurrentJob(localJob)
+    }
+
+    if (!activeJob) {
+      alert('Please select a job role or enter a custom job title')
+      return
+    }
+
+    // Process uploaded files with ML backend
+    if (uploadedFiles.length > 0) {
+      setIsProcessing(true)
+      try {
+        const formData = new FormData()
+        // Use 'resumes' as field name - matching backend expectation
+        uploadedFiles.forEach(f => formData.append('resumes', f))
+        formData.append('jobId', activeJob.id || '')
+        formData.append('jobTitle', activeJob.name || '')
+        formData.append('requiredSkills', JSON.stringify(activeJob.requiredSkills || []))
+        
+        // POST to /hr/resumes - the correct backend endpoint
+        const res = await post('/hr/resumes', formData, true)
+        
+        console.log('Upload response:', res)
+        
+        // Handle different response formats from backend and clean data
+        if(res?.analyzed && Array.isArray(res.analyzed)) {
+          setCandidatesList(cleanCandidateData(res.analyzed))
+        } else if(res?.candidates && Array.isArray(res.candidates)) {
+          setCandidatesList(cleanCandidateData(res.candidates))
+        } else if(Array.isArray(res)) {
+          setCandidatesList(cleanCandidateData(res))
+        } else {
+          console.log('Response format:', res)
+          // Try to fetch candidates after upload
+          computeMatchesForJob(activeJob)
+        }
+      } catch(e) {
+        console.error('Upload error:', e)
+        alert('Failed to upload resumes: ' + e.message)
+      } finally {
+        setIsProcessing(false)
+      }
+    } else {
+      // No files uploaded, just set the job and try to fetch existing candidates
+      computeMatchesForJob(activeJob)
     }
   }
 
-  useEffect(()=>{
-    if(selectedRoleId){
-      const found = jobRoles.find(j => j.id === selectedRoleId);
-      if(found){
-        setCurrentJob(found);
-        setJobTitle(found.name);
-        setJobLocation(found.location || '');
-        setJobDesc((found.roadmapSteps||[]).join('; '));
-        computeMatchesForJob(found);
+  useEffect(() => {
+    if (selectedRoleId) {
+      const found = jobRoles.find(j => j.id === selectedRoleId)
+      if (found) {
+        setCurrentJob(found)
+        setJobTitle(found.name)
+        setJobLocation(found.location || '')
+        setJobDesc((found.roadmapSteps || []).join('; '))
       }
     }
-  },[selectedRoleId, jobRoles])
+  }, [selectedRoleId, jobRoles])
 
-  const filtered = useMemo(()=>{
+  const filtered = useMemo(() => {
     let list = candidatesList.slice()
-    if(filters.skill) list = list.filter(c => c.skills.map(s=>s.toLowerCase()).includes(filters.skill.toLowerCase()))
-    if(filters.location) list = list.filter(c => c.location.toLowerCase() === filters.location.toLowerCase())
-    if(filters.college) list = list.filter(c => c.college.toLowerCase() === filters.college.toLowerCase())
-    if(filters.experience) list = list.filter(c => c.experience >= Number(filters.experience))
-    if(filters.minMatch) list = list.filter(c => c.matchPercentage >= Number(filters.minMatch))
+    if (filters.skill) list = list.filter(c => c.skills?.map(s => s.toLowerCase()).includes(filters.skill.toLowerCase()))
+    if (filters.location) list = list.filter(c => c.location?.toLowerCase() === filters.location.toLowerCase())
+    if (filters.college) list = list.filter(c => c.college?.toLowerCase() === filters.college.toLowerCase())
+    if (filters.experience) list = list.filter(c => c.experience >= Number(filters.experience))
+    if (filters.minMatch) list = list.filter(c => c.matchPercentage >= Number(filters.minMatch))
 
-    if(sortBy === 'highest_score') list.sort((a,b)=>b.score-a.score)
-    if(sortBy === 'most_experience') list.sort((a,b)=>b.experience-a.experience)
-    if(sortBy === 'top5') list = list.slice(0,5)
+    if (sortBy === 'highest_score') list.sort((a, b) => (b.score || 0) - (a.score || 0))
+    if (sortBy === 'most_experience') list.sort((a, b) => (b.experience || 0) - (a.experience || 0))
+    if (sortBy === 'top5') list = list.slice(0, 5)
 
     return list
-  },[filters, sortBy, candidatesList])
+  }, [filters, sortBy, candidatesList])
 
-  const stats = useMemo(()=>{
+  const stats = useMemo(() => {
     const total = candidatesList.length
-    const avgScore = Math.round((candidatesList.reduce((s,c)=>s+c.score,0)/total)||0)
-    const avgExp = Math.round((candidatesList.reduce((s,c)=>s+c.experience,0)/total)||0)
-    const topSkills = Object.entries(candidatesList.flatMap(c=>c.skills).reduce((acc,s)=>{acc[s]=(acc[s]||0)+1;return acc},{}) ).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0])
-    const matchedCount = candidatesList.filter(c=>c.matchPercentage>=70).length
-    return {total, avgScore, avgExp, topSkills, matchedCount}
-  },[candidatesList])
+    const avgScore = Math.round((candidatesList.reduce((s, c) => s + (c.score || 0), 0) / total) || 0)
+    const avgExp = Math.round((candidatesList.reduce((s, c) => s + (c.experience || 0), 0) / total) || 0)
+    const topSkills = Object.entries(candidatesList.flatMap(c => c.skills || []).reduce((acc, s) => { acc[s] = (acc[s] || 0) + 1; return acc }, {})).sort((a, b) => b[1] - a[1]).slice(0, 5).map(x => x[0])
+    const matchedCount = candidatesList.filter(c => (c.matchPercentage || 0) >= 70).length
+    return { total, avgScore, avgExp, topSkills, matchedCount }
+  }, [candidatesList])
+
+  function downloadCSV() {
+    if (filtered.length === 0) {
+      alert('No candidates to download.')
+      return
+    }
+    const headers = ['Name', 'Email', 'Phone', 'Location', 'College', 'Branch/Degree', 'Experience (Years)', 'Score', 'Match %', 'Skills', 'Internships', 'Portfolio Links']
+    const rows = filtered.map(c => [
+      c.name || '',
+      c.email || '',
+      c.phone || '',
+      isValidLocation(c.location) ? c.location : '',
+      c.college || '',
+      c.branch || c.degree || '',
+      c.experience && c.experience > 0 && c.experience < 50 ? c.experience : 0,
+      c.score || 0,
+      c.matchPercentage || 0,
+      (c.skills || []).join('; '),
+      (c.internships || []).join('; '),
+      (c.portfolioLinks || []).join('; ')
+    ])
+
+    const csvContent = [
+      headers.map(h => `"${h}"`).join(','),
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n')
+
+    const metadata = [
+      `"Job Role","${currentJob?.name || 'Not selected'}"`,
+      `"Total","${filtered.length}"`,
+      `"Date","${new Date().toLocaleString()}"`,
+      ''
+    ].join('\n')
+
+    const blob = new Blob([metadata + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `candidates_${(currentJob?.name || 'all').replace(/\s+/g, '_')}_${Date.now()}.csv`
+    link.click()
+    URL.revokeObjectURL(link.href)
+  }
 
   return (
     <div className="space-y-6 py-6">
+      {/* Header */}
       <div className="card flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
@@ -141,24 +254,21 @@ export default function HRDashboard(){
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-3 space-y-4">
+        {/* Left Sidebar - increased to 4 columns */}
+        <div className="lg:col-span-4 space-y-4">
+          {/* Stats Cards */}
           <div className="grid grid-cols-2 gap-3">
             <div className="card bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
               <div className="text-xs font-semibold text-gray-600 mb-1">Total Candidates</div>
               <div className="text-3xl font-bold text-indigo-600">{stats.total}</div>
-              <div className="text-xs text-gray-500 mt-1">📊 All applicants</div>
             </div>
             <div className="card bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
               <div className="text-xs font-semibold text-gray-600 mb-1">Avg Score</div>
-              <div className="flex items-center gap-2">
-                <div className="text-3xl font-bold text-green-600">{stats.avgScore}</div>
-              </div>
-              <div className="text-xs text-gray-500 mt-1">⭐ Average rating</div>
+              <div className="text-3xl font-bold text-green-600">{stats.avgScore}</div>
             </div>
             <div className="card bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
               <div className="text-xs font-semibold text-gray-600 mb-1">Avg Experience</div>
               <div className="text-3xl font-bold text-purple-600">{stats.avgExp} yrs</div>
-              <div className="text-xs text-gray-500 mt-1">💼 Years of exp</div>
             </div>
             <div className="card bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200">
               <div className="text-xs font-semibold text-gray-600 mb-1">Top Skills</div>
@@ -167,21 +277,15 @@ export default function HRDashboard(){
                   <span key={s} className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">{s}</span>
                 ))}
               </div>
-              {stats.topSkills.length > 3 && (
-                <div className="text-xs text-gray-500 mt-1">+{stats.topSkills.length - 3} more</div>
-              )}
             </div>
           </div>
 
+          {/* Job Selection & Resume Upload Combined */}
           <div className="card">
-            <h4 className="font-bold text-lg mb-4 flex items-center gap-2">
-              💼 Create / Select Job
-            </h4>
+            <h4 className="font-bold text-lg mb-4">💼 Create / Select Job Role</h4>
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Select Job Role <span className="text-indigo-600">({jobRoles.length} roles)</span>
-                </label>
+                <label className="text-sm font-semibold text-gray-700 mb-2 block">Select Job Role</label>
                 <select 
                   value={selectedRoleId} 
                   onChange={e=>{
@@ -200,53 +304,82 @@ export default function HRDashboard(){
                     <option key={j.id} value={j.id}>{j.name}</option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">Choose from {jobRoles.length} predefined roles</p>
+                
+                {/* Job Role Details Preview */}
+                {selectedRoleId && currentJob && (
+                  <div className="mt-3 p-3 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg border border-indigo-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg">📋</span>
+                      <span className="text-sm font-bold text-gray-800">{currentJob.name}</span>
+                    </div>
+                    
+                    {currentJob.requiredSkills && currentJob.requiredSkills.length > 0 && (
+                      <div className="mb-3">
+                        <div className="text-xs font-semibold text-gray-600 mb-1.5">🎯 Required Skills ({currentJob.requiredSkills.length})</div>
+                        <div className="flex flex-wrap gap-1">
+                          {currentJob.requiredSkills.slice(0, 10).map(skill => (
+                            <span key={skill} className="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-medium">{skill}</span>
+                          ))}
+                          {currentJob.requiredSkills.length > 10 && (
+                            <span className="text-xs text-gray-500 px-2 py-0.5">+{currentJob.requiredSkills.length - 10} more</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {currentJob.roadmapSteps && currentJob.roadmapSteps.length > 0 && (
+                      <div>
+                        <div className="text-xs font-semibold text-gray-600 mb-1.5">📚 Learning Roadmap</div>
+                        <ul className="text-xs text-gray-600 space-y-1.5 max-h-32 overflow-y-auto pr-2">
+                          {currentJob.roadmapSteps.map((step, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="bg-indigo-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">{idx + 1}</span>
+                              <span>{step}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="border-t pt-4">
-                <div className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  <span>Or</span>
-                  <span className="text-xs font-normal text-gray-500">create custom job</span>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Job Title *</label>
-                    <input 
-                      value={jobTitle} 
-                      onChange={e=>setJobTitle(e.target.value)} 
-                      placeholder="e.g. Senior Software Engineer" 
-                      className="input-field"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Location</label>
-                    <input 
-                      value={jobLocation} 
-                      onChange={e=>setJobLocation(e.target.value)} 
-                      placeholder="e.g. Bangalore, Remote" 
-                      className="input-field"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Description</label>
-                    <textarea 
-                      value={jobDesc} 
-                      onChange={e=>setJobDesc(e.target.value)} 
-                      placeholder="Brief job description..." 
-                      className="input-field"
-                      rows={3}
-                    />
-                  </div>
-                </div>
+                <div className="text-sm font-semibold text-gray-700 mb-3">Or create custom job</div>
+                <input value={jobTitle} onChange={e=>setJobTitle(e.target.value)} placeholder="Job Title" className="input-field mb-2"/>
+                <input value={jobLocation} onChange={e=>setJobLocation(e.target.value)} placeholder="Location (e.g., Remote, Bangalore)" className="input-field mb-2"/>
+                <textarea 
+                  value={jobDesc} 
+                  onChange={e=>setJobDesc(e.target.value)} 
+                  placeholder="Job Description / Requirements / Skills needed..." 
+                  className="input-field text-sm" 
+                  rows={3}
+                />
+              </div>
+
+              {/* Resume Upload Section */}
+              <div className="border-t pt-4">
+                <label className="text-sm font-semibold text-gray-700 mb-2 block">Upload Resumes</label>
+                <ResumeUpload 
+                  single={false} 
+                  currentJob={currentJob} 
+                  filters={filters} 
+                  onUploaded={(res)=>{ 
+                    if(res?.analyzed) setCandidatesList(res.analyzed)
+                  }}
+                  onFilesChange={(files) => setUploadedFiles(files)}
+                  hideSubmitButton={true}
+                />
+                <p className="text-xs text-gray-500 mt-2">Upload candidate resumes (PDF/DOCX) - Max 200 files</p>
               </div>
 
               <div className="flex gap-2 pt-2">
                 <button 
-                  onClick={handleCreateJob} 
-                  className="btn-primary flex-1 text-sm py-2.5"
-                  disabled={!selectedRoleId && !jobTitle.trim()}
+                  onClick={handleApplyRoles} 
+                  className="btn-primary flex-1 text-sm py-2.5" 
+                  disabled={(!selectedRoleId && !jobTitle.trim()) || isProcessing}
                 >
-                  {selectedRoleId ? 'Apply Selected Role' : 'Create Custom Job'}
+                  {isProcessing ? '⏳ Processing...' : '🚀 Apply Roles'}
                 </button>
                 <button 
                   onClick={()=>{
@@ -256,250 +389,127 @@ export default function HRDashboard(){
                     setJobLocation('')
                     setCurrentJob(null)
                     setCandidatesList([])
+                    setUploadedFiles([])
                   }} 
-                  className="btn-secondary text-sm py-2.5 px-4"
+                  className="btn-secondary text-sm px-4 py-2.5"
                 >
                   Reset
                 </button>
               </div>
 
               {currentJob && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
-                  <div className="font-bold text-indigo-800 mb-2 flex items-center gap-2">
-                    ✅ Active Job
-                  </div>
-                  <div className="font-semibold text-gray-800 mb-2">{currentJob.name}</div>
-                  {currentJob.location && (
-                    <div className="text-xs text-gray-600 mb-1">
-                      📍 <strong>Location:</strong> {currentJob.location}
-                    </div>
-                  )}
-                  {currentJob.requiredSkills && currentJob.requiredSkills.length > 0 && (
-                    <div className="text-xs text-gray-600 mb-1">
-                      <strong>Required Skills:</strong> {currentJob.requiredSkills.join(', ')}
-                    </div>
-                  )}
-                  <div className="text-xs text-gray-600 mt-2 pt-2 border-t border-indigo-200">
-                    <strong>Matched candidates (≥70%):</strong> <span className="font-bold text-green-600">{stats.matchedCount}</span>
-                  </div>
+                <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                  <div className="font-bold text-indigo-800 mb-1">✅ Active: {currentJob.name}</div>
+                  {currentJob.location && <div className="text-xs text-gray-600 mb-1">📍 {currentJob.location}</div>}
+                  <div className="text-xs text-gray-600">Matched (≥70%): <span className="font-bold text-green-600">{stats.matchedCount}</span></div>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="bg-white rounded shadow p-4">
-            <h4 className="font-semibold mb-2">Upload Resumes</h4>
-            <ResumeUpload 
-              single={false} 
-              currentJob={currentJob} 
-              filters={filters} 
-              onUploaded={(res)=>{ 
-                console.log('Upload response received:', res); 
-                if(res && res.error){
-                  console.error('Upload error:', res.error);
-                  alert('Error: ' + res.error);
-                  return;
-                }
-                if(res && res.analyzed && Array.isArray(res.analyzed)){
-                  console.log('Setting candidates list:', res.analyzed.length, 'candidates');
-                  setCandidatesList(res.analyzed);
-                  if(res.analyzed.length === 0){
-                    alert('No candidates found. Make sure you have selected a job role and uploaded resume files.');
-                  }
-                } else {
-                  console.warn('Unexpected response format:', res);
-                  alert('Unexpected response format. Check console for details.');
-                }
-              }} 
-            />
-            <p className="text-xs text-gray-500 mt-2">Supports 1�200 files (UI-only)</p>
-          </div>
-
-          <div className="bg-white rounded shadow p-4">
+          {/* Filters */}
+          <div className="card">
             <FilterPanel filters={filters} setFilters={setFilters} setSortBy={setSortBy} currentJob={currentJob} candidatesList={candidatesList} />
+            <div className="mt-4 pt-4 border-t">
+              <button 
+                onClick={() => {
+                  setFilters({skill:"", location:"", college:"", minMatch:0, experience:""})
+                  setSortBy("")
+                }}
+                className="btn-secondary w-full text-sm py-2"
+              >
+                🔄 Reset Filters
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="lg:col-span-9">
+        {/* Main Content - adjusted to 8 columns */}
+        <div className="lg:col-span-8">
+          {/* Controls Bar */}
           <div className="card mb-4">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
                 <div className="text-sm text-gray-600">
                   Results: <span className="font-bold text-indigo-600 text-lg">{filtered.length}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Sort:</span>
-                  <select onChange={e=>setSortBy(e.target.value)} className="input-field text-sm py-2 max-w-[180px]">
-                    <option value="">Default</option>
-                    <option value="top5">Top 5</option>
-                    <option value="highest_score">Highest score</option>
-                    <option value="most_experience">Most experience</option>
-                  </select>
-                </div>
+                <select onChange={e=>setSortBy(e.target.value)} className="input-field text-sm py-2 max-w-[180px]">
+                  <option value="">Sort: Default</option>
+                  <option value="top5">Top 5</option>
+                  <option value="highest_score">Highest score</option>
+                  <option value="most_experience">Most experience</option>
+                </select>
               </div>
 
               <div className="flex items-center gap-2">
-                <button 
-                  onClick={()=>setView('cards')} 
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    view==='cards'
-                      ?'bg-indigo-600 text-white shadow-md' 
-                      :'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  📋 Card View
+                <button onClick={downloadCSV} className="px-4 py-2 rounded-lg font-medium bg-green-600 text-white hover:bg-green-700" disabled={filtered.length === 0}>
+                  📥 Download CSV
                 </button>
-                <button 
-                  onClick={()=>setView('table')} 
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    view==='table'
-                      ?'bg-indigo-600 text-white shadow-md' 
-                      :'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  📊 Table View
+                <button onClick={()=>setView('cards')} className={`px-4 py-2 rounded-lg font-medium ${view==='cards'?'bg-indigo-600 text-white':'bg-gray-100 text-gray-600'}`}>
+                  📋 Cards
+                </button>
+                <button onClick={()=>setView('table')} className={`px-4 py-2 rounded-lg font-medium ${view==='table'?'bg-indigo-600 text-white':'bg-gray-100 text-gray-600'}`}>
+                  📊 Table
                 </button>
               </div>
             </div>
           </div>
 
+          {/* Card View */}
           {view === 'cards' && (
             <div className="space-y-4">
-              {filtered.length > 0 ? (
-                filtered.map(c => <CandidateCard key={c.candidateId} candidate={c} />)
-              ) : (
+              {filtered.length > 0 ? filtered.map(c => <CandidateCard key={c.candidateId || c.id || c.email} candidate={c} />) : (
                 <div className="card text-center py-12">
                   <div className="text-5xl mb-4">🔍</div>
-                  <p className="text-gray-600 font-medium">No candidates match the filters.</p>
-                  <p className="text-sm text-gray-500 mt-1">Try adjusting your filter criteria.</p>
+                  <p className="text-gray-600">No candidates found. Upload resumes and click "Apply Roles" to analyze.</p>
                 </div>
               )}
             </div>
           )}
 
+          {/* Table View */}
           {view === 'table' && (
             <div className="card overflow-hidden p-0">
               <div className="overflow-x-auto">
                 <table className="min-w-full table-auto">
-                  <thead className="bg-gradient-to-r from-indigo-50 to-purple-50">
+                  <thead className="bg-indigo-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Name & Contact</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Location</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">College</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Experience</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Internships</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Score</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Match %</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Skills</th>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Portfolio</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Name & Contact</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Location</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">College</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Branch/Degree</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Experience</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Score</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Match %</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Skills</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {filtered.length > 0 ? (
-                      filtered.map(c=> (
-                        <tr key={c.candidateId} className="hover:bg-indigo-50 transition-colors">
-                          <td className="px-4 py-4">
-                            <div className="font-semibold text-gray-900 mb-1">{c.name}</div>
-                            <div className="text-xs text-gray-600 space-y-0.5">
-                              {c.email && (
-                                <div className="flex items-center gap-1">
-                                  <span>📧</span>
-                                  <a href={`mailto:${c.email}`} className="text-indigo-600 hover:underline truncate max-w-[200px]" title={c.email}>
-                                    {c.email}
-                                  </a>
-                                </div>
-                              )}
-                              {c.phone && (
-                                <div className="flex items-center gap-1">
-                                  <span>📞</span>
-                                  <a href={`tel:${c.phone}`} className="text-indigo-600 hover:underline">
-                                    {c.phone}
-                                  </a>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-gray-600">
-                            {c.location && c.location !== 'Not specified' ? (
-                              <span>📍 {c.location}</span>
-                            ) : (
-                              <span className="text-gray-400">—</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-gray-600">
-                            {c.college && c.college !== 'Not specified' ? (
-                              <span>🏫 {c.college}</span>
-                            ) : (
-                              <span className="text-gray-400">—</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-gray-600">
-                            {c.experience > 0 ? `${c.experience} yrs` : <span className="text-gray-400">—</span>}
-                          </td>
-                          <td className="px-4 py-4">
-                            {c.internships && c.internships.length > 0 ? (
-                              <div className="text-xs">
-                                {c.internships.map((intern, idx) => (
-                                  <div key={idx} className="text-indigo-600 mb-1">💼 {intern}</div>
-                                ))}
-                              </div>
-                            ) : (
-                              <span className="text-gray-400 text-xs">—</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <ScoreBadge score={c.score} />
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span className="font-semibold text-indigo-600">{c.matchPercentage}%</span>
-                          </td>
-                          <td className="px-4 py-4">
-                            <div className="flex flex-wrap gap-1 max-w-[300px]">
-                              {c.skills && c.skills.length > 0 ? (
-                                <>
-                                  {c.skills.slice(0,4).map(s=> (
-                                    <span key={s} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">
-                                      {s}
-                                    </span>
-                                  ))}
-                                  {c.skills.length > 4 && (
-                                    <span className="text-xs text-gray-500 px-2 py-1">+{c.skills.length - 4}</span>
-                                  )}
-                                </>
-                              ) : (
-                                <span className="text-gray-400 text-xs">—</span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-4 py-4">
-                            {c.portfolioLinks && c.portfolioLinks.length > 0 ? (
-                              <div className="space-y-1">
-                                {c.portfolioLinks.slice(0, 3).map((link, idx) => (
-                                  <div key={idx} className="text-xs">
-                                    <a 
-                                      href={link} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="text-indigo-600 hover:underline truncate block max-w-[150px]"
-                                      title={link}
-                                    >
-                                      🔗 {link.includes('github') ? 'GitHub' : link.includes('linkedin') ? 'LinkedIn' : 'Portfolio'}
-                                    </a>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <span className="text-gray-400 text-xs">—</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
+                    {filtered.length > 0 ? filtered.map(c => (
+                      <tr key={c.candidateId || c.id || c.email} className="hover:bg-indigo-50">
+                        <td className="px-4 py-4">
+                          <div className="font-semibold">{c.name || 'Unknown'}</div>
+                          <div className="text-xs text-gray-600">{c.email || '—'}</div>
+                          <div className="text-xs text-gray-600">{c.phone || '—'}</div>
+                        </td>
+                        <td className="px-4 py-4 text-gray-600">{isValidLocation(c.location) ? c.location : '—'}</td>
+                        <td className="px-4 py-4 text-gray-600">{c.college || '—'}</td>
+                        <td className="px-4 py-4 text-gray-600">{c.branch || c.degree || '—'}</td>
+                        <td className="px-4 py-4 text-gray-600">{c.experience > 0 && c.experience < 50 ? `${c.experience} yrs` : '—'}</td>
+                        <td className="px-4 py-4"><ScoreBadge score={c.score} /></td>
+                        <td className="px-4 py-4 font-semibold text-indigo-600">{c.matchPercentage || 0}%</td>
+                        <td className="px-4 py-4">
+                          <div className="flex flex-wrap gap-1">
+                            {(c.skills || []).slice(0, 4).map((s, idx) => <span key={`${s}-${idx}`} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{s}</span>)}
+                            {(c.skills || []).length > 4 && <span className="text-xs text-gray-500">+{c.skills.length - 4}</span>}
+                          </div>
+                        </td>
+                      </tr>
+                    )) : (
                       <tr>
-                        <td colSpan="9" className="px-6 py-12 text-center">
+                        <td colSpan="8" className="px-6 py-12 text-center">
                           <div className="text-5xl mb-4">🔍</div>
-                          <p className="text-gray-600 font-medium">No candidates match the filters.</p>
-                          <p className="text-sm text-gray-500 mt-1">Try adjusting your filter criteria.</p>
+                          <p className="text-gray-600">No candidates found.</p>
                         </td>
                       </tr>
                     )}
@@ -513,3 +523,8 @@ export default function HRDashboard(){
     </div>
   )
 }
+
+
+
+
+

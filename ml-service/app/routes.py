@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, UploadFile, File, Form, Request
 from typing import List, Optional
 from . import resume_parser, skill_extractor, scorer
@@ -544,60 +543,248 @@ def extract_college_smart(text: str) -> Optional[str]:
 
 
 def extract_location_smart(text: str) -> Optional[str]:
-    """Extract location with better filtering"""
+    """Extract location with strict filtering - only real places"""
     if not text:
         return None
     
-    # Common false positives for location (tools, skills, etc.)
+    # Comprehensive list of false positives (programming languages, tools, skills, etc.)
     location_false_positives = {
-        'latex', 'git', 'github', 'docker', 'kubernetes', 'aws', 'azure', 'gcp',
-        'python', 'java', 'javascript', 'typescript', 'react', 'node', 'sql',
-        'html', 'css', 'json', 'xml', 'yaml', 'markdown', 'bash', 'shell',
-        'linux', 'windows', 'macos', 'ubuntu', 'debian', 'centos', 'reddy'
+        # Programming languages
+        'c', 'c++', 'c#', 'java', 'python', 'javascript', 'typescript', 'ruby', 'go', 'rust',
+        'swift', 'kotlin', 'scala', 'r', 'matlab', 'php', 'perl', 'lua', 'dart', 'julia',
+        'fortran', 'cobol', 'assembly', 'haskell', 'erlang', 'elixir', 'clojure', 'f#',
+        # Web technologies
+        'html', 'css', 'sass', 'less', 'react', 'angular', 'vue', 'svelte', 'jquery',
+        'bootstrap', 'tailwind', 'node', 'node.js', 'express', 'next.js', 'nuxt', 'gatsby',
+        # Databases
+        'sql', 'mysql', 'postgresql', 'mongodb', 'redis', 'cassandra', 'elasticsearch',
+        'dynamodb', 'firebase', 'sqlite', 'oracle', 'mariadb', 'neo4j', 'couchdb',
+        # DevOps & Cloud
+        'docker', 'kubernetes', 'aws', 'azure', 'gcp', 'heroku', 'vercel', 'netlify',
+        'jenkins', 'travis', 'circleci', 'terraform', 'ansible', 'puppet', 'chef',
+        # Tools & Frameworks
+        'git', 'github', 'gitlab', 'bitbucket', 'jira', 'confluence', 'slack', 'trello',
+        'latex', 'vim', 'emacs', 'vscode', 'intellij', 'eclipse', 'xcode', 'android studio',
+        # ML/AI
+        'tensorflow', 'pytorch', 'keras', 'scikit', 'scikit-learn', 'pandas', 'numpy',
+        'scipy', 'matplotlib', 'seaborn', 'opencv', 'nltk', 'spacy', 'huggingface',
+        'jupyter', 'anaconda', 'colab', 'kaggle',
+        # Other technical terms
+        'api', 'apis', 'rest', 'graphql', 'json', 'xml', 'yaml', 'csv', 'http', 'https',
+        'tcp', 'udp', 'websocket', 'grpc', 'soap', 'oauth', 'jwt', 'ssl', 'tls',
+        'linux', 'unix', 'windows', 'macos', 'ubuntu', 'debian', 'centos', 'fedora',
+        'bash', 'shell', 'powershell', 'zsh', 'fish',
+        # Academic terms that might be confused
+        'calculus', 'algebra', 'statistics', 'probability', 'linear', 'discrete',
+        'algorithms', 'data structures', 'machine learning', 'deep learning', 'ai', 'ml',
+        'nlp', 'computer vision', 'robotics', 'iot', 'blockchain', 'cryptography',
+        # Common words that NER might pick up
+        'experience', 'project', 'projects', 'skills', 'education', 'work', 'job',
+        'intern', 'internship', 'trainee', 'engineer', 'developer', 'analyst',
+        'reddy', 'kumar', 'singh', 'sharma', 'patel', 'gupta'  # Common Indian surnames
     }
     
-    # Common city/state names to prioritize
-    common_locations = [
-        'bangalore', 'mumbai', 'delhi', 'hyderabad', 'chennai', 'pune', 'kolkata',
-        'ahmedabad', 'jaipur', 'surat', 'lucknow', 'kanpur', 'nagpur', 'indore',
-        'thane', 'bhopal', 'visakhapatnam', 'patna', 'vadodara', 'gurgaon',
-        'noida', 'faridabad', 'coimbatore', 'mysore', 'vijayawada', 'warangal'
-    ]
+    # Valid Indian cities and states (prioritize these)
+    indian_locations = {
+        # Major cities
+        'bangalore', 'bengaluru', 'mumbai', 'delhi', 'new delhi', 'hyderabad', 'chennai',
+        'pune', 'kolkata', 'ahmedabad', 'jaipur', 'surat', 'lucknow', 'kanpur', 'nagpur',
+        'indore', 'thane', 'bhopal', 'visakhapatnam', 'vizag', 'patna', 'vadodara',
+        'gurgaon', 'gurugram', 'noida', 'greater noida', 'faridabad', 'ghaziabad',
+        'coimbatore', 'mysore', 'mysuru', 'vijayawada', 'warangal', 'guntur', 'nellore',
+        'kochi', 'cochin', 'thiruvananthapuram', 'trivandrum', 'kozhikode', 'calicut',
+        'chandigarh', 'ludhiana', 'amritsar', 'jalandhar', 'dehradun', 'haridwar',
+        'ranchi', 'jamshedpur', 'dhanbad', 'raipur', 'bilaspur', 'bhubaneswar', 'cuttack',
+        'guwahati', 'shillong', 'imphal', 'agartala', 'aizawl', 'kohima', 'itanagar',
+        'gangtok', 'shimla', 'manali', 'srinagar', 'jammu', 'leh', 'ladakh',
+        'pondicherry', 'puducherry', 'panaji', 'goa', 'daman', 'diu', 'silvassa',
+        'port blair', 'kavaratti',
+        # States
+        'andhra pradesh', 'arunachal pradesh', 'assam', 'bihar', 'chhattisgarh',
+        'goa', 'gujarat', 'haryana', 'himachal pradesh', 'jharkhand', 'karnataka',
+        'kerala', 'madhya pradesh', 'maharashtra', 'manipur', 'meghalaya', 'mizoram',
+        'nagaland', 'odisha', 'punjab', 'rajasthan', 'sikkim', 'tamil nadu',
+        'telangana', 'tripura', 'uttar pradesh', 'uttarakhand', 'west bengal',
+        # International
+        'usa', 'uk', 'canada', 'australia', 'germany', 'france', 'singapore',
+        'dubai', 'uae', 'remote', 'work from home', 'wfh'
+    }
+    
+    text_lower = text.lower()
     
     # Pattern-based extraction first
     location_patterns = [
-        re.compile(r'location\s*:?\s*([A-Z][a-zA-Z\s,]+)', re.IGNORECASE),
-        re.compile(r'📍\s*([A-Z][a-zA-Z\s,]+)', re.IGNORECASE),
-        re.compile(r'address\s*:?\s*([A-Z][a-zA-Z\s,]+)', re.IGNORECASE),
+        re.compile(r'(?:location|address|city|place)\s*[:\-]?\s*([A-Za-z][a-zA-Z\s,]+?)(?:\n|$|;|\|)', re.IGNORECASE),
+        re.compile(r'📍\s*([A-Za-z][a-zA-Z\s,]+?)(?:\n|$|;|\|)', re.IGNORECASE),
+        re.compile(r'(?:based in|located in|from)\s+([A-Za-z][a-zA-Z\s,]+?)(?:\n|$|;|\.|,)', re.IGNORECASE),
     ]
     
     for pattern in location_patterns:
-        match = pattern.search(text[:1000])
+        match = pattern.search(text[:2000])  # Check first 2000 chars
         if match:
             loc_candidate = match.group(1).strip()
-            loc_lower = loc_candidate.lower()
+            loc_lower = loc_candidate.lower().strip()
+            # Clean up
             loc_candidate = re.sub(r',\s*$', '', loc_candidate).strip()
+            loc_candidate = re.sub(r'\s+', ' ', loc_candidate).strip()
+            
+            # Validate
             if (loc_lower not in location_false_positives and
+                not any(fp in loc_lower for fp in location_false_positives) and
                 len(loc_candidate) > 2 and len(loc_candidate) < 50):
-                return loc_candidate
+                # Check if it's a known location
+                if any(loc in loc_lower for loc in indian_locations):
+                    return loc_candidate.title()
     
-    # Use NER as fallback
+    # Check for known Indian locations in text
+    for loc in indian_locations:
+        # Use word boundary to avoid partial matches
+        pattern = re.compile(r'\b' + re.escape(loc) + r'\b', re.IGNORECASE)
+        if pattern.search(text[:3000]):
+            return loc.title()
+    
+    # Use NER as fallback with strict filtering
     if nlp:
         try:
             doc = nlp(text[:5000])
             for ent in doc.ents:
-                if ent.label_ in ('GPE','LOC'):
-                    ent_text_lower = ent.text.lower().strip()
-                    if (ent_text_lower not in location_false_positives and
-                        len(ent.text.strip()) > 2 and
-                        len(ent.text.strip()) < 50):
-                        if any(city in ent_text_lower for city in common_locations):
-                            return ent.text.strip()
-                        elif not any(fp in ent_text_lower for fp in location_false_positives):
-                            if not re.search(r'[a-z]+\.[a-z]+', ent_text_lower):
-                                return ent.text.strip()
+                if ent.label_ in ('GPE', 'LOC'):
+                    ent_text = ent.text.strip()
+                    ent_lower = ent_text.lower().strip()
+                    
+                    # Skip if it's a false positive
+                    if ent_lower in location_false_positives:
+                        continue
+                    if any(fp in ent_lower for fp in location_false_positives):
+                        continue
+                    
+                    # Skip if too short or too long
+                    if len(ent_text) < 3 or len(ent_text) > 50:
+                        continue
+                    
+                    # Skip if contains programming-related characters
+                    if any(char in ent_text for char in ['+', '#', '.js', '.py', '()']):
+                        continue
+                    
+                    # Prefer known locations
+                    if any(loc in ent_lower for loc in indian_locations):
+                        return ent_text.title()
         except Exception:
             pass
+    
+    return None
+
+
+def extract_branch_degree(text: str) -> Optional[str]:
+    """Extract educational branch/degree from resume"""
+    if not text:
+        return None
+    
+    text_lower = text.lower()
+    
+    # Common degree patterns
+    degree_patterns = [
+        # B.Tech / B.E. patterns
+        (r'\bb\.?\s*tech\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'B.Tech'),
+        (r'\bbtech\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'B.Tech'),
+        (r'\bb\.?\s*e\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'B.E.'),
+        (r'\bbe\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'B.E.'),
+        
+        # M.Tech / M.E. patterns
+        (r'\bm\.?\s*tech\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'M.Tech'),
+        (r'\bmtech\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'M.Tech'),
+        (r'\bm\.?\s*e\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'M.E.'),
+        
+        # B.Sc / M.Sc patterns
+        (r'\bb\.?\s*sc\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'B.Sc'),
+        (r'\bbsc\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'B.Sc'),
+        (r'\bm\.?\s*sc\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'M.Sc'),
+        
+        # MBA patterns
+        (r'\bmba\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'MBA'),
+        (r'\bm\.?\s*b\.?\s*a\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'MBA'),
+        
+        # BCA / MCA patterns
+        (r'\bbca\b', 'BCA'),
+        (r'\bmca\b', 'MCA'),
+        
+        # PhD patterns
+        (r'\bph\.?\s*d\.?\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'Ph.D'),
+        (r'\bdoctorate\s*(?:in\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'Ph.D'),
+        
+        # Generic Bachelor/Master
+        (r'\bbachelor(?:\'?s)?\s+(?:of\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'Bachelor'),
+        (r'\bmaster(?:\'?s)?\s+(?:of\s+)?([a-zA-Z\s&]+?)(?:\s+from|\s+at|\s*,|\s*\n|\s*\(|\s*-|$)', 'Master'),
+    ]
+    
+    # Common branches/specializations
+    valid_branches = [
+        'computer science', 'computer science and engineering', 'cse', 'cs',
+        'information technology', 'it', 'information systems',
+        'electronics', 'electronics and communication', 'ece', 'eee',
+        'electrical', 'electrical engineering', 'ee',
+        'mechanical', 'mechanical engineering', 'me',
+        'civil', 'civil engineering', 'ce',
+        'chemical', 'chemical engineering',
+        'aerospace', 'aeronautical',
+        'biotechnology', 'biotech',
+        'artificial intelligence', 'ai', 'machine learning', 'ml',
+        'data science', 'data analytics',
+        'software engineering', 'se',
+        'mathematics', 'maths', 'math',
+        'physics', 'chemistry', 'biology',
+        'commerce', 'finance', 'accounting',
+        'economics', 'business', 'management',
+        'marketing', 'hr', 'human resources',
+        'operations', 'supply chain',
+    ]
+    
+    # Try each pattern
+    for pattern_str, degree_type in degree_patterns:
+        pattern = re.compile(pattern_str, re.IGNORECASE)
+        match = pattern.search(text)
+        if match:
+            if match.groups():
+                branch = match.group(1).strip()
+                # Clean up branch name
+                branch = re.sub(r'\s+', ' ', branch).strip()
+                branch = re.sub(r'^(in|of)\s+', '', branch, flags=re.IGNORECASE).strip()
+                
+                # Validate branch
+                branch_lower = branch.lower()
+                if len(branch) > 1 and len(branch) < 60:
+                    # Check if it's a valid branch
+                    if any(vb in branch_lower for vb in valid_branches):
+                        return f"{degree_type} {branch.title()}"
+                    elif len(branch) > 2:
+                        return f"{degree_type} {branch.title()}"
+            else:
+                # Pattern matched but no group (like BCA, MCA)
+                return degree_type
+    
+    # Fallback: Look for common degree + branch combinations
+    simple_patterns = [
+        (r'\b(b\.?tech|btech)\b.*?\b(cse|cs|it|ece|eee|me|ce)\b', 'B.Tech'),
+        (r'\b(m\.?tech|mtech)\b.*?\b(cse|cs|it|ece|eee|me|ce)\b', 'M.Tech'),
+        (r'\b(cse|computer science)\b', 'Computer Science'),
+        (r'\b(ece|electronics)\b', 'Electronics'),
+        (r'\b(it|information technology)\b', 'Information Technology'),
+    ]
+    
+    for pattern_str, label in simple_patterns:
+        match = re.search(pattern_str, text_lower)
+        if match:
+            if 'tech' in pattern_str.lower():
+                branch_match = match.group(2) if len(match.groups()) > 1 else None
+                if branch_match:
+                    branch_map = {
+                        'cse': 'Computer Science', 'cs': 'Computer Science',
+                        'it': 'Information Technology', 'ece': 'Electronics & Communication',
+                        'eee': 'Electrical & Electronics', 'me': 'Mechanical', 'ce': 'Civil'
+                    }
+                    branch = branch_map.get(branch_match.lower(), branch_match.upper())
+                    return f"{label} {branch}"
+            return label
     
     return None
 
@@ -1121,8 +1308,11 @@ async def analyze_resumes(
                 # #endregion
                 
                 # Properly categorize and clean data
-                college = college_ner.strip() if college_ner and college_ner.strip() else 'Not specified'
-                location = location_ner.strip() if location_ner and location_ner.strip() else 'Not specified'
+                college = college_ner.strip() if college_ner and college_ner.strip() else None
+                location = location_ner.strip() if location_ner and location_ner.strip() else None
+                
+                # Extract branch/degree
+                branch = extract_branch_degree(text)
                 
                 # Ensure proper data types and categories
                 candidate = {
@@ -1133,16 +1323,18 @@ async def analyze_resumes(
                     'phone': phone.strip() if phone else None,
                     
                     # Skills Information
-                    'skills': [s.strip() for s in skills[:20] if s.strip()],  # Limit to top 20, clean whitespace
+                    'skills': [s.strip() for s in skills[:20] if s.strip()],
                     'missingSkills': [s.strip() for s in missing_skills if s.strip()],
                     
                     # Experience Information
-                    'experience': int(experience) if experience else 0,
-                    'internships': internships[:2] if internships and len(internships) > 0 else None,  # Top 2 only
+                    'experience': int(experience) if experience and experience > 0 and experience < 50 else 0,
+                    'internships': internships[:2] if internships and len(internships) > 0 else None,
                     
                     # Education Information
-                    'college': college if college != 'Not specified' else None,
-                    'location': location if location != 'Not specified' else None,
+                    'college': college,
+                    'branch': branch,  # NEW FIELD
+                    'degree': branch,  # Alias for compatibility
+                    'location': location,
                     
                     # Portfolio/Links
                     'portfolioLinks': portfolio_links if portfolio_links and len(portfolio_links) > 0 else None,
@@ -1150,10 +1342,10 @@ async def analyze_resumes(
                     # Scoring Information
                     'matchPercentage': int(matchPercentage),
                     'score': int(score),
-                'resumeStrength': resumeStrength,
-                'jobFitLevel': jobFitLevel
-            }
-                
+                    'resumeStrength': resumeStrength,
+                    'jobFitLevel': jobFitLevel
+                }
+
                 # #region agent log
                 try:
                     with open(log_path, 'a', encoding='utf-8') as log_file:
@@ -1192,13 +1384,25 @@ async def analyze_resumes(
                             'data': {
                                 'name': name,
                                 'phone': phone,
-                                'portfolio_count': len(portfolio_links) if portfolio_links else 0,
+                                'email': email,
+                                'skills_found': skills,
+                                'matched_skills': matched_skills,
+                                'missing_skills': missing_skills,
+                                'experience_years': experience,
+                                'college': college_ner,
+                                'location': location_ner,
+                                'bert_similarity': bert_sim,
+                                'tfidf_similarity': tfidf_sim,
+                                'skill_ratio': skill_ratio,
+                                'final_score': final_score,
+                                'score': score,
                                 'internships_count': len(internships),
-                                'score': score
+                                'portfolio_count': len(portfolio_links) if portfolio_links else 0
                             },
                             'timestamp': int(time.time() * 1000)
                         }) + '\n')
-                except: pass
+                except: 
+                    pass
                 # #endregion
                 
                 print(f"Processed {f.filename}: {len(skills)} skills, {experience} yrs exp, {len(internships)} internships, score: {score}%")
@@ -1214,6 +1418,8 @@ async def analyze_resumes(
                     'missingSkills': req_skills,
                     'experience': 0,
                     'college': None,
+                    'branch': None,
+                    'degree': None,
                     'location': None,
                     'matchPercentage': 0,
                     'score': 0,

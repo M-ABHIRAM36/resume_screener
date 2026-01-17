@@ -1,26 +1,22 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+const BASE_URL = 'http://localhost:5000';
 
-export async function get(path){
-  const res = await fetch(API_BASE + path);
-  if(!res.ok) throw new Error(await res.text());
+export async function get(endpoint) {
+  const res = await fetch(`${BASE_URL}${endpoint}`);
+  if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-export async function post(path, body){
-  const res = await fetch(API_BASE + path, {
+export async function post(endpoint, data, isFormData = false) {
+  const options = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  if(!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-export async function postForm(path, formData){
-  const res = await fetch(API_BASE + path, {
-    method: 'POST',
-    body: formData
-  });
-  if(!res.ok) throw new Error(await res.text());
+    body: isFormData ? data : JSON.stringify(data),
+  };
+  
+  if (!isFormData) {
+    options.headers = { 'Content-Type': 'application/json' };
+  }
+  
+  const res = await fetch(`${BASE_URL}${endpoint}`, options);
+  if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
