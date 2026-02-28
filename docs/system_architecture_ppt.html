@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Architecture - PPT Ready</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+        }
+        
+        /* Each slide is a separate page */
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: white;
+            margin: 20px auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+        }
+        
+        .slide-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .slide-header h1 {
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        
+        .slide-header .subtitle {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .slide-content {
+            padding: 25px 40px;
+            height: calc(100% - 80px);
+        }
+        
+        /* Two column layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+        
+        .col {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .col h2 {
+            color: #2c3e50;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .col h3 {
+            color: #34495e;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+        
+        .col p {
+            font-size: 0.95em;
+            line-height: 1.5;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        .col ul {
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin-left: 20px;
+            color: #444;
+        }
+        
+        .col li {
+            margin-bottom: 5px;
+        }
+        
+        /* Diagram box */
+        .diagram-box {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .diagram-title {
+            background: #3498db;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        
+        .mermaid {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        
+        /* Info cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .info-card {
+            background: linear-gradient(145deg, #fff, #f5f5f5);
+            border-left: 4px solid #3498db;
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .info-card h4 {
+            color: #3498db;
+            font-size: 0.95em;
+            margin-bottom: 6px;
+        }
+        
+        .info-card ul {
+            font-size: 0.8em;
+            margin-left: 15px;
+            color: #555;
+        }
+        
+        .info-card li {
+            margin-bottom: 3px;
+        }
+        
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+        
+        th {
+            background: #3498db;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) { background: #f9f9f9; }
+        
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 20px;
+            padding: 10px 15px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+        }
+        
+        .legend-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.7em;
+        }
+        
+        .leg-entity { background: #27ae60; }
+        .leg-process { background: #3498db; border-radius: 50%; }
+        .leg-store { background: #7f8c8d; }
+        .leg-flow { background: #e74c3c; }
+        
+        /* Full width diagram */
+        .full-diagram {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .full-diagram .diagram-box {
+            flex: 1;
+        }
+        
+        /* Layer boxes */
+        .layer-box {
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(52, 152, 219, 0.05);
+        }
+        
+        .layer-title {
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        
+        .layer-box p {
+            font-size: 0.85em;
+            margin: 0;
+        }
+        
+        /* Tech stack grid */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .tech-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .tech-card h5 {
+            color: #2c3e50;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .tech-card p {
+            font-size: 0.75em;
+            color: #666;
+            margin: 0;
+        }
+
+        /* Module grid for slide */
+        .module-grid-slide {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            height: 100%;
+        }
+        
+        .module-card-slide {
+            background: linear-gradient(145deg, #fff, #f8f8f8);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .module-card-slide h4 {
+            color: #3498db;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        
+        .module-card-slide ul {
+            font-size: 0.8em;
+            margin-left: 15px;
+            color: #555;
+        }
+        
+        .module-card-slide li {
+            margin-bottom: 4px;
+        }
+        
+        /* Scoring formula */
+        .formula-box {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        /* Score table */
+        .score-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .score-table th {
+            background: #2c3e50;
+        }
+        
+        @media print {
+            .slide {
+                box-shadow: none;
+                margin: 0;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title & Overview -->
+<div class="slide">
+    <div class="slide-header">
+        <div>
+            <h1>📄 System Architecture</h1>
+            <span class="subtitle">Resume Screening and Career Guidance System</span>
+        </div>
+        <span class="subtitle">Slide 1/8</span>
+    </div>
+    <div class="slide-content">
+        <div class="two-col">
+            <div class="col">
+                <h2>System Overview</h2>
+                <p>A web-based application designed to automate resume screening for HR professionals and provide career guidance to job seekers.</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Resume upload and text extraction</li>
+                    <li>Automatic skill identification</li>
+                    <li>Resume scoring against job requirements</li>
+                    <li>Candidate ranking and filtering</li>
+                    <li>Skill gap analysis</li>
+                    <li>Career roadmap generation</li>
+                </ul>
+                
+                <h3>Target Users</h3>
+                <ul>
+                    <li><strong>HR Professionals:</strong> Upload multiple resumes, filter and rank candidates</li>
+                    <li><strong>Candidates:</strong> Get resume score, skill gaps, and career guidance</li>
+                </ul>
+            </div>
+            <div class="col">
+                <h2>Technology Stack</h2>
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <h5>Frontend</h5>
+                        <p>React.js<br>Tailwind CSS<br>Vite</p>
+                    </div>
+                    <div class="tech-card">
+                        <h5>Backend</h5>
+                        <p>Node.js<br>Express.js<br>Multer</p>
+                    </div>
+                    <div class="tech-card">
+                        <h5>Processing</h5>
+                        <p>Python<br>FastAPI<br>spaCy</p>
+                    </div>
+                    <div class="tech-card">
+                        <h5>Scoring</h5>
+                        <p>sentence-transformers<br>scikit-learn<br>TF-IDF</p>
+                    </div>
+                    <div class="tech-card">
+                        <h5>Parsing</h5>
+                        <p>pdfplumber<br>python-docx</p>
+                    </div>
+                    <div class="tech-card">
+                        <h5>Storage</h5>
+                        <p>JSON Files<br>File System</p>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top:20px;">Architecture Pattern</h3>
+                <p><strong>Three-Tier Architecture</strong> with clear separation:</p>
+                <ul>
+                    <li>Presentation Layer (React.js)</li>
+                    <li>Application Layer (Node.js/Express)</li>
+                    <li>Processing Layer (Python/FastAPI)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 2: System Architecture Diagram -->
+<div class="slide">
+    <div class="slide-header">
+        <div>
+            <h1>🏗️ System Architecture Diagram</h1>
+            <span class="subtitle">Three-Tier Architecture Overview</span>
+        </div>
+        <span class="subtitle">Slide 2/8</span>
+    </div>
+    <div class="slide-content">
+        <div class="full-diagram">
+            <div class="diagram-box">
+                <div class="diagram-title">System Architecture</div>
+                <div class="mermaid">
+flowchart LR
+    subgraph CL["Client"]
+        U[User Browser]
+    end
+    
+    subgraph FE["Frontend - React"]
+        R[React App]
+        RC[Components]
+        AX[Axios]
+    end
+    
+    subgraph BE["Backend - Node.js"]
+        EX[Express Server]
+        RT[Routes]
+        CT[Controllers]
+        ML[Multer]
+    end
+    
+    subgraph PY["Processing - Python"]
+        FA[FastAPI]
+        PR[Parser]
+        SE[Skill Extractor]
+        SC[Scorer]
+    end
+    
+    subgraph DB["Data"]
+        F[(Files)]
+        SK[(Skills)]
+        JB[(Jobs)]
+    end
+    
+    U --> R --> RC --> AX
+    AX -->|HTTP| EX --> RT --> CT
+    CT --> ML --> F
+    CT -->|HTTP| FA
+    FA --> PR & SE & SC
+    SE --> SK
+    CT --> JB
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 3: Module Architecture -->
+<div class="slide">
+    <div class="slide-header">
+        <div>
+            <h1>📦 Module Architecture</h1>
+            <span class="subtitle">System Components and Functions</span>
+        </div>
+        <span class="subtitle">Slide 3/8</span>
+    </div>
+    <div class="slide-content">
+        <div class="module-grid-slide">
+            <div class="module-card-slide">
+                <h4>📄 Resume Parser</h4>
+                <ul>
+                    <li>PDF extraction (pdfplumber)</li>
+                    <li>DOCX extraction (python-docx)</li>
+                    <li>Layout-aware parsing</li>
+                    <li>Table content extraction</li>
+                    <li>Text normalization</li>
+                </ul>
+            </div>
+            <div class="module-card-slide">
+                <h4>🔍 Skill Extractor</h4>
+                <ul>
+                    <li>Pattern-based matching</li>
+                    <li>Skill normalization</li>
+                    <li>Database lookup</li>
+                    <li>Word boundary detection</li>
+                    <li>Variation handling</li>
+                </ul>
+            </div>
+            <div class="module-card-slide">
+                <h4>📊 Scoring Module</h4>
+                <ul>
+                    <li>Semantic similarity (BERT)</li>
+                    <li>TF-IDF matching</li>
+                    <li>Skill ratio calculation</li>
+                    <li>Weighted computation</li>
+                    <li>Score normalization</li>
+                </ul>
+            </div>
+            <div class="module-card-slide">
+                <h4>👤 NLP Processing</h4>
+                <ul>
+                    <li>Named Entity Recognition</li>
+                    <li>Contact extraction</li>
+                    <li>Experience detection</li>
+                    <li>Education parsing</li>
+                    <li>Portfolio link extraction</li>
+                </ul>
+            </div>
+            <div class="module-card-slide">
+                <h4>🎯 Career Guidance</h4>
+                <ul>
+                    <li>Skill gap identification</li>
+                    <li>Roadmap generation</li>
+                    <li>Resource recommendations</li>
+                    <li>Progress tracking</li>
+                    <li>Score interpretation</li>
+                </ul>
+            </div>
+            <div class="module-card-slide">
+                <h4>🔐 Authentication</h4>
+                <ul>
+                    <li>User registration</li>
+                    <li>Login/logout</li>
+                    <li>Role-based access</li>
+                    <li>Session management</li>
+                    <li>Password security</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 4: DFD Level 0 -->
+<div class="slide">
+    <div class="slide-header">
+        <div>
+            <h1>📊 DFD Level 0 - Context Diagram</h1>
+            <span class="subtitle">System Boundary and External Entities</span>
+        </div>
+        <span class="subtitle">Slide 4/8</span>
+    </div>
+    <div class="slide-content">
+        <div class="two-col">
+            <div class="col">
+                <div class="diagram-box" style="height:100%;">
+                    <div class="diagram-title">Context Diagram</div>
+                    <div class="mermaid">
+flowchart LR
+    HR(["👔 HR User"])
+    CAND(["👤 Candidate"])
+    
+    SYS(("Resume Screening<br/>System"))
+    
+    HR -->|"Resume Files<br/>Job Requirements<br/>Filter Criteria"| SYS
+    SYS -->|"Ranked Candidates<br/>Match Scores"| HR
+    
+    CAND -->|"Resume File<br/>Target Role"| SYS
+    SYS -->|"Resume Score<br/>Skill Gap<br/>Roadmap"| CAND
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <h2>External Entities</h2>
+                <div class="info-card" style="margin-bottom:15px;">
+                    <h4>👔 HR User</h4>
+                    <p style="font-size:0.85em;">Human Resource professional who uploads resumes and evaluates candidates against job requirements</p>
+                </div>
+                <div class="info-card" style="margin-bottom:15px;">
+                    <h4>👤 Candidate</h4>
+                    <p style="font-size:0.85em;">Job seeker who uploads resume for analysis and career guidance</p>
+                </div>
+                
+                <h2 style="margin-top:20px;">Data Flows</h2>
+                <table>
+                    <tr><th>Entity</th><th>Input</th><th>Output</th></tr>
+                    <tr><td>HR User</td><td>Resumes, Job Req, Filters</td><td>Rankings, Scores</td></tr>
+                    <tr><td>Candidate</td><td>Resume, Target Role</td><td>Score, Gap, Roadmap</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 5: DFD Level 1 -->
+<div class="slide">
+    <div class="slide-header">
+        <div>
+            <h1>📊 DFD Level 1 - Frontend to Backend Flow</h1>
+            <span class="subtitle">User Interaction and Web Application Flow</span>
+        </div>
+        <span class="subtitle">Slide 5/8</span>
+    </div>
+    <div class="slide-content">
+        <div class="two-col">
+            <div class="col">
+                <div class="diagram-box" style="height:100%;">
+                    <div class="diagram-title">Level 1 DFD - Frontend ↔ Backend</div>
+                    <div class="mermaid">
+flowchart LR
+    subgraph EXT[" "]
+        U(["👤 User"])
+    end
+    
+    subgraph FE["Frontend"]
+        F1((Upload))
+        F2((Select Role))
+        F3((Display))
+    end
+    
+    subgraph BE["Backend"]
+        B1((Handle Request))
+        B2((Store Data))
+    end
+    
+    subgraph DS[" "]
+        D1[(Resume DB)]
+        D2[(Score DB)]
+    end
+    
+    U --> F1 --> F2 --> B1 --> B2 --> D1
+    B2 --> D2
+    D2 --> F3 --> U
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <h2>Process Description</h2>
+                <table>
+                    <tr><th>Process</th><th>Function</th></tr>
+                    <tr><td>Resume Upload</td><td>User uploads resume file via web form</td></tr>
+                    <tr><td>Role Selection</td><td>User selects target job role</td></tr>
+                    <tr><td>Request Analysis</td><td>Frontend sends data to backend API</td></tr>
+                    <tr><td>Result Display</td><td>Shows scores and results to user</td></tr>
+                    <tr><td>File Handler</td><td>Backend receives and stores files</td></tr>
+                    <tr><td>Data Manager</td><td>Manages data flow and responses</td></tr>
+                </table>
+                
+                <h2 style="margin-top:20px;">Data Stores</h2>
+                <table>
+                    <tr><th>Store</th><th>Contents</th></tr>
+                    <tr><td>Resume Database</td><td>Uploaded resume files</td></tr>
+                    <tr><td>Score Records</td><td>Analysis results and scores</td></tr>
+                </table>
+                
+                <h2 style="margin-top:20px;">Data Flow Summary</h2>
+                <p style="font-size:0.85em;">User → Frontend → Backend → Database → Backend → Frontend → User</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 6: DFD Level 2 -->
+<div class="slide">
+    <div class="slide-header">
+        <div>
+            <h1>📊 DFD Level 2 - Backend to Python Processing</h1>
+            <span class="subtitle">Detailed Resume Analysis Flow</span>
+        </div>
+        <span class="subtitle">Slide 6/8</span>
+    </div>
+    <div class="slide-content">
+        <div class="two-col">
+            <div class="col">
+                <div class="diagram-box" style="height:100%;">
+                    <div class="diagram-title">Level 2 DFD - Backend ↔ Python Processing</div>
+                    <div class="mermaid">
+flowchart TD
+    subgraph BE["Backend"]
+        B1["Node.js Server"]
+    end
+    
+    subgraph PY["Python Processing"]
+        P1["Text Extraction"]
+        P2["Text Cleaning"]
+        P3["Skill Matching"]
+        P4["Score Calculation"]
+        P5["Roadmap Generation"]
+    end
+    
+    subgraph DS["Data Stores"]
+        D1[("Resume DB")]
+        D2[("Skills DB")]
+        D3[("Score Records")]
+    end
+    
+    B1 --> P1
+    D1 --> P1
+    P1 --> P2
+    P2 --> P3
+    D2 --> P3
+    P3 --> P4
+    P4 --> D3
+    P4 --> P5
+    D2 --> P5
+    P5 --> B1
+    D3 --> B1
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <h2>Process Description</h2>
+                <table>
+                    <tr><th>Process</th><th>Function</th></tr>
+                    <tr><td>Text Extraction</td><td>Parse PDF/DOCX to raw text</td></tr>
+                    <tr><td>Text Cleaning</td><td>Remove noise, normalize format</td></tr>
+                    <tr><td>Skill Identification</td><td>Match skills from database</td></tr>
+                    <tr><td>Similarity Calculation</td><td>Compare resume with job description</td></tr>
+                    <tr><td>Resume Scoring</td><td>Calculate final match score</td></tr>
+                    <tr><td>Career Guidance</td><td>Generate skill gap and roadmap</td></tr>
+                </table>
+                
+                <h2 style="margin-top:15px;">Data Stores</h2>
+                <table>
+                    <tr><th>Store</th><th>Contents</th></tr>
+                    <tr><td>Resume Database</td><td>Uploaded resume files</td></tr>
+                    <tr><td>Skills Database</td><td>Master list of technical skills</td></tr>
+                    <tr><td>Score Records</td><td>Analysis results and roadmaps</td></tr>
+                </table>
+                
+                <h2 style="margin-top:15px;">External Interaction</h2>
+                <ul style="font-size:0.85em;">
+                    <li>Backend sends resume to Python service</li>
+                    <li>Python returns extracted data, scores, roadmap</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 7: Scoring Algorithm -->
+<div class="slide">
+    <div class="slide-header">
+        <div>
+            <h1>📈 Scoring Algorithm</h1>
+            <span class="subtitle">Match Score Calculation Method</span>
+        </div>
+        <span class="subtitle">Slide 7/8</span>
+    </div>
+    <div class="slide-content">
+        <div class="two-col">
+            <div class="col">
+                <h2>Scoring Formula</h2>
+                <div class="formula-box">
+                    Score = 0.45×Skills + 0.40×Semantic + 0.15×Keywords
+                </div>
+                
+                <h3>Weight Distribution</h3>
+                <table class="score-table">
+                    <tr><th>Component</th><th>Weight</th><th>Method</th></tr>
+                    <tr><td>Skill Match</td><td>45%</td><td>Set intersection ratio</td></tr>
+                    <tr><td>Semantic</td><td>40%</td><td>BERT cosine similarity</td></tr>
+                    <tr><td>Keywords</td><td>15%</td><td>TF-IDF cosine similarity</td></tr>
+                </table>
+                
+                <h3 style="margin-top:15px;">Why This Weighting?</h3>
+                <ul style="font-size:0.9em;">
+                    <li><strong>Skills (45%):</strong> Direct measurement of job fit</li>
+                    <li><strong>Semantic (40%):</strong> Captures context and meaning</li>
+                    <li><strong>Keywords (15%):</strong> Ensures terminology match</li>
+                </ul>
+            </div>
+            <div class="col">
+                <div class="diagram-box" style="height:100%;">
+                    <div class="diagram-title">Scoring Flow</div>
+                    <div class="mermaid">
+flowchart TB
+    subgraph IN["Input"]
+        RT[Resume Text]
+        JD[Job Description]
+        CS[Candidate Skills]
+        RS[Required Skills]
+    end
+    
+    subgraph CALC["Calculation"]
+        B[BERT<br/>Similarity]
+        T[TF-IDF<br/>Similarity]
+        S[Skill<br/>Ratio]
+    end
+    
+    subgraph OUT["Output"]
+        W[Weighted<br/>Sum]
+        F[Final Score<br/>0-100%]
+    end
+    
+    RT & JD --> B
+    RT & JD --> T
+    CS & RS --> S
+    
+    B -->|40%| W
+    T -->|15%| W
+    S -->|45%| W
+    W --> F
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 8: API & Deployment -->
+<div class="slide">
+    <div class="slide-header">
+        <div>
+            <h1>🔌 API & Deployment</h1>
+            <span class="subtitle">Endpoints and Server Configuration</span>
+        </div>
+        <span class="subtitle">Slide 8/8</span>
+    </div>
+    <div class="slide-content">
+        <div class="two-col">
+            <div class="col">
+                <h2>API Endpoints</h2>
+                <table>
+                    <tr><th>Endpoint</th><th>Method</th><th>Function</th></tr>
+                    <tr><td>/hr/auth/login</td><td>POST</td><td>HR login</td></tr>
+                    <tr><td>/hr/auth/signup</td><td>POST</td><td>HR register</td></tr>
+                    <tr><td>/hr/jobs</td><td>GET</td><td>Get job roles</td></tr>
+                    <tr><td>/hr/resumes</td><td>POST</td><td>Upload & analyze</td></tr>
+                    <tr><td>/hr/dashboard/:id</td><td>GET</td><td>Get candidates</td></tr>
+                </table>
+                
+                <h2 style="margin-top:20px;">Python Service</h2>
+                <table>
+                    <tr><th>Endpoint</th><th>Function</th></tr>
+                    <tr><td>/analyze</td><td>Resume analysis</td></tr>
+                    <tr><td>/health</td><td>Health check</td></tr>
+                </table>
+            </div>
+            <div class="col">
+                <h2>Deployment Configuration</h2>
+                <div class="diagram-box" style="height:auto; margin-bottom:15px;">
+                    <div class="diagram-title">Server Ports</div>
+                    <div class="mermaid">
+flowchart LR
+    B[Browser]
+    V[Vite<br/>:5173]
+    N[Node.js<br/>:3000]
+    P[Python<br/>:8000]
+    
+    B --> V --> N --> P
+                    </div>
+                </div>
+                
+                <table>
+                    <tr><th>Service</th><th>Port</th><th>Technology</th></tr>
+                    <tr><td>Frontend</td><td>5173</td><td>Vite Dev Server</td></tr>
+                    <tr><td>Backend</td><td>3000</td><td>Node.js/Express</td></tr>
+                    <tr><td>Processing</td><td>8000</td><td>Python/FastAPI</td></tr>
+                </table>
+                
+                <h3 style="margin-top:15px;">File Storage</h3>
+                <ul style="font-size:0.9em;">
+                    <li><strong>/uploads/</strong> - Resume files</li>
+                    <li><strong>/data/</strong> - JSON databases</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+            primaryColor: '#3498db',
+            primaryTextColor: '#fff',
+            primaryBorderColor: '#2980b9',
+            lineColor: '#34495e',
+            secondaryColor: '#ecf0f1',
+            tertiaryColor: '#f8f9fa',
+            fontFamily: 'Segoe UI, sans-serif',
+            fontSize: '12px'
+        },
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            curve: 'basis',
+            padding: 10,
+            nodeSpacing: 30,
+            rankSpacing: 30
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Architecture - Resume Screening and Career Guidance System</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        section {
+            margin-bottom: 50px;
+        }
+        
+        h2 {
+            color: #1a1a2e;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+        
+        h3 {
+            color: #16213e;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+        }
+        
+        h4 {
+            color: #333;
+            font-size: 1.15em;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .diagram-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px 0;
+            border: 2px solid #e9ecef;
+        }
+        
+        .diagram-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .module-card {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .module-card h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        
+        .module-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .module-card li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .module-card li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.8em;
+        }
+        
+        .legend-entity { background: #28a745; }
+        .legend-process { background: #007bff; border-radius: 50%; }
+        .legend-datastore { background: #6c757d; }
+        .legend-dataflow { background: #ffc107; color: #333; }
+        
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+        
+        .note-box strong {
+            color: #856404;
+        }
+        
+        .architecture-layer {
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .layer-title {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        footer {
+            background: #1a1a2e;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .edgeLabel{
+            color: #000000;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .diagram-container {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 System Architecture Document</h1>
+            <p>Resume Screening and Career Guidance System</p>
+        </header>
+        
+        <div class="content">
+            <!-- Section 1: Introduction -->
+            <section>
+                <h2>1. Introduction</h2>
+                <p>
+                    This document presents the system architecture and data flow diagrams for the 
+                    <strong>Resume Screening and Career Guidance System</strong>. The system is designed 
+                    to automate the resume screening process for HR professionals and provide career 
+                    guidance to job seekers through skill gap analysis and personalized roadmaps.
+                </p>
+                <p>
+                    The architecture follows a three-tier design pattern with clear separation between 
+                    the presentation layer (React.js), application layer (Node.js/Express), and 
+                    processing layer (Python/FastAPI). This modular approach ensures maintainability, 
+                    scalability, and ease of future enhancements.
+                </p>
+            </section>
+
+            <!-- Section 2: System Architecture Overview -->
+            <section>
+                <h2>2. System Architecture Overview</h2>
+                
+                <div class="diagram-container">
+                    <div class="diagram-title">System Architecture</div>
+                    <div class="mermaid">
+flowchart TB
+    subgraph CLIENT["Client Layer"]
+        UI[Web Browser]
+        HR[HR User Interface]
+        CAND[Candidate User Interface]
+    end
+    
+    subgraph FRONTEND["Presentation Layer - React.js"]
+        REACT[React Application]
+        ROUTER[React Router]
+        COMPONENTS[UI Components]
+        API_CLIENT[API Client - Axios]
+    end
+    
+    subgraph BACKEND["Application Layer - Node.js"]
+        EXPRESS[Express Server]
+        ROUTES[API Routes]
+        CONTROLLERS[Controllers]
+        MULTER[File Upload Handler]
+    end
+    
+    subgraph PROCESSING["Processing Layer - Python"]
+        FASTAPI[FastAPI Server]
+        PARSER[Resume Parser]
+        EXTRACTOR[Skill Extractor]
+        SCORER[Similarity Scorer]
+        NLP[NLP Processing - spaCy]
+    end
+    
+    subgraph DATA["Data Layer"]
+        FILES[(Resume Files)]
+        SKILLS[(Skills Database)]
+        JOBS[(Job Roles Data)]
+        USERS[(User Data)]
+    end
+    
+    UI --> HR & CAND
+    HR & CAND --> REACT
+    REACT --> ROUTER --> COMPONENTS --> API_CLIENT
+    API_CLIENT -->|HTTP Requests| EXPRESS
+    EXPRESS --> ROUTES --> CONTROLLERS
+    CONTROLLERS --> MULTER --> FILES
+    CONTROLLERS -->|HTTP Requests| FASTAPI
+    FASTAPI --> PARSER & EXTRACTOR & SCORER
+    EXTRACTOR --> NLP
+    SCORER --> NLP
+    PARSER --> FILES
+    EXTRACTOR --> SKILLS
+    CONTROLLERS --> JOBS & USERS
+                    </div>
+                </div>
+
+                <h3>2.1 Architecture Layers</h3>
+                
+                <div class="architecture-layer">
+                    <span class="layer-title">Presentation Layer (Frontend)</span>
+                    <p>
+                        The frontend is built using <strong>React.js</strong> with Vite as the build tool. 
+                        It provides responsive user interfaces for both HR professionals and candidates. 
+                        Key components include dashboard views, resume upload functionality, filtering panels, 
+                        and result visualization.
+                    </p>
+                    <ul>
+                        <li><strong>Technology:</strong> React.js, React Router, Tailwind CSS</li>
+                        <li><strong>Communication:</strong> RESTful API calls via Axios</li>
+                        <li><strong>Features:</strong> Single Page Application (SPA), Responsive Design</li>
+                    </ul>
+                </div>
+
+                <div class="architecture-layer">
+                    <span class="layer-title">Application Layer (Backend)</span>
+                    <p>
+                        The backend server is built using <strong>Node.js</strong> with <strong>Express.js</strong> 
+                        framework. It handles HTTP requests, manages file uploads using Multer, implements 
+                        business logic, and communicates with the processing service.
+                    </p>
+                    <ul>
+                        <li><strong>Technology:</strong> Node.js, Express.js, Multer</li>
+                        <li><strong>API Design:</strong> RESTful architecture</li>
+                        <li><strong>Features:</strong> Authentication, File Management, Request Routing</li>
+                    </ul>
+                </div>
+
+                <div class="architecture-layer">
+                    <span class="layer-title">Processing Layer (Python Service)</span>
+                    <p>
+                        The processing service is built using <strong>FastAPI</strong> (Python) and handles 
+                        all resume analysis operations. It performs text extraction, skill identification, 
+                        and similarity scoring using NLP techniques.
+                    </p>
+                    <ul>
+                        <li><strong>Technology:</strong> Python, FastAPI, spaCy, sentence-transformers</li>
+                        <li><strong>Functions:</strong> Resume Parsing, Skill Extraction, Similarity Calculation</li>
+                        <li><strong>Features:</strong> High Performance, Concurrent Processing</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Module Architecture -->
+            <section>
+                <h2>3. Module Architecture</h2>
+                
+                <div class="module-grid">
+                    <div class="module-card">
+                        <h4>📄 Resume Parser Module</h4>
+                        <ul>
+                            <li>PDF text extraction (pdfplumber)</li>
+                            <li>DOCX text extraction (python-docx)</li>
+                            <li>Layout-aware parsing</li>
+                            <li>Table content extraction</li>
+                            <li>Text cleaning and normalization</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="module-card">
+                        <h4>🔍 Skill Extractor Module</h4>
+                        <ul>
+                            <li>Pattern-based skill matching</li>
+                            <li>Canonical skill normalization</li>
+                            <li>Skills database lookup</li>
+                            <li>Word boundary detection</li>
+                            <li>Variation handling</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="module-card">
+                        <h4>📊 Scoring Module</h4>
+                        <ul>
+                            <li>Semantic similarity (BERT)</li>
+                            <li>TF-IDF keyword matching</li>
+                            <li>Skill ratio calculation</li>
+                            <li>Weighted score computation</li>
+                            <li>Score normalization</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="module-card">
+                        <h4>👤 NLP Processing Module</h4>
+                        <ul>
+                            <li>Named Entity Recognition</li>
+                            <li>Contact information extraction</li>
+                            <li>Experience detection</li>
+                            <li>Education parsing</li>
+                            <li>Portfolio link extraction</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="module-card">
+                        <h4>🎯 Career Guidance Module</h4>
+                        <ul>
+                            <li>Skill gap identification</li>
+                            <li>Learning roadmap generation</li>
+                            <li>Resource recommendations</li>
+                            <li>Progress tracking</li>
+                            <li>Score interpretation</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="module-card">
+                        <h4>🔐 Authentication Module</h4>
+                        <ul>
+                            <li>User registration</li>
+                            <li>Login/logout functionality</li>
+                            <li>Role-based access control</li>
+                            <li>Session management</li>
+                            <li>Password security</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Data Flow Diagrams -->
+            <section>
+                <h2>4. Data Flow Diagrams (DFD)</h2>
+                
+                <p>
+                    Data Flow Diagrams illustrate how data moves through the system. The following 
+                    diagrams show the system at different levels of detail, from a high-level context 
+                    diagram to detailed process breakdowns.
+                </p>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-box legend-entity">E</div>
+                        <span>External Entity (User/System)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box legend-process">P</div>
+                        <span>Process</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box legend-datastore">D</div>
+                        <span>Data Store</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box legend-dataflow">→</div>
+                        <span>Data Flow</span>
+                    </div>
+                </div>
+
+                <!-- DFD Level 0 -->
+                <h3>4.1 DFD Level 0 - Context Diagram</h3>
+                <p>
+                    The context diagram shows the system as a single process and its interaction with 
+                    external entities. It provides a high-level overview of system boundaries and 
+                    data flows.
+                </p>
+
+                <div class="diagram-container">
+                    <div class="diagram-title">DFD Level 0 - Context Diagram</div>
+                    <div class="mermaid">
+flowchart LR
+    HR([👔 HR User])
+    CAND([👤 Candidate])
+    
+    SYSTEM((Resume Screening<br/>and Career<br/>Guidance System))
+    
+    HR -->|Resume Files| SYSTEM
+    HR -->|Job Requirements| SYSTEM
+    HR -->|Filter Criteria| SYSTEM
+    SYSTEM -->|Ranked Candidates| HR
+    SYSTEM -->|Match Scores| HR
+    SYSTEM -->|Candidate Details| HR
+    
+    CAND -->|Resume File| SYSTEM
+    CAND -->|Target Job Role| SYSTEM
+    SYSTEM -->|Resume Score| CAND
+    SYSTEM -->|Skill Gap Report| CAND
+    SYSTEM -->|Career Roadmap| CAND
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <strong>External Entities:</strong>
+                    <ul>
+                        <li><strong>HR User:</strong> Human Resource professional who uploads resumes and evaluates candidates</li>
+                        <li><strong>Candidate:</strong> Job seeker who uploads resume for analysis and career guidance</li>
+                    </ul>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Input to System</th>
+                        <th>Output from System</th>
+                    </tr>
+                    <tr>
+                        <td>HR User</td>
+                        <td>Resume Files, Job Requirements, Filter Criteria</td>
+                        <td>Ranked Candidates, Match Scores, Candidate Details</td>
+                    </tr>
+                    <tr>
+                        <td>Candidate</td>
+                        <td>Resume File, Target Job Role</td>
+                        <td>Resume Score, Skill Gap Report, Career Roadmap</td>
+                    </tr>
+                </table>
+
+                <!-- DFD Level 1 -->
+                <h3>4.2 DFD Level 1 - Main Processes</h3>
+                <p>
+                    Level 1 DFD decomposes the system into its major processes, showing how data 
+                    flows between processes and data stores. This level reveals the main functional 
+                    components of the system.
+                </p>
+
+                <div class="diagram-container">
+                    <div class="diagram-title">DFD Level 1 - System Decomposition</div>
+                    <div class="mermaid">
+flowchart TB
+    HR([👔 HR User])
+    CAND([👤 Candidate])
+    
+    P1((1.0<br/>Resume<br/>Upload))
+    P2((2.0<br/>Resume<br/>Analysis))
+    P3((3.0<br/>Scoring &<br/>Ranking))
+    P4((4.0<br/>Career<br/>Guidance))
+    P5((5.0<br/>User<br/>Management))
+    
+    D1[(D1: Resume<br/>Database)]
+    D2[(D2: Skills<br/>Database)]
+    D3[(D3: Job Roles<br/>Database)]
+    D4[(D4: Score<br/>Records)]
+    D5[(D5: User<br/>Database)]
+    
+    %% HR flows
+    HR -->|Resume Files| P1
+    HR -->|Job Requirements| P3
+    HR -->|Filter Criteria| P3
+    HR -->|Login Credentials| P5
+    
+    %% Candidate flows
+    CAND -->|Resume File| P1
+    CAND -->|Target Role| P4
+    CAND -->|Login Credentials| P5
+    
+    %% Process 1 flows
+    P1 -->|Stored Resume| D1
+    P1 -->|Resume Data| P2
+    
+    %% Process 2 flows
+    D1 -->|Resume Text| P2
+    D2 -->|Skills List| P2
+    P2 -->|Extracted Skills| P3
+    P2 -->|Candidate Info| P3
+    P2 -->|Extracted Skills| P4
+    
+    %% Process 3 flows
+    D3 -->|Job Requirements| P3
+    P3 -->|Match Score| D4
+    P3 -->|Ranked Candidates| HR
+    P3 -->|Match Scores| HR
+    
+    %% Process 4 flows
+    D3 -->|Role Requirements| P4
+    D4 -->|Current Score| P4
+    P4 -->|Skill Gap Report| CAND
+    P4 -->|Career Roadmap| CAND
+    P4 -->|Resume Score| CAND
+    
+    %% Process 5 flows
+    D5 -->|User Data| P5
+    P5 -->|Auth Token| HR
+    P5 -->|Auth Token| CAND
+                    </div>
+                </div>
+
+                <h4>Process Descriptions</h4>
+                <table>
+                    <tr>
+                        <th>Process ID</th>
+                        <th>Process Name</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>1.0</td>
+                        <td>Resume Upload</td>
+                        <td>Handles file upload, validation, and storage of resume documents</td>
+                    </tr>
+                    <tr>
+                        <td>2.0</td>
+                        <td>Resume Analysis</td>
+                        <td>Extracts text, identifies skills, and parses candidate information</td>
+                    </tr>
+                    <tr>
+                        <td>3.0</td>
+                        <td>Scoring & Ranking</td>
+                        <td>Calculates match scores and ranks candidates against job requirements</td>
+                    </tr>
+                    <tr>
+                        <td>4.0</td>
+                        <td>Career Guidance</td>
+                        <td>Identifies skill gaps and generates personalized career roadmaps</td>
+                    </tr>
+                    <tr>
+                        <td>5.0</td>
+                        <td>User Management</td>
+                        <td>Handles user authentication, registration, and session management</td>
+                    </tr>
+                </table>
+
+                <h4>Data Store Descriptions</h4>
+                <table>
+                    <tr>
+                        <th>Store ID</th>
+                        <th>Store Name</th>
+                        <th>Contents</th>
+                    </tr>
+                    <tr>
+                        <td>D1</td>
+                        <td>Resume Database</td>
+                        <td>Uploaded resume files and extracted text content</td>
+                    </tr>
+                    <tr>
+                        <td>D2</td>
+                        <td>Skills Database</td>
+                        <td>Master list of skills with variations and categories</td>
+                    </tr>
+                    <tr>
+                        <td>D3</td>
+                        <td>Job Roles Database</td>
+                        <td>Job titles, descriptions, and required skills</td>
+                    </tr>
+                    <tr>
+                        <td>D4</td>
+                        <td>Score Records</td>
+                        <td>Calculated match scores and ranking history</td>
+                    </tr>
+                    <tr>
+                        <td>D5</td>
+                        <td>User Database</td>
+                        <td>User accounts, credentials, and profiles</td>
+                    </tr>
+                </table>
+
+                <!-- DFD Level 2 -->
+                <h3>4.3 DFD Level 2 - Resume Analysis Process (2.0)</h3>
+                <p>
+                    Level 2 DFD provides a detailed breakdown of the Resume Analysis process (Process 2.0), 
+                    showing the sub-processes involved in extracting and processing resume information.
+                </p>
+
+                <div class="diagram-container">
+                    <div class="diagram-title">DFD Level 2 - Resume Analysis Process Decomposition</div>
+                    <div class="mermaid">
+flowchart TB
+    subgraph INPUT["Input"]
+        D1[(D1: Resume<br/>Database)]
+    end
+    
+    subgraph PROCESS2["Process 2.0: Resume Analysis"]
+        P21((2.1<br/>Text<br/>Extraction))
+        P22((2.2<br/>Text<br/>Cleaning))
+        P23((2.3<br/>Contact<br/>Extraction))
+        P24((2.4<br/>Skill<br/>Identification))
+        P25((2.5<br/>Experience<br/>Detection))
+        P26((2.6<br/>Entity<br/>Recognition))
+    end
+    
+    subgraph DATASTORES["Data Stores"]
+        D2[(D2: Skills<br/>Database)]
+        D6[(D6: Extracted<br/>Data)]
+    end
+    
+    subgraph OUTPUT["Output"]
+        OUT1[/Extracted Skills/]
+        OUT2[/Candidate Info/]
+    end
+    
+    %% Input flows
+    D1 -->|PDF/DOCX File| P21
+    
+    %% Process 2.1 flows
+    P21 -->|Raw Text| P22
+    P21 -->|Table Data| P22
+    
+    %% Process 2.2 flows
+    P22 -->|Clean Text| P23
+    P22 -->|Clean Text| P24
+    P22 -->|Clean Text| P25
+    P22 -->|Clean Text| P26
+    
+    %% Process 2.3 flows
+    P23 -->|Email, Phone| D6
+    
+    %% Process 2.4 flows
+    D2 -->|Skills List| P24
+    D2 -->|Skill Variations| P24
+    P24 -->|Matched Skills| D6
+    P24 -->|Matched Skills| OUT1
+    
+    %% Process 2.5 flows
+    P25 -->|Years of Experience| D6
+    
+    %% Process 2.6 flows
+    P26 -->|Name, Location| D6
+    P26 -->|Education| D6
+    P26 -->|Companies| D6
+    
+    %% Output aggregation
+    D6 -->|Candidate Profile| OUT2
+                    </div>
+                </div>
+
+                <h4>Sub-Process Descriptions</h4>
+                <table>
+                    <tr>
+                        <th>Process ID</th>
+                        <th>Process Name</th>
+                        <th>Description</th>
+                        <th>Technology</th>
+                    </tr>
+                    <tr>
+                        <td>2.1</td>
+                        <td>Text Extraction</td>
+                        <td>Extracts raw text from PDF and DOCX files using layout-aware parsing</td>
+                        <td>pdfplumber, python-docx</td>
+                    </tr>
+                    <tr>
+                        <td>2.2</td>
+                        <td>Text Cleaning</td>
+                        <td>Removes excess whitespace, normalizes text while preserving structure</td>
+                        <td>Python regex</td>
+                    </tr>
+                    <tr>
+                        <td>2.3</td>
+                        <td>Contact Extraction</td>
+                        <td>Identifies email addresses, phone numbers, and portfolio links</td>
+                        <td>Regular expressions</td>
+                    </tr>
+                    <tr>
+                        <td>2.4</td>
+                        <td>Skill Identification</td>
+                        <td>Matches text against skills database with variation handling</td>
+                        <td>Pattern matching, word boundaries</td>
+                    </tr>
+                    <tr>
+                        <td>2.5</td>
+                        <td>Experience Detection</td>
+                        <td>Extracts years of experience from various text patterns</td>
+                        <td>Regular expressions</td>
+                    </tr>
+                    <tr>
+                        <td>2.6</td>
+                        <td>Entity Recognition</td>
+                        <td>Identifies names, organizations, locations using NLP</td>
+                        <td>spaCy NER</td>
+                    </tr>
+                </table>
+
+                <div class="note-box">
+                    <strong>Data Flow Details:</strong>
+                    <ul>
+                        <li>PDF/DOCX files flow from Resume Database to Text Extraction process</li>
+                        <li>Clean text is distributed to multiple parallel extraction processes</li>
+                        <li>All extracted information is consolidated in Extracted Data store</li>
+                        <li>Final output includes structured candidate information and identified skills</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 5: Scoring Algorithm Flow -->
+            <section>
+                <h2>5. Scoring Algorithm Flow</h2>
+                
+                <div class="diagram-container">
+                    <div class="diagram-title">Scoring Process Flow</div>
+                    <div class="mermaid">
+flowchart LR
+    subgraph INPUT["Input Data"]
+        RT[Resume Text]
+        JD[Job Description]
+        CS[Candidate Skills]
+        RS[Required Skills]
+    end
+    
+    subgraph SIMILARITY["Similarity Calculation"]
+        BERT[Semantic Similarity<br/>BERT Encoding]
+        TFIDF[Keyword Similarity<br/>TF-IDF Vectors]
+        SKILL[Skill Match<br/>Ratio Calculation]
+    end
+    
+    subgraph SCORING["Score Computation"]
+        WEIGHT[Weighted<br/>Combination]
+        NORM[Score<br/>Normalization]
+    end
+    
+    subgraph OUTPUT["Output"]
+        FINAL[Final Match<br/>Score 0-100%]
+    end
+    
+    RT --> BERT
+    JD --> BERT
+    RT --> TFIDF
+    JD --> TFIDF
+    CS --> SKILL
+    RS --> SKILL
+    
+    BERT -->|40% Weight| WEIGHT
+    TFIDF -->|15% Weight| WEIGHT
+    SKILL -->|45% Weight| WEIGHT
+    
+    WEIGHT --> NORM --> FINAL
+                    </div>
+                </div>
+
+                <h3>5.1 Scoring Formula</h3>
+                <p>The final match score is calculated using a weighted combination of three metrics:</p>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; font-family: 'Courier New', monospace; font-size: 1.2em; margin: 20px 0;">
+                    <strong>Final Score = (0.45 × Skill Match) + (0.40 × Semantic Similarity) + (0.15 × Keyword Similarity)</strong>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Weight</th>
+                        <th>Method</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>Skill Match Ratio</td>
+                        <td>45%</td>
+                        <td>Set intersection of candidate skills and required skills</td>
+                        <td>Direct measurement of skill coverage</td>
+                    </tr>
+                    <tr>
+                        <td>Semantic Similarity</td>
+                        <td>40%</td>
+                        <td>BERT embeddings with cosine similarity</td>
+                        <td>Captures meaning and context alignment</td>
+                    </tr>
+                    <tr>
+                        <td>Keyword Similarity</td>
+                        <td>15%</td>
+                        <td>TF-IDF vectors with cosine similarity</td>
+                        <td>Ensures important terms are present</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Section 6: API Architecture -->
+            <section>
+                <h2>6. API Architecture</h2>
+                
+                <div class="diagram-container">
+                    <div class="diagram-title">API Endpoint Structure</div>
+                    <div class="mermaid">
+flowchart LR
+    subgraph FRONTEND["Frontend React App"]
+        UI[User Interface]
+    end
+    
+    subgraph BACKEND["Backend API - /hr"]
+        AUTH["/auth<br/>Login/Signup"]
+        JOBS["/jobs<br/>Job Management"]
+        RESUMES["/resumes<br/>Resume Upload"]
+        DASH["/dashboard<br/>Analytics"]
+    end
+    
+    subgraph PYTHON["Python Service"]
+        ANALYZE["/analyze<br/>Resume Analysis"]
+    end
+    
+    UI -->|POST /hr/auth/login| AUTH
+    UI -->|GET /hr/jobs| JOBS
+    UI -->|POST /hr/resumes| RESUMES
+    UI -->|GET /hr/dashboard/:jobId| DASH
+    RESUMES -->|POST /analyze| ANALYZE
+                    </div>
+                </div>
+
+                <h3>6.1 Backend API Endpoints</h3>
+                <table>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>/hr/auth/login</td>
+                        <td>POST</td>
+                        <td>Authenticate HR user</td>
+                    </tr>
+                    <tr>
+                        <td>/hr/auth/signup</td>
+                        <td>POST</td>
+                        <td>Register new HR user</td>
+                    </tr>
+                    <tr>
+                        <td>/hr/jobs</td>
+                        <td>GET</td>
+                        <td>Retrieve all job roles</td>
+                    </tr>
+                    <tr>
+                        <td>/hr/resumes</td>
+                        <td>POST</td>
+                        <td>Upload and analyze resumes</td>
+                    </tr>
+                    <tr>
+                        <td>/hr/dashboard/:jobId</td>
+                        <td>GET</td>
+                        <td>Get candidates for specific job</td>
+                    </tr>
+                </table>
+
+                <h3>6.2 Python Service Endpoints</h3>
+                <table>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>/analyze</td>
+                        <td>POST</td>
+                        <td>Analyze resume file with job requirements</td>
+                    </tr>
+                    <tr>
+                        <td>/health</td>
+                        <td>GET</td>
+                        <td>Service health check</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Section 7: Technology Integration -->
+            <section>
+                <h2>7. Technology Integration</h2>
+                
+                <div class="diagram-container">
+                    <div class="diagram-title">Technology Stack Integration</div>
+                    <div class="mermaid">
+flowchart TB
+    subgraph BROWSER["Web Browser"]
+        HTML[HTML5]
+        CSS[Tailwind CSS]
+        JS[JavaScript ES6+]
+    end
+    
+    subgraph REACT["React Ecosystem"]
+        REACTLIB[React 18]
+        ROUTER[React Router 6]
+        VITE[Vite Build Tool]
+    end
+    
+    subgraph NODE["Node.js Ecosystem"]
+        EXPRESS[Express.js 4]
+        MULTER[Multer]
+        AXIOS1[Axios Client]
+        CORS[CORS Middleware]
+    end
+    
+    subgraph PYTHON["Python Ecosystem"]
+        FASTAPI[FastAPI]
+        SPACY[spaCy 3]
+        SBERT[sentence-transformers]
+        SKLEARN[scikit-learn]
+        PDFP[pdfplumber]
+        DOCX[python-docx]
+    end
+    
+    subgraph STORAGE["Data Storage"]
+        JSON[JSON Files]
+        FS[File System]
+    end
+    
+    HTML & CSS & JS --> REACTLIB
+    REACTLIB --> ROUTER --> VITE
+    VITE -->|HTTP| EXPRESS
+    EXPRESS --> MULTER & AXIOS1 & CORS
+    AXIOS1 -->|HTTP| FASTAPI
+    FASTAPI --> SPACY & SBERT & SKLEARN & PDFP & DOCX
+    MULTER --> FS
+    EXPRESS --> JSON
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: Deployment Architecture -->
+            <section>
+                <h2>8. Deployment Architecture</h2>
+                
+                <div class="diagram-container">
+                    <div class="diagram-title">Deployment Configuration</div>
+                    <div class="mermaid">
+flowchart LR
+    subgraph CLIENT["Client"]
+        BROWSER[Web Browser<br/>localhost:5173]
+    end
+    
+    subgraph SERVERS["Development Servers"]
+        VITE_SERVER[Vite Dev Server<br/>Port 5173]
+        NODE_SERVER[Node.js Server<br/>Port 3000]
+        PYTHON_SERVER[FastAPI Server<br/>Port 8000]
+    end
+    
+    subgraph FILES["File Storage"]
+        UPLOADS[/uploads/<br/>Resume Files]
+        DATA[/data/<br/>JSON Databases]
+    end
+    
+    BROWSER --> VITE_SERVER
+    VITE_SERVER --> NODE_SERVER
+    NODE_SERVER --> PYTHON_SERVER
+    NODE_SERVER --> UPLOADS
+    NODE_SERVER --> DATA
+                    </div>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>Service</th>
+                        <th>Port</th>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>Frontend Dev Server</td>
+                        <td>5173</td>
+                        <td>Vite</td>
+                        <td>Serves React application with hot reload</td>
+                    </tr>
+                    <tr>
+                        <td>Backend API Server</td>
+                        <td>3000</td>
+                        <td>Node.js/Express</td>
+                        <td>Handles API requests and file uploads</td>
+                    </tr>
+                    <tr>
+                        <td>Processing Service</td>
+                        <td>8000</td>
+                        <td>Python/FastAPI</td>
+                        <td>Performs resume analysis and scoring</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Section 9: Conclusion -->
+            <section>
+                <h2>9. Conclusion</h2>
+                <p>
+                    The Resume Screening and Career Guidance System architecture is designed with 
+                    modularity, scalability, and maintainability in mind. The three-tier architecture 
+                    ensures clear separation of concerns:
+                </p>
+                <ul>
+                    <li><strong>Presentation Layer:</strong> Handles user interaction with responsive React interfaces</li>
+                    <li><strong>Application Layer:</strong> Manages business logic, routing, and file handling</li>
+                    <li><strong>Processing Layer:</strong> Performs computationally intensive NLP operations</li>
+                </ul>
+                <p>
+                    The Data Flow Diagrams presented in this document illustrate the systematic 
+                    flow of information from user input to final output, ensuring transparency 
+                    and traceability of data processing.
+                </p>
+            </section>
+        </div>
+        
+        <footer>
+            <p>Resume Screening and Career Guidance System - System Architecture Document</p>
+            <p>Academic Year 2025-2026 | Generated: January 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#667eea',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#5a67d8',
+                lineColor: '#4a5568',
+                secondaryColor: '#f7fafc',
+                tertiaryColor: '#edf2f7',
+                fontFamily: 'Segoe UI, sans-serif'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                padding: 15,
+                nodeSpacing: 50,
+                rankSpacing: 50
+            }
+        });
+    </script>
+</body>
+</html>
