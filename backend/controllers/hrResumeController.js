@@ -64,7 +64,7 @@ exports.uploadResumes = async (req, res) => {
   let analyzed = []
   try{
     const ml = require('../services/mlService');
-    analyzed = await ml.analyze(job, files);
+    analyzed = await ml.analyze(job, files, req.body.nameMethod);
     console.log('ML service returned', analyzed?.length || 0, 'candidates');
   }catch(e){
     console.error('ML service failed', e);

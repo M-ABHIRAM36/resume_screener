@@ -23,6 +23,7 @@ export default function HRDashboard(){
   const [candidatesList, setCandidatesList] = useState([])
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
+  const [nameMethod, setNameMethod] = useState('filename')
   
   const jobRoles = useMemo(() => {
     const uniqueRoles = []
@@ -132,6 +133,7 @@ export default function HRDashboard(){
         formData.append('jobId', activeJob.id || '')
         formData.append('jobTitle', activeJob.name || '')
         formData.append('requiredSkills', JSON.stringify(activeJob.requiredSkills || []))
+        formData.append('nameMethod', nameMethod)
         
         // POST to /hr/resumes - the correct backend endpoint
         const res = await post('/hr/resumes', formData, true)
@@ -284,7 +286,7 @@ export default function HRDashboard(){
     const rows = filtered.map(c => [
       c.name || '',
       c.email || '',
-      c.phone || '',
+      c.phone ? `="${c.phone}"` : '',
       isValidLocation(c.location) ? c.location : '',
       c.college || '',
       c.branch || c.degree || '',
@@ -462,6 +464,45 @@ export default function HRDashboard(){
                   className="input-field text-sm" 
                   rows={3}
                 />
+              </div>
+
+              {/* Name Extraction Method */}
+              <div className="border-t pt-4">
+                <label className="text-sm font-semibold text-gray-700 mb-2 block">Name Extraction Method</label>
+                <div className="space-y-2 mb-3">
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                    nameMethod === 'filename' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="nameMethod"
+                      value="filename"
+                      checked={nameMethod === 'filename'}
+                      onChange={() => setNameMethod('filename')}
+                      className="mt-1 accent-indigo-600"
+                    />
+                    <div>
+                      <div className="font-semibold text-sm text-gray-800">Standard Resume Names <span className="text-xs text-green-600 font-normal">(Recommended)</span></div>
+                      <div className="text-xs text-gray-500 mt-0.5">Resume filename must be full name. e.g., <span className="font-mono bg-gray-100 px-1 rounded">Rahul Sharma.pdf</span></div>
+                    </div>
+                  </label>
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                    nameMethod === 'auto' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="nameMethod"
+                      value="auto"
+                      checked={nameMethod === 'auto'}
+                      onChange={() => setNameMethod('auto')}
+                      className="mt-1 accent-indigo-600"
+                    />
+                    <div>
+                      <div className="font-semibold text-sm text-gray-800">Automatic Extraction</div>
+                      <div className="text-xs text-gray-500 mt-0.5">Extract name from resume text using text analysis</div>
+                    </div>
+                  </label>
+                </div>
               </div>
 
               {/* Resume Upload Section */}

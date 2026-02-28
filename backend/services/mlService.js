@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 
 const ML_URL = process.env.ML_URL || 'http://localhost:8000/analyze-resumes';
 
-async function analyze(job, files){
+async function analyze(job, files, nameMethod){
   const form = new FormData();
   
   // Build comprehensive job description
@@ -35,6 +35,11 @@ async function analyze(job, files){
   }
   
   form.append('job_description', jobDescription || jobTitle || 'Software Developer Position');
+  
+  // Name extraction method
+  if(nameMethod && typeof nameMethod === 'string') {
+    form.append('name_method', nameMethod);
+  }
   
   // Send required skills
   const reqSkills = job && (job.requiredSkills || job.required_skills) ? (job.requiredSkills || job.required_skills) : [];
