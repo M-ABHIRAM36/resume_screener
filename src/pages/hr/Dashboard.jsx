@@ -6,6 +6,36 @@ import ScoreBadge from "../../components/ScoreBadge"
 import { get, post } from "../../api"
 import jobRolesData from "../../data/job_roles.json"
 
+function TableSkillsCell({ skills = [] }) {
+  const [expanded, setExpanded] = useState(false)
+  const PREVIEW = 4
+  const hasMore = skills.length > PREVIEW
+  const visible = expanded ? skills : skills.slice(0, PREVIEW)
+  return (
+    <div className="flex flex-wrap gap-1">
+      {visible.map((s, idx) => (
+        <span key={`${s}-${idx}`} className="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">{s}</span>
+      ))}
+      {hasMore && !expanded && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-full font-medium border border-indigo-200"
+        >
+          +{skills.length - PREVIEW} more
+        </button>
+      )}
+      {expanded && hasMore && (
+        <button
+          onClick={() => setExpanded(false)}
+          className="text-xs text-gray-500 hover:text-indigo-600 px-1 py-0.5 font-medium"
+        >
+          ▲ less
+        </button>
+      )}
+    </div>
+  )
+}
+
 export default function HRDashboard(){
   const [filters, setFilters] = useState({
     skill:"", location:"", college:"", minMatch:0, experience:"",
@@ -667,10 +697,7 @@ export default function HRDashboard(){
                         <td className="px-4 py-4"><ScoreBadge score={c.score} /></td>
                         <td className="px-4 py-4 font-semibold text-indigo-600">{c.matchPercentage || 0}%</td>
                         <td className="px-4 py-4">
-                          <div className="flex flex-wrap gap-1">
-                            {(c.skills || []).slice(0, 4).map((s, idx) => <span key={`${s}-${idx}`} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{s}</span>)}
-                            {(c.skills || []).length > 4 && <span className="text-xs text-gray-500">+{c.skills.length - 4}</span>}
-                          </div>
+                          <TableSkillsCell skills={c.skills || []} />
                         </td>
                       </tr>
                     )) : (

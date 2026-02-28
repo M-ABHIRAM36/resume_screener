@@ -539,13 +539,43 @@ def extract_name_smart(text: str) -> Optional[str]:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def extract_college_smart(text: str) -> Optional[str]:
+    """
+    Extract the HIGHEST-LEVEL college/university.
+    Prioritises B.Tech/M.Tech/degree institutions over 10th/12th schools.
+    """
     if not text:
         return None
 
     table_header_words = {'degree', 'cgpa', 'marks(%)', 'year',
                           'university/institute', 'cgpa/marks'}
+
+    # Keywords that indicate 10th / 12th / school-level — skip these
+    school_level_keywords = {
+        '10th', 'tenth', 'x ', 'xth', 'ssc', 'sslc', 'matriculation',
+        '12th', 'twelfth', 'xii', 'hsc', 'intermediate', 'inter',
+        'higher secondary', 'senior secondary', 'junior college',
+        'pu college', 'p.u. college', 'pre-university',
+        'high school', 'secondary school', 'cbse', 'icse', 'isc',
+        'class 10', 'class 12', 'class x', 'class xii',
+        'board of secondary', 'board of intermediate',
+    }
+
+    # Keywords that indicate UG/PG degree level — prefer these
+    degree_level_keywords = {
+        'b.tech', 'btech', 'm.tech', 'mtech', 'b.e', 'b.e.', 'm.e', 'm.e.',
+        'b.sc', 'bsc', 'm.sc', 'msc', 'b.com', 'bcom', 'm.com', 'mcom',
+        'b.a', 'ba', 'm.a', 'ma', 'mba', 'bca', 'mca',
+        'ph.d', 'phd', 'pgdm', 'diploma in',
+        'bachelor', 'master', 'doctorate',
+        'engineering', 'technology',
+    }
+
     lines = text.split('\n')
     in_education = False
+
+    # Two-pass: first collect degree-level, then any college
+    degree_college = None  # From lines near B.Tech/M.Tech etc.
+    any_college = None     # Any college/university/institute
 
     for i, line in enumerate(lines):
         ll = line.strip().lower()
@@ -555,40 +585,82 @@ def extract_college_smart(text: str) -> Optional[str]:
         if len(set(ll.split()) & table_header_words) >= 2:
             continue
 
-        if in_education or i < 60:
-            # IIT / NIT / BITS / IIIT / IISC
-            m = re.search(
-                r'\b(IIT|NIT|IIIT|BITS|IISC)\s+([A-Za-z][a-zA-Z\s]+?)(?:\s*[,\n(]|$)',
-                line, re.I
-            )
-            if m:
-                prefix = m.group(1).upper()
-                campus = re.sub(r'\s+', ' ', m.group(2)).strip()
-                # Remove trailing degree/field text
-                campus = re.sub(
-                    r'\s+(degree|year|cgpa|marks|btech|b\.tech|mtech|m\.tech|'
-                    r'engineering|science|technology|computer|electrical|'
-                    r'mechanical|civil|electronics).*$',
-                    '', campus, flags=re.I
-                )
-                campus_words = campus.split()
-                if 1 <= len(campus_words) <= 3 and len(campus) < 30:
-                    return f"{prefix} {campus.title()}"
+        if not (in_education or i < 60):
+            continue
 
-            # "XYZ University" / "XYZ College" / "XYZ Institute of ..."
-            m = re.search(
-                r'\b([A-Z][a-zA-Z\s&\.\'-]{2,50})\s+'
-                r'(University|College|Institute(?:\s+of\s+\w+)?)\b',
-                line
+        # Check if this line or nearby lines are school-level (10th/12th)
+        nearby_text = ' '.join(
+            lines[max(0, i - 1):min(len(lines), i + 2)]
+        ).lower()
+        is_school_level = any(sk in nearby_text for sk in school_level_keywords)
+        is_degree_level = any(dk in nearby_text for dk in degree_level_keywords)
+
+        # ── IIT / NIT / BITS / IIIT / IISC (always top-priority) ──
+        m = re.search(
+            r'\b(IIT|NIT|IIIT|BITS|IISC)\s+([A-Za-z][a-zA-Z\s]+?)(?:\s*[,\n(]|$)',
+            line, re.I
+        )
+        if m:
+            prefix = m.group(1).upper()
+            campus = re.sub(r'\s+', ' ', m.group(2)).strip()
+            campus = re.sub(
+                r'\s+(degree|year|cgpa|marks|btech|b\.tech|mtech|m\.tech|'
+                r'engineering|science|technology|computer|electrical|'
+                r'mechanical|civil|electronics).*$',
+                '', campus, flags=re.I
             )
-            if m:
-                name = (m.group(1).strip() + ' ' + m.group(2).strip()).strip()
-                name = re.sub(r'\s+(degree|year|cgpa|marks).*$', '', name, flags=re.I)
-                if len(name) > 5 and not any(w in name.lower() for w in table_header_words):
-                    # Reject if it's just "PU College" or "Jr. College"
-                    name_lower = name.lower()
-                    if not re.match(r'^(pu|jr\.?|junior|base|govt\.?|government)\s+(college|school)$', name_lower):
-                        return name
+            campus_words = campus.split()
+            if 1 <= len(campus_words) <= 3 and len(campus) < 30:
+                return f"{prefix} {campus.title()}"  # IIT/NIT always wins
+
+        # ── "XYZ University" / "XYZ College" / "XYZ Institute of ..." ──
+        m = re.search(
+            r'\b([A-Z][a-zA-Z\s&\.\'-]{2,50})\s+'
+            r'(University|College|Institute(?:\s+of\s+\w+)?)\b',
+            line
+        )
+        if m:
+            name = (m.group(1).strip() + ' ' + m.group(2).strip()).strip()
+            name = re.sub(r'\s+(degree|year|cgpa|marks).*$', '', name, flags=re.I)
+            if len(name) <= 5:
+                continue
+            if any(w in name.lower() for w in table_header_words):
+                continue
+
+            name_lower = name.lower()
+
+            # Skip obvious school-level names
+            if re.match(r'^(pu|p\.u\.?|jr\.?|junior|base|govt\.?|government)\s+'
+                        r'(college|school)$', name_lower):
+                continue
+            if any(sk in name_lower for sk in ('high school', 'secondary school',
+                                                 'vidyalaya', 'senior secondary',
+                                                 'junior college', 'pu college')):
+                # Only save as fallback if nothing else found
+                if not any_college and not is_degree_level:
+                    any_college = name
+                continue
+
+            # If near degree-level keywords, it's the primary college
+            if is_degree_level and not is_school_level:
+                if not degree_college:
+                    degree_college = name
+            elif not is_school_level:
+                # Not near any level markers — could be either
+                if not degree_college:
+                    degree_college = name
+                elif not any_college:
+                    any_college = name
+            else:
+                # School-level line — only use as last resort
+                if not any_college:
+                    any_college = name
+
+    # Return degree-level college first, fall back to any college
+    if degree_college:
+        return degree_college
+    if any_college:
+        return any_college
 
     # NER fallback
     if nlp:
@@ -599,8 +671,14 @@ def extract_college_smart(text: str) -> Optional[str]:
             for ent in doc.ents:
                 if ent.label_ == 'ORG':
                     t = ent.text.strip()
-                    if any(kw in t.lower() for kw in college_kw):
-                        if not any(w in t.lower() for w in table_header_words):
+                    t_lower = t.lower()
+                    if any(kw in t_lower for kw in college_kw):
+                        if not any(w in t_lower for w in table_header_words):
+                            # Skip school-level
+                            if any(sk in t_lower for sk in ('high school', 'vidyalaya',
+                                                              'junior college', 'pu college',
+                                                              'secondary school')):
+                                continue
                             if 3 < len(t) < 80:
                                 return t
         except Exception:

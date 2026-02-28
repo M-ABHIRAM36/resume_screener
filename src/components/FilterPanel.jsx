@@ -253,24 +253,30 @@ export default function FilterPanel({ filters, setFilters, setSortBy, sortBy, cu
           </div>
 
           {/* Has Portfolio */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-1">
             <label className="text-xs font-semibold text-gray-600">🔗 Has Portfolio Links</label>
             <button
+              type="button"
+              role="switch"
+              aria-checked={filters.hasPortfolio}
               onClick={() => setFilters({ ...filters, hasPortfolio: !filters.hasPortfolio })}
-              className={`w-10 h-5 rounded-full transition-colors relative ${filters.hasPortfolio ? 'bg-indigo-500' : 'bg-gray-300'}`}
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 ${filters.hasPortfolio ? 'bg-indigo-600' : 'bg-gray-300'}`}
             >
-              <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${filters.hasPortfolio ? 'translate-x-5' : 'translate-x-0.5'}`} />
+              <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${filters.hasPortfolio ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
           </div>
 
           {/* Has Internships */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-1">
             <label className="text-xs font-semibold text-gray-600">💼 Has Internships</label>
             <button
+              type="button"
+              role="switch"
+              aria-checked={filters.hasInternships}
               onClick={() => setFilters({ ...filters, hasInternships: !filters.hasInternships })}
-              className={`w-10 h-5 rounded-full transition-colors relative ${filters.hasInternships ? 'bg-indigo-500' : 'bg-gray-300'}`}
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 ${filters.hasInternships ? 'bg-indigo-600' : 'bg-gray-300'}`}
             >
-              <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${filters.hasInternships ? 'translate-x-5' : 'translate-x-0.5'}`} />
+              <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${filters.hasInternships ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
           </div>
 

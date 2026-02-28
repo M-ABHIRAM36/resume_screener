@@ -1,4 +1,4 @@
-﻿import React from "react"
+﻿import React, { useState } from "react"
 import SkillBadge from "./SkillBadge"
 import ScoreBadge from "./ScoreBadge"
 
@@ -20,6 +20,48 @@ function isValidLocation(loc) {
   if (locLower.length < 3) return false
   if (/^[\d\W]+$/.test(locLower)) return false
   return true
+}
+
+const PREVIEW_COUNT = 6
+
+function SkillsSection({ skills }) {
+  const [expanded, setExpanded] = useState(false)
+  const hasMore = skills.length > PREVIEW_COUNT
+  const visible = expanded ? skills : skills.slice(0, PREVIEW_COUNT)
+  const hiddenCount = skills.length - PREVIEW_COUNT
+
+  return (
+    <div className="border-t pt-3">
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-xs font-semibold text-gray-600">
+          Skills <span className="text-gray-400 font-normal">({skills.length})</span>
+        </div>
+        {hasMore && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1 transition-colors"
+          >
+            {expanded ? (
+              <>Show less <span className="text-[10px]">▲</span></>
+            ) : (
+              <>View all {skills.length} skills <span className="text-[10px]">▼</span></>
+            )}
+          </button>
+        )}
+      </div>
+      <div className={`flex flex-wrap gap-1.5 ${expanded ? '' : ''}`}>
+        {visible.map((s, idx) => <SkillBadge key={`${s}-${idx}`} skill={s} />)}
+        {!expanded && hasMore && (
+          <button
+            onClick={() => setExpanded(true)}
+            className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-full font-medium transition-colors border border-indigo-200"
+          >
+            +{hiddenCount} more
+          </button>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default function CandidateCard({ candidate }) {
@@ -69,15 +111,7 @@ export default function CandidateCard({ candidate }) {
       </div>
 
       {/* Skills */}
-      <div className="border-t pt-3">
-        <div className="text-xs font-semibold text-gray-600 mb-2">Skills:</div>
-        <div className="flex flex-wrap gap-2">
-          {c.skills?.slice(0, 8).map((s, idx) => <SkillBadge key={`${s}-${idx}`} skill={s} />)}
-          {c.skills?.length > 8 && (
-            <span className="text-xs text-gray-500 px-2 py-1">+{c.skills.length - 8} more</span>
-          )}
-        </div>
-      </div>
+      <SkillsSection skills={c.skills || []} />
 
       {/* Internships if available */}
       {c.internships && c.internships.length > 0 && (
