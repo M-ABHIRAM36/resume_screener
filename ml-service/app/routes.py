@@ -1230,6 +1230,30 @@ async def analyze_resumes(
                 else 'Low Fit'
             )
 
+            # ── Category scores (0-100 each) for candidate breakdown ──────
+            cat_skill   = int(round(min(max(skill_ratio, 0), 1) * 100))
+            cat_exp     = int(round(min(experience / 5.0, 1.0) * 100))
+            cat_project = int(round((0.5 if has_projects else 0.0) * 100))
+            cat_keyword = int(round(min(max(tfidf_sim, 0), 1) * 100))
+            cat_edu     = 0
+            if has_top_edu:
+                cat_edu += 50
+            if branch:
+                cat_edu += 30
+            if college:
+                cat_edu += 20
+            cat_edu = min(cat_edu, 100)
+
+            bonus_detail = {}
+            if has_projects:        bonus_detail['projects'] = True
+            if has_achievements:    bonus_detail['achievements'] = True
+            if has_publications:    bonus_detail['publications'] = True
+            if has_leadership:      bonus_detail['leadership'] = True
+            if has_technical_depth: bonus_detail['technicalDepth'] = True
+            if has_top_edu:         bonus_detail['topEducation'] = True
+            if internships:         bonus_detail['internships'] = len(internships[:3])
+            if portfolio:           bonus_detail['portfolio'] = True
+
             # ── Build result ────────────────────────────────────────────────
             results.append({
                 'candidateId':    f'cand_{int(time.time())}_{idx}',
@@ -1237,6 +1261,7 @@ async def analyze_resumes(
                 'email':          email.strip() if email else '',
                 'phone':          str(phone) if phone else None,
                 'skills':         [s.strip() for s in skills[:20] if s.strip()],
+                'matchedSkills':  [s.strip() for s in matched if s.strip()],
                 'missingSkills':  [s.strip() for s in missing if s.strip()],
                 'experience':     max(0, min(experience, 30)),
                 'internships':    internships[:3] if internships else None,
@@ -1249,6 +1274,14 @@ async def analyze_resumes(
                 'score':          score,
                 'resumeStrength': resume_strength,
                 'jobFitLevel':    job_fit,
+                'categoryScores': {
+                    'skillMatch':   cat_skill,
+                    'experience':   cat_exp,
+                    'projects':     cat_project,
+                    'keywords':     cat_keyword,
+                    'education':    cat_edu,
+                },
+                'bonusFactors':   bonus_detail,
             })
 
             print(f"✓ {f.filename}: name={name}, skills={len(skills)}, "

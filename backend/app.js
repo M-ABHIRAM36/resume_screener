@@ -16,11 +16,13 @@ const hrAuthRoutes = require('./routes/hrAuthRoutes');
 const hrJobRoutes = require('./routes/hrJobRoutes');
 const hrResumeRoutes = require('./routes/hrResumeRoutes');
 const hrDashboardRoutes = require('./routes/hrDashboardRoutes');
+const candidateRoutes = require('./routes/candidateRoutes');
 
 app.use('/hr/auth', hrAuthRoutes);
 app.use('/hr/jobs', hrJobRoutes);
 app.use('/hr/resumes', hrResumeRoutes);
 app.use('/hr/dashboard', hrDashboardRoutes);
+app.use('/candidate', candidateRoutes);
 const hrDebugRoutes = require('./routes/hrDebugRoutes');
 app.use('/hr/debug', hrDebugRoutes);
 
