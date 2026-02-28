@@ -1,5 +1,120 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
+
+/* ── Roadmap image mapping ─────────────────────────────────────── */
+const ROADMAP_MAP = {
+  'backend developer': 'backend',
+  'frontend developer': 'frontend',
+  'full stack developer': 'full-stack',
+  'fullstack developer': 'full-stack',
+  'data analyst': 'data-analyst',
+  'data engineer': 'data-engineer',
+  'data scientist': 'ai-data-scientist',
+  'machine learning engineer': 'machine-learning',
+  'ml engineer': 'machine-learning',
+  'mlops engineer': 'mlops',
+  'devops engineer': 'devops',
+  'react developer': 'react',
+  'react native developer': 'react-native',
+  'node.js developer': 'nodejs',
+  'nodejs developer': 'nodejs',
+  'python developer': 'python',
+  'java developer': 'java',
+  'javascript developer': 'javascript',
+  'typescript developer': 'typescript',
+  'angular developer': 'angular',
+  'vue developer': 'vue',
+  'vue.js developer': 'vue',
+  'next.js developer': 'nextjs',
+  'flutter developer': 'flutter',
+  'android developer': 'android',
+  'ios developer': 'ios',
+  'golang developer': 'golang',
+  'go developer': 'golang',
+  'rust developer': 'rust',
+  'php developer': 'php',
+  'c++ developer': 'cpp',
+  'kotlin developer': 'kotlin',
+  'swift developer': 'swift-ui',
+  'laravel developer': 'laravel',
+  'spring boot developer': 'spring-boot',
+  'devrel': 'devrel',
+  'developer relations': 'devrel',
+  'qa engineer': 'qa',
+  'quality assurance': 'qa',
+  'blockchain developer': 'blockchain',
+  'cyber security engineer': 'cyber-security',
+  'cybersecurity': 'cyber-security',
+  'cloud engineer': 'aws',
+  'aws engineer': 'aws',
+  'system design': 'system-design',
+  'software architect': 'software-architect',
+  'engineering manager': 'engineering-manager',
+  'product manager': 'product-manager',
+  'ux designer': 'ux-design',
+  'ui/ux designer': 'ux-design',
+  'technical writer': 'technical-writer',
+  'game developer': 'game-developer',
+  'ai engineer': 'ai-engineer',
+  'prompt engineer': 'prompt-engineering',
+  'docker': 'docker',
+  'kubernetes': 'kubernetes',
+  'mongodb developer': 'mongodb',
+  'sql developer': 'sql',
+  'postgresql dba': 'postgresql-dba',
+  'linux administrator': 'linux',
+  'terraform engineer': 'terraform',
+  'graphql developer': 'graphql',
+}
+
+function resolveRoadmapSlug(jobName) {
+  if (!jobName) return null
+  const lower = jobName.toLowerCase().trim()
+  // Direct lookup
+  if (ROADMAP_MAP[lower]) return ROADMAP_MAP[lower]
+  // Partial match — find the first key contained in the job name
+  for (const [key, slug] of Object.entries(ROADMAP_MAP)) {
+    if (lower.includes(key) || key.includes(lower)) return slug
+  }
+  // Last resort — slugify the job name itself and hope a file matches
+  return lower.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+function RoadmapImage({ jobName }) {
+  const slug = useMemo(() => resolveRoadmapSlug(jobName), [jobName])
+  const src = slug ? `/roadmaps/${slug}.png` : null
+  const [valid, setValid] = useState(false)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    setValid(false)
+    setLoaded(false)
+    if (!src) return
+    const img = new Image()
+    img.onload = () => { setValid(true) }
+    img.onerror = () => { setValid(false) }
+    img.src = src
+  }, [src])
+
+  if (!valid) return null
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="px-6 pt-6 pb-2">
+        <h3 className="font-bold text-gray-800 text-base mb-0.5">Full Career Roadmap</h3>
+        <p className="text-xs text-gray-400">Complete visual roadmap for this role</p>
+      </div>
+      <div className="px-6 pb-6">
+        <img
+          src={src}
+          alt={`${jobName} roadmap`}
+          onLoad={() => setLoaded(true)}
+          className={`w-full rounded-xl shadow-md border border-gray-100 transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        />
+      </div>
+    </div>
+  )
+}
 
 export default function Roadmap() {
   const { state } = useLocation()
@@ -198,6 +313,9 @@ export default function Roadmap() {
           <p className="text-xs text-gray-400 mt-1">Please select a different job role to view a learning path</p>
         </div>
       )}
+
+      {/* Full Career Roadmap Image */}
+      <RoadmapImage jobName={job.name} />
 
       {/* Actions */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
