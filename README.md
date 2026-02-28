@@ -1405,7 +1405,7 @@ After: ...
     <td align="center">
       <a href="https://github.com/your-username">
         <img src="https://github.com/your-username.png" width="80px;" alt="Your Name"/>
-        <br /><sub><b>Your Name</b></sub>
+        <br /><sub><b>M.Abhiram</b></sub>
       </a>
       <br />
       <sub>💻 Project Lead & Full-Stack Development</sub>
