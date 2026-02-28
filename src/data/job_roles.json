@@ -1,47 +1,730 @@
-﻿[
-  {"name":"Backend Developer","requiredSkills":["Node.js","Express","Databases","REST APIs","SQL"],"roadmapSteps":["Learn JavaScript/TypeScript","Understand Node.js","Build REST APIs","Work with Databases","Testing & CI"]},
-  {"name":"Frontend Developer","requiredSkills":["HTML","CSS","JavaScript","React","Accessibility"],"roadmapSteps":["HTML & CSS","JavaScript fundamentals","React basics","State management","Performance & Testing"]},
-  {"name":"Full Stack Developer","requiredSkills":["Frontend","Backend","Databases","APIs","DevOps"],"roadmapSteps":["Learn frontend basics","Learn backend basics","Connect frontend & backend","Deploy apps","DevOps fundamentals"]},
-  {"name":"Machine Learning Engineer","requiredSkills":["Python","Machine Learning","TensorFlow","PyTorch","Data Processing"],"roadmapSteps":["Python for ML","Statistics & Linear Algebra","ML Algorithms","Deep Learning","Model Deployment"]},
-  {"name":"Data Scientist","requiredSkills":["Python","Pandas","Statistics","Visualization","Modeling"],"roadmapSteps":["Python & Pandas","Statistics","Exploratory Data Analysis","Modeling","Communication"]},
-  {"name":"DevOps Engineer","requiredSkills":["CI/CD","Docker","Kubernetes","Monitoring","Cloud"],"roadmapSteps":["Linux basics","Docker & Containers","CI/CD pipelines","Kubernetes basics","Monitoring & Alerting"]},
-  {"name":"Cloud Engineer","requiredSkills":["AWS","Azure","GCP","Networking","Security"],"roadmapSteps":["Cloud fundamentals","Compute & Storage","Networking","Security","Cost Management"]},
-  {"name":"Android Developer","requiredSkills":["Kotlin","Android SDK","UI","APIs","Testing"],"roadmapSteps":["Kotlin basics","Android UI","Networking","Local Storage","Publish to Play Store"]},
-  {"name":"iOS Developer","requiredSkills":["Swift","iOS SDK","UIKit/SwiftUI","APIs","Testing"],"roadmapSteps":["Swift basics","iOS UI","Networking","Data Persistence","App Store"]},
-  {"name":"Cyber Security Analyst","requiredSkills":["Security fundamentals","Networking","Monitoring","Incident Response","Ethical Hacking"],"roadmapSteps":["Security basics","Network security","Threat intel","Monitoring","Incident response"]},
-  {"name":"Blockchain Developer","requiredSkills":["Smart Contracts","Solidity","Ethereum","Cryptography","Web3"],"roadmapSteps":["Blockchain basics","Ethereum & Solidity","Smart contract development","Security auditing","dApp integration"]},
-  {"name":"UI/UX Designer","requiredSkills":["Design Principles","Figma","Prototyping","User Research","Accessibility"],"roadmapSteps":["Design fundamentals","Wireframing","High-fidelity design","Prototyping","User testing"]},
-  {"name":"Game Developer","requiredSkills":["Game Engines","C#/C++","Math","Graphics","Optimization"],"roadmapSteps":["Game engine basics","Scripting","Game physics","Graphics","Optimization & Publishing"]},
-  {"name":"QA Engineer","requiredSkills":["Test Automation","Manual Testing","Selenium","Jest","CI"],"roadmapSteps":["Testing fundamentals","Manual testing","Automation basics","Frameworks","CI integration"]},
-  {"name":"Data Analyst","requiredSkills":["SQL","Excel","Visualization","Statistics","Reporting"],"roadmapSteps":["SQL basics","Data cleaning","Visualization","Statistics","Reporting & Dashboards"]},
-  {"name":"Business Analyst","requiredSkills":["Requirements","Communication","Modeling","Stakeholder Management","UML"],"roadmapSteps":["Domain knowledge","Requirement elicitation","Process modeling","Stakeholder engagement","Documentation"]},
-  {"name":"AI Engineer","requiredSkills":["Machine Learning","Deep Learning","Model Deployment","Python","Data"],"roadmapSteps":["ML fundamentals","Deep learning","Model optimization","Deployment","MLOps"]},
-  {"name":"NLP Engineer","requiredSkills":["NLP","Transformers","Python","Text Processing","Modeling"],"roadmapSteps":["Text processing","Classical NLP","Deep NLP","Transformers","Deploy NLP models"]},
-  {"name":"Robotics Engineer","requiredSkills":["ROS","C++","Control Systems","Sensors","Actuators"],"roadmapSteps":["Embedded basics","ROS fundamentals","Control theory","Sensors integration","System integration"]},
-  {"name":"Embedded Systems Engineer","requiredSkills":["C/C++","Microcontrollers","RTOS","Hardware","Debugging"],"roadmapSteps":["C fundamentals","Microcontrollers","Peripherals","RTOS basics","Hardware debugging"]},
-  {"name":"Data Engineer","requiredSkills":["ETL","SQL","Spark","Data Warehousing","Python"],"roadmapSteps":["SQL & Databases","ETL fundamentals","Batch processing","Streaming","Data modeling"]},
-  {"name":"Site Reliability Engineer","requiredSkills":["Monitoring","SRE practices","Alerting","Automation","Infrastructure"],"roadmapSteps":["SRE basics","Monitoring","SLIs/SLOs","Automation","Incident management"]},
-  {"name":"Computer Vision Engineer","requiredSkills":["OpenCV","Deep Learning","Python","Image Processing","Modeling"],"roadmapSteps":["Image processing","Classical CV","Deep learning for CV","CNNs","Deployment"]},
-  {"name":"Product Manager","requiredSkills":["Roadmapping","Communication","Analytics","Prioritization","Stakeholder Mgmt"],"roadmapSteps":["Market research","Product strategy","Roadmapping","Execution","Metrics"]},
-  {"name":"Technical Writer","requiredSkills":["Writing","Documentation","Markdown","API docs","Communication"],"roadmapSteps":["Writing fundamentals","API documentation","Tools & formats","User guides","Process"]},
-  {"name":"Systems Architect","requiredSkills":["Architecture","Design Patterns","Scalability","Cloud","Security"],"roadmapSteps":["Design patterns","Scalability","Distributed systems","Security","Leadership"]},
-  {"name":"Network Engineer","requiredSkills":["Routing","Switching","Firewalls","TCP/IP","Monitoring"],"roadmapSteps":["Networking basics","Routing & switching","Security","Monitoring","Automation"]},
-  {"name":"Database Administrator","requiredSkills":["SQL","Performance Tuning","Backups","Replication","Security"],"roadmapSteps":["SQL fundamentals","Performance tuning","Backups & Recovery","Replication","Security"]},
-  {"name":"QA Automation Engineer","requiredSkills":["Selenium","Cypress","Test Automation","CI","APIs"],"roadmapSteps":["Testing basics","Automation frameworks","E2E testing","CI integration","Reporting"]},
-  {"name":"Mobile QA Engineer","requiredSkills":["Mobile testing","Automation","Device farms","APIs","Performance"],"roadmapSteps":["Mobile basics","Manual testing","Automation","Cloud device farms","Performance testing"]},
-  {"name":"DevSecOps Engineer","requiredSkills":["Security","CI/CD","Kubernetes","Scanning","Compliance"],"roadmapSteps":["Security basics","Secure CI","Kubernetes security","Scanning & SAST","Compliance"]},
-  {"name":"Performance Engineer","requiredSkills":["Load Testing","Profiling","Optimization","Monitoring","APIs"],"roadmapSteps":["Performance fundamentals","Load testing","Profiling","Optimization","Monitoring"]},
-  {"name":"Systems Programmer","requiredSkills":["C","Operating Systems","Low-level programming","Debugging","Concurrency"],"roadmapSteps":["C mastery","OS concepts","Concurrency","Low-level performance","Debugging"]},
-  {"name":"Hardware Engineer","requiredSkills":["Electronics","PCB","FPGA","Circuit design","Testing"],"roadmapSteps":["Electronics basics","Circuit design","PCB layout","FPGA basics","Testing"]},
-  {"name":"Embedded Linux Engineer","requiredSkills":["Linux","Embedded","Kernel","Bootloaders","Device Drivers"],"roadmapSteps":["Linux basics","Embedded toolchains","Kernel modules","Device drivers","Bootloaders"]},
-  {"name":"Cloud Security Engineer","requiredSkills":["Cloud","Security","IAM","Monitoring","Networking"],"roadmapSteps":["Cloud fundamentals","IAM","Network security","Monitoring","Threat modeling"]},
-  {"name":"AI Researcher","requiredSkills":["Math","ML","Research","Python","Optimization"],"roadmapSteps":["Math fundamentals","ML theory","Research methods","Implement models","Publish papers"]},
-  {"name":"Computer Graphics Engineer","requiredSkills":["OpenGL","Shaders","Math","C++","Rendering"],"roadmapSteps":["Graphics math","Shaders","Rendering pipeline","Optimization","Tools"]},
-  {"name":"Sales Engineer","requiredSkills":["Communication","Product knowledge","Demos","Technical aptitude","CRM"],"roadmapSteps":["Product knowledge","Demo skills","Customer engagement","Sales process","Technical enablement"]},
-  {"name":"Customer Success Manager","requiredSkills":["Communication","Onboarding","Product","Analytics","Customer advocacy"],"roadmapSteps":["Product onboarding","Customer engagement","Health metrics","Escalations","Strategy"]},
-  {"name":"Localization Engineer","requiredSkills":["i18n","l10n","Tools","Automation","Quality"],"roadmapSteps":["i18n basics","Localization pipelines","Automation","Quality assurance","Deployment"]},
-  {"name":"Accessibility Specialist","requiredSkills":["a11y","WCAG","Screen readers","Testing","Design"],"roadmapSteps":["Accessibility basics","WCAG","Testing tools","Design patterns","Evaluation"]},
-  {"name":"Embedded Firmware Engineer","requiredSkills":["C","Microcontrollers","RTOS","Hardware","Debugging"],"roadmapSteps":["C & embedded","RTOS","Device drivers","Hardware interfacing","Debugging"]},
-  {"name":"Computer Forensics Analyst","requiredSkills":["Forensics","Tools","Investigation","Security","Legal"],"roadmapSteps":["Forensics basics","Tools","Evidence handling","Analysis","Reporting"]},
-  {"name":"Database Developer","requiredSkills":["SQL","Procedures","Optimization","ETL","Data Modeling"],"roadmapSteps":["SQL mastery","Procedural SQL","Optimization","ETL","Data modeling"]}
+[
+  {
+    "id": "role_001",
+    "name": "Frontend Developer",
+    "requiredSkills": ["HTML", "CSS", "JavaScript", "React", "TypeScript", "Tailwind CSS", "Git"],
+    "roadmapSteps": [
+      "Learn HTML & CSS fundamentals",
+      "Master JavaScript (ES6+)",
+      "Learn React framework",
+      "Understand state management (Redux/Context)",
+      "Build responsive UI components",
+      "Learn TypeScript",
+      "Practice with real projects"
+    ]
+  },
+  {
+    "id": "role_002",
+    "name": "Backend Developer",
+    "requiredSkills": ["Node.js", "Express", "REST APIs", "MongoDB", "SQL", "Git", "Docker"],
+    "roadmapSteps": [
+      "Learn JavaScript/TypeScript",
+      "Master Node.js and Express",
+      "Learn database design (SQL & NoSQL)",
+      "Build RESTful APIs",
+      "Learn authentication & security",
+      "Understand microservices",
+      "Deploy applications"
+    ]
+  },
+  {
+    "id": "role_003",
+    "name": "Full Stack Developer",
+    "requiredSkills": ["React", "Node.js", "MongoDB", "Express", "REST APIs", "Git", "Docker", "AWS"],
+    "roadmapSteps": [
+      "Master frontend (React/Vue)",
+      "Master backend (Node.js/Python)",
+      "Learn database management",
+      "Build full-stack applications",
+      "Learn DevOps basics",
+      "Understand cloud services",
+      "Deploy full applications"
+    ]
+  },
+  {
+    "id": "role_004",
+    "name": "Machine Learning Engineer",
+    "requiredSkills": ["Python", "TensorFlow", "PyTorch", "scikit-learn", "Pandas", "NumPy", "SQL"],
+    "roadmapSteps": [
+      "Learn Python programming",
+      "Study mathematics (Linear Algebra, Calculus)",
+      "Learn data preprocessing",
+      "Master ML algorithms",
+      "Learn deep learning frameworks",
+      "Build ML models",
+      "Deploy ML systems"
+    ]
+  },
+  {
+    "id": "role_005",
+    "name": "Data Scientist",
+    "requiredSkills": ["Python", "R", "Pandas", "NumPy", "scikit-learn", "SQL", "Tableau", "Statistics"],
+    "roadmapSteps": [
+      "Learn Python/R programming",
+      "Master statistics and probability",
+      "Learn data analysis with Pandas",
+      "Study machine learning basics",
+      "Learn data visualization",
+      "Practice with real datasets",
+      "Build data science projects"
+    ]
+  },
+  {
+    "id": "role_006",
+    "name": "DevOps Engineer",
+    "requiredSkills": ["Docker", "Kubernetes", "AWS", "Jenkins", "CI/CD", "Linux", "Git", "Terraform"],
+    "roadmapSteps": [
+      "Learn Linux fundamentals",
+      "Master Git and version control",
+      "Learn containerization (Docker)",
+      "Study orchestration (Kubernetes)",
+      "Learn cloud platforms (AWS/Azure/GCP)",
+      "Master CI/CD pipelines",
+      "Learn infrastructure as code"
+    ]
+  },
+  {
+    "id": "role_007",
+    "name": "Cloud Engineer",
+    "requiredSkills": ["AWS", "Azure", "GCP", "Docker", "Kubernetes", "Terraform", "Linux", "Networking"],
+    "roadmapSteps": [
+      "Learn cloud fundamentals",
+      "Get AWS/Azure/GCP certified",
+      "Master containerization",
+      "Learn infrastructure as code",
+      "Study networking and security",
+      "Learn monitoring and logging",
+      "Build cloud architectures"
+    ]
+  },
+  {
+    "id": "role_008",
+    "name": "Android Developer",
+    "requiredSkills": ["Java", "Kotlin", "Android SDK", "XML", "Git", "REST APIs", "SQLite"],
+    "roadmapSteps": [
+      "Learn Java/Kotlin",
+      "Study Android fundamentals",
+      "Learn Android UI/UX",
+      "Master Android architecture",
+      "Learn database management",
+      "Build Android apps",
+      "Publish to Play Store"
+    ]
+  },
+  {
+    "id": "role_009",
+    "name": "iOS Developer",
+    "requiredSkills": ["Swift", "Objective-C", "Xcode", "UIKit", "SwiftUI", "Core Data", "Git"],
+    "roadmapSteps": [
+      "Learn Swift programming",
+      "Master Xcode IDE",
+      "Study iOS UI frameworks",
+      "Learn iOS architecture patterns",
+      "Understand Core Data",
+      "Build iOS applications",
+      "Publish to App Store"
+    ]
+  },
+  {
+    "id": "role_010",
+    "name": "Cyber Security Analyst",
+    "requiredSkills": ["Network Security", "Penetration Testing", "Linux", "Python", "Wireshark", "Metasploit", "CEH"],
+    "roadmapSteps": [
+      "Learn networking fundamentals",
+      "Study cybersecurity basics",
+      "Learn penetration testing",
+      "Master security tools",
+      "Get security certifications",
+      "Practice ethical hacking",
+      "Build security solutions"
+    ]
+  },
+  {
+    "id": "role_011",
+    "name": "Blockchain Developer",
+    "requiredSkills": ["Solidity", "Ethereum", "Web3.js", "Smart Contracts", "JavaScript", "Node.js", "Truffle"],
+    "roadmapSteps": [
+      "Learn blockchain fundamentals",
+      "Master Solidity programming",
+      "Learn Ethereum development",
+      "Study smart contracts",
+      "Learn Web3.js",
+      "Build DApps",
+      "Deploy on blockchain"
+    ]
+  },
+  {
+    "id": "role_012",
+    "name": "UI/UX Designer",
+    "requiredSkills": ["Figma", "Adobe XD", "Sketch", "User Research", "Prototyping", "Design Systems", "Wireframing"],
+    "roadmapSteps": [
+      "Learn design principles",
+      "Master design tools (Figma)",
+      "Study user research methods",
+      "Learn prototyping",
+      "Understand design systems",
+      "Build design portfolio",
+      "Get user feedback"
+    ]
+  },
+  {
+    "id": "role_013",
+    "name": "Game Developer",
+    "requiredSkills": ["Unity", "C#", "Unreal Engine", "C++", "Game Design", "3D Modeling", "Physics"],
+    "roadmapSteps": [
+      "Learn game development basics",
+      "Master Unity/Unreal Engine",
+      "Learn C#/C++ programming",
+      "Study game design principles",
+      "Learn 3D modeling basics",
+      "Build game prototypes",
+      "Publish games"
+    ]
+  },
+  {
+    "id": "role_014",
+    "name": "QA Engineer",
+    "requiredSkills": ["Selenium", "Test Automation", "Java/Python", "JIRA", "Test Planning", "API Testing", "Agile"],
+    "roadmapSteps": [
+      "Learn testing fundamentals",
+      "Master test automation tools",
+      "Learn programming for testing",
+      "Study API testing",
+      "Learn performance testing",
+      "Build test frameworks",
+      "Practice agile testing"
+    ]
+  },
+  {
+    "id": "role_015",
+    "name": "Data Analyst",
+    "requiredSkills": ["SQL", "Excel", "Python", "Tableau", "Power BI", "Statistics", "Data Visualization"],
+    "roadmapSteps": [
+      "Learn SQL fundamentals",
+      "Master Excel advanced features",
+      "Learn Python for data analysis",
+      "Study statistics",
+      "Master visualization tools",
+      "Practice with real data",
+      "Build analytical reports"
+    ]
+  },
+  {
+    "id": "role_016",
+    "name": "Business Analyst",
+    "requiredSkills": ["SQL", "Excel", "Power BI", "Requirements Gathering", "Agile", "JIRA", "Documentation"],
+    "roadmapSteps": [
+      "Learn business analysis basics",
+      "Master requirements gathering",
+      "Learn data analysis tools",
+      "Study agile methodologies",
+      "Learn documentation",
+      "Practice stakeholder management",
+      "Build BA portfolio"
+    ]
+  },
+  {
+    "id": "role_017",
+    "name": "AI Engineer",
+    "requiredSkills": ["Python", "TensorFlow", "PyTorch", "Deep Learning", "NLP", "Computer Vision", "MLOps"],
+    "roadmapSteps": [
+      "Learn Python programming",
+      "Study machine learning",
+      "Master deep learning",
+      "Learn NLP and CV",
+      "Study MLOps",
+      "Build AI systems",
+      "Deploy AI models"
+    ]
+  },
+  {
+    "id": "role_018",
+    "name": "NLP Engineer",
+    "requiredSkills": ["Python", "NLTK", "spaCy", "Transformers", "BERT", "GPT", "Deep Learning"],
+    "roadmapSteps": [
+      "Learn Python programming",
+      "Study linguistics basics",
+      "Learn NLP libraries",
+      "Master transformer models",
+      "Learn text preprocessing",
+      "Build NLP applications",
+      "Deploy NLP systems"
+    ]
+  },
+  {
+    "id": "role_019",
+    "name": "Robotics Engineer",
+    "requiredSkills": ["C++", "Python", "ROS", "Robotics", "Control Systems", "Computer Vision", "Embedded Systems"],
+    "roadmapSteps": [
+      "Learn programming (C++/Python)",
+      "Study robotics fundamentals",
+      "Learn ROS framework",
+      "Master control systems",
+      "Study computer vision",
+      "Build robotics projects",
+      "Deploy robotic systems"
+    ]
+  },
+  {
+    "id": "role_020",
+    "name": "Embedded Systems Engineer",
+    "requiredSkills": ["C/C++", "Microcontrollers", "Arduino", "Raspberry Pi", "RTOS", "Circuit Design", "Debugging"],
+    "roadmapSteps": [
+      "Learn C/C++ programming",
+      "Study electronics basics",
+      "Learn microcontrollers",
+      "Master embedded programming",
+      "Study RTOS",
+      "Build embedded projects",
+      "Deploy embedded systems"
+    ]
+  },
+  {
+    "id": "role_021",
+    "name": "Software Architect",
+    "requiredSkills": ["System Design", "Architecture Patterns", "Cloud", "Microservices", "Scalability", "Leadership", "Documentation"],
+    "roadmapSteps": [
+      "Master software engineering",
+      "Study system design",
+      "Learn architecture patterns",
+      "Master cloud architectures",
+      "Learn scalability",
+      "Build large systems",
+      "Lead technical teams"
+    ]
+  },
+  {
+    "id": "role_022",
+    "name": "Site Reliability Engineer (SRE)",
+    "requiredSkills": ["Linux", "Kubernetes", "Monitoring", "Automation", "Python", "Incident Response", "SLI/SLO"],
+    "roadmapSteps": [
+      "Learn Linux and networking",
+      "Master containerization",
+      "Learn monitoring tools",
+      "Study automation",
+      "Learn incident management",
+      "Build reliable systems",
+      "Optimize system performance"
+    ]
+  },
+  {
+    "id": "role_023",
+    "name": "Product Manager",
+    "requiredSkills": ["Product Strategy", "Agile", "User Research", "Data Analysis", "Roadmapping", "Stakeholder Management", "JIRA"],
+    "roadmapSteps": [
+      "Learn product management basics",
+      "Master agile methodologies",
+      "Study user research",
+      "Learn data analysis",
+      "Build product roadmaps",
+      "Manage product launches",
+      "Lead product teams"
+    ]
+  },
+  {
+    "id": "role_024",
+    "name": "Technical Writer",
+    "requiredSkills": ["Technical Writing", "Documentation", "Markdown", "API Documentation", "Git", "Communication", "Research"],
+    "roadmapSteps": [
+      "Learn technical writing",
+      "Master documentation tools",
+      "Study API documentation",
+      "Learn version control",
+      "Practice writing",
+      "Build documentation portfolio",
+      "Publish technical content"
+    ]
+  },
+  {
+    "id": "role_025",
+    "name": "Database Administrator",
+    "requiredSkills": ["SQL", "MySQL", "PostgreSQL", "MongoDB", "Backup & Recovery", "Performance Tuning", "Security"],
+    "roadmapSteps": [
+      "Learn database fundamentals",
+      "Master SQL",
+      "Study database administration",
+      "Learn backup strategies",
+      "Master performance tuning",
+      "Learn database security",
+      "Manage production databases"
+    ]
+  },
+  {
+    "id": "role_026",
+    "name": "Network Engineer",
+    "requiredSkills": ["Networking", "Cisco", "Routing", "Switching", "Firewalls", "TCP/IP", "Troubleshooting"],
+    "roadmapSteps": [
+      "Learn networking fundamentals",
+      "Study TCP/IP protocols",
+      "Learn routing and switching",
+      "Master network security",
+      "Get network certifications",
+      "Design network architectures",
+      "Manage network infrastructure"
+    ]
+  },
+  {
+    "id": "role_027",
+    "name": "Security Engineer",
+    "requiredSkills": ["Security", "Penetration Testing", "SIEM", "Firewalls", "Python", "Incident Response", "Compliance"],
+    "roadmapSteps": [
+      "Learn cybersecurity basics",
+      "Study security frameworks",
+      "Learn penetration testing",
+      "Master security tools",
+      "Learn incident response",
+      "Build security systems",
+      "Ensure compliance"
+    ]
+  },
+  {
+    "id": "role_028",
+    "name": "Mobile App Developer",
+    "requiredSkills": ["React Native", "Flutter", "iOS", "Android", "REST APIs", "Git", "App Store"],
+    "roadmapSteps": [
+      "Learn mobile development",
+      "Choose platform (iOS/Android)",
+      "Master mobile frameworks",
+      "Learn cross-platform development",
+      "Build mobile apps",
+      "Test on devices",
+      "Publish to app stores"
+    ]
+  },
+  {
+    "id": "role_029",
+    "name": "API Developer",
+    "requiredSkills": ["REST APIs", "GraphQL", "Node.js", "Python", "API Design", "Postman", "Documentation"],
+    "roadmapSteps": [
+      "Learn API fundamentals",
+      "Master REST API design",
+      "Learn GraphQL",
+      "Study API security",
+      "Learn API testing",
+      "Build RESTful APIs",
+      "Document and deploy APIs"
+    ]
+  },
+  {
+    "id": "role_030",
+    "name": "Big Data Engineer",
+    "requiredSkills": ["Hadoop", "Spark", "Kafka", "Python", "Scala", "Data Pipelines", "Cloud"],
+    "roadmapSteps": [
+      "Learn big data fundamentals",
+      "Master Hadoop ecosystem",
+      "Learn Apache Spark",
+      "Study data pipelines",
+      "Learn streaming (Kafka)",
+      "Build data systems",
+      "Deploy on cloud"
+    ]
+  },
+  {
+    "id": "role_031",
+    "name": "Computer Vision Engineer",
+    "requiredSkills": ["Python", "OpenCV", "TensorFlow", "PyTorch", "Image Processing", "Deep Learning", "CNN"],
+    "roadmapSteps": [
+      "Learn Python programming",
+      "Study image processing",
+      "Learn OpenCV",
+      "Master deep learning",
+      "Study CNN architectures",
+      "Build CV applications",
+      "Deploy CV systems"
+    ]
+  },
+  {
+    "id": "role_032",
+    "name": "React Developer",
+    "requiredSkills": ["React", "JavaScript", "TypeScript", "Redux", "React Router", "Hooks", "Testing"],
+    "roadmapSteps": [
+      "Master JavaScript/TypeScript",
+      "Learn React fundamentals",
+      "Study React hooks",
+      "Learn state management",
+      "Master React Router",
+      "Learn testing (Jest)",
+      "Build React applications"
+    ]
+  },
+  {
+    "id": "role_033",
+    "name": "Python Developer",
+    "requiredSkills": ["Python", "Django", "Flask", "REST APIs", "SQL", "Git", "Testing"],
+    "roadmapSteps": [
+      "Master Python programming",
+      "Learn web frameworks",
+      "Study database integration",
+      "Learn REST API development",
+      "Master testing",
+      "Build Python applications",
+      "Deploy Python apps"
+    ]
+  },
+  {
+    "id": "role_034",
+    "name": "Java Developer",
+    "requiredSkills": ["Java", "Spring Boot", "Maven", "REST APIs", "SQL", "Git", "Microservices"],
+    "roadmapSteps": [
+      "Master Java programming",
+      "Learn Spring framework",
+      "Study Spring Boot",
+      "Learn database integration",
+      "Master microservices",
+      "Build Java applications",
+      "Deploy Java services"
+    ]
+  },
+  {
+    "id": "role_035",
+    "name": ".NET Developer",
+    "requiredSkills": ["C#", ".NET", "ASP.NET", "SQL Server", "REST APIs", "Git", "Azure"],
+    "roadmapSteps": [
+      "Learn C# programming",
+      "Master .NET framework",
+      "Study ASP.NET",
+      "Learn database integration",
+      "Master web APIs",
+      "Build .NET applications",
+      "Deploy on Azure"
+    ]
+  },
+  {
+    "id": "role_036",
+    "name": "Ruby Developer",
+    "requiredSkills": ["Ruby", "Ruby on Rails", "REST APIs", "PostgreSQL", "Git", "Testing", "RSpec"],
+    "roadmapSteps": [
+      "Master Ruby programming",
+      "Learn Ruby on Rails",
+      "Study MVC architecture",
+      "Learn database integration",
+      "Master testing",
+      "Build Rails applications",
+      "Deploy Rails apps"
+    ]
+  },
+  {
+    "id": "role_037",
+    "name": "Go Developer",
+    "requiredSkills": ["Go", "Goroutines", "REST APIs", "Docker", "Kubernetes", "Microservices", "Git"],
+    "roadmapSteps": [
+      "Learn Go programming",
+      "Master concurrency",
+      "Study microservices",
+      "Learn API development",
+      "Master containerization",
+      "Build Go applications",
+      "Deploy Go services"
+    ]
+  },
+  {
+    "id": "role_038",
+    "name": "PHP Developer",
+    "requiredSkills": ["PHP", "Laravel", "MySQL", "REST APIs", "Git", "Composer", "Testing"],
+    "roadmapSteps": [
+      "Master PHP programming",
+      "Learn Laravel framework",
+      "Study database integration",
+      "Learn API development",
+      "Master testing",
+      "Build PHP applications",
+      "Deploy PHP apps"
+    ]
+  },
+  {
+    "id": "role_039",
+    "name": "Vue.js Developer",
+    "requiredSkills": ["Vue.js", "JavaScript", "TypeScript", "Vuex", "Vue Router", "Composition API", "Testing"],
+    "roadmapSteps": [
+      "Master JavaScript/TypeScript",
+      "Learn Vue.js fundamentals",
+      "Study Vue Router",
+      "Learn state management",
+      "Master Composition API",
+      "Learn testing",
+      "Build Vue applications"
+    ]
+  },
+  {
+    "id": "role_040",
+    "name": "Angular Developer",
+    "requiredSkills": ["Angular", "TypeScript", "RxJS", "Angular CLI", "NgRx", "Testing", "Material Design"],
+    "roadmapSteps": [
+      "Master TypeScript",
+      "Learn Angular fundamentals",
+      "Study RxJS",
+      "Learn state management",
+      "Master Angular CLI",
+      "Learn testing",
+      "Build Angular applications"
+    ]
+  },
+  {
+    "id": "role_041",
+    "name": "Node.js Developer",
+    "requiredSkills": ["Node.js", "Express", "JavaScript", "REST APIs", "MongoDB", "Git", "Testing"],
+    "roadmapSteps": [
+      "Master JavaScript",
+      "Learn Node.js fundamentals",
+      "Study Express framework",
+      "Learn database integration",
+      "Master API development",
+      "Learn testing",
+      "Build Node.js applications"
+    ]
+  },
+  {
+    "id": "role_042",
+    "name": "Django Developer",
+    "requiredSkills": ["Python", "Django", "REST APIs", "PostgreSQL", "Git", "Testing", "Deployment"],
+    "roadmapSteps": [
+      "Master Python",
+      "Learn Django framework",
+      "Study Django ORM",
+      "Learn REST framework",
+      "Master database integration",
+      "Learn testing",
+      "Deploy Django apps"
+    ]
+  },
+  {
+    "id": "role_043",
+    "name": "Flask Developer",
+    "requiredSkills": ["Python", "Flask", "REST APIs", "SQLAlchemy", "Git", "Testing", "Deployment"],
+    "roadmapSteps": [
+      "Master Python",
+      "Learn Flask framework",
+      "Study database integration",
+      "Learn REST API development",
+      "Master testing",
+      "Build Flask applications",
+      "Deploy Flask apps"
+    ]
+  },
+  {
+    "id": "role_044",
+    "name": "Laravel Developer",
+    "requiredSkills": ["PHP", "Laravel", "MySQL", "REST APIs", "Eloquent", "Git", "Testing"],
+    "roadmapSteps": [
+      "Master PHP",
+      "Learn Laravel framework",
+      "Study Eloquent ORM",
+      "Learn API development",
+      "Master testing",
+      "Build Laravel applications",
+      "Deploy Laravel apps"
+    ]
+  },
+  {
+    "id": "role_045",
+    "name": "Spring Boot Developer",
+    "requiredSkills": ["Java", "Spring Boot", "REST APIs", "JPA", "Maven", "Git", "Testing"],
+    "roadmapSteps": [
+      "Master Java",
+      "Learn Spring framework",
+      "Study Spring Boot",
+      "Learn JPA/Hibernate",
+      "Master REST APIs",
+      "Learn testing",
+      "Build Spring Boot apps"
+    ]
+  },
+  {
+    "id": "role_046",
+    "name": "MERN Stack Developer",
+    "requiredSkills": ["MongoDB", "Express", "React", "Node.js", "REST APIs", "Git", "Full Stack"],
+    "roadmapSteps": [
+      "Learn MongoDB",
+      "Master Express.js",
+      "Learn React",
+      "Study Node.js",
+      "Build full-stack apps",
+      "Learn deployment",
+      "Deploy MERN applications"
+    ]
+  },
+  {
+    "id": "role_047",
+    "name": "MEAN Stack Developer",
+    "requiredSkills": ["MongoDB", "Express", "Angular", "Node.js", "REST APIs", "Git", "Full Stack"],
+    "roadmapSteps": [
+      "Learn MongoDB",
+      "Master Express.js",
+      "Learn Angular",
+      "Study Node.js",
+      "Build full-stack apps",
+      "Learn deployment",
+      "Deploy MEAN applications"
+    ]
+  },
+  {
+    "id": "role_048",
+    "name": "WordPress Developer",
+    "requiredSkills": ["PHP", "WordPress", "MySQL", "CSS", "JavaScript", "Theme Development", "Plugins"],
+    "roadmapSteps": [
+      "Learn PHP",
+      "Master WordPress",
+      "Study theme development",
+      "Learn plugin development",
+      "Master customization",
+      "Build WordPress sites",
+      "Deploy WordPress projects"
+    ]
+  },
+  {
+    "id": "role_049",
+    "name": "Shopify Developer",
+    "requiredSkills": ["Liquid", "JavaScript", "CSS", "Shopify API", "Theme Development", "Apps", "E-commerce"],
+    "roadmapSteps": [
+      "Learn Liquid templating",
+      "Master Shopify platform",
+      "Study theme development",
+      "Learn Shopify API",
+      "Master app development",
+      "Build Shopify stores",
+      "Deploy e-commerce solutions"
+    ]
+  },
+  {
+    "id": "role_050",
+    "name": "Salesforce Developer",
+    "requiredSkills": ["Apex", "Visualforce", "Lightning", "Salesforce", "SOQL", "Integration", "Certification"],
+    "roadmapSteps": [
+      "Learn Salesforce basics",
+      "Master Apex programming",
+      "Study Lightning framework",
+      "Learn SOQL",
+      "Master integrations",
+      "Get Salesforce certified",
+      "Build Salesforce solutions"
+    ]
+  },
+  {
+    "id": "role_051",
+    "name": "Power BI Developer",
+    "requiredSkills": ["Power BI", "DAX", "SQL", "Data Modeling", "Visualization", "Excel", "ETL"],
+    "roadmapSteps": [
+      "Learn Power BI basics",
+      "Master DAX language",
+      "Study data modeling",
+      "Learn visualization",
+      "Master ETL processes",
+      "Build Power BI reports",
+      "Deploy BI solutions"
+    ]
+  },
+  {
+    "id": "role_052",
+    "name": "Tableau Developer",
+    "requiredSkills": ["Tableau", "SQL", "Data Visualization", "Dashboard Design", "ETL", "Analytics", "Business Intelligence"],
+    "roadmapSteps": [
+      "Learn Tableau basics",
+      "Master data visualization",
+      "Study dashboard design",
+      "Learn advanced analytics",
+      "Master ETL processes",
+      "Build Tableau dashboards",
+      "Deploy BI solutions"
+    ]
+  }
 ]

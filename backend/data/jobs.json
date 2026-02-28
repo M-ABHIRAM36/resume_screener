@@ -1,0 +1,412 @@
+[
+  {
+    "id": "job_1001",
+    "name": "Frontend Developer",
+    "requiredSkills": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "React",
+      "Tailwind"
+    ],
+    "experienceRange": "2-5",
+    "location": "Bangalore",
+    "roadmapSteps": [
+      "HTML & CSS basics",
+      "JavaScript fundamentals",
+      "React basics",
+      "State management & hooks",
+      "Build portfolio projects"
+    ]
+  },
+  {
+    "id": "job_1002",
+    "name": "Backend Developer",
+    "requiredSkills": [
+      "Node.js",
+      "Express",
+      "APIs",
+      "MongoDB",
+      "SQL"
+    ],
+    "experienceRange": "3-6",
+    "location": "abhirama",
+    "roadmapSteps": [
+      "JavaScript (advanced)",
+      "Node.js & Express",
+      "Database design",
+      "RESTful APIs",
+      "Testing & Deployment"
+    ]
+  },
+  {
+    "id": "job_1003",
+    "name": "Data Scientist",
+    "requiredSkills": [
+      "Python",
+      "Pandas",
+      "scikit-learn",
+      "Statistics",
+      "Machine Learning"
+    ],
+    "experienceRange": "2-4",
+    "location": "Bangalore",
+    "roadmapSteps": [
+      "Python for data",
+      "Data cleaning with Pandas",
+      "Exploratory data analysis",
+      "Supervised learning",
+      "Model evaluation & deployment"
+    ]
+  },
+  {
+    "id": "job_1766511470466",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511474352",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511475953",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511477471",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511477704",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511477927",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511478131",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511478319",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511478504",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511478691",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511478895",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511479071",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511479239",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511479783",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511480038",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511480287",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511480551",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511545368",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766511607236",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "abhirama"
+  },
+  {
+    "id": "job_1766512178447",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512703483",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512704312",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512704975",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512705051",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512705669",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512705679",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512706436",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512706448",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512706457",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512706460",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512707040",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512707049",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512707055",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512707203",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512707768",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512707780",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512707788",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766512708508",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766514270931",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766514935838",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766516256457",
+    "name": "Frontend Developer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "Bangalore"
+  },
+  {
+    "id": "job_1766516277423",
+    "name": "Frontend Developer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "Bangalore"
+  },
+  {
+    "id": "job_1766516278544",
+    "name": "Frontend Developer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "Bangalore"
+  },
+  {
+    "id": "job_1766516279520",
+    "name": "Frontend Developer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "Bangalore"
+  },
+  {
+    "id": "job_1766584683826",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1766688376539",
+    "name": "Custom Job",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  },
+  {
+    "id": "job_1767629425453",
+    "name": "new trainer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "remote"
+  },
+  {
+    "id": "job_1767629486317",
+    "name": "new trainer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "remote"
+  },
+  {
+    "id": "job_1767629541819",
+    "name": "software any role",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": "remote"
+  },
+  {
+    "id": "job_1767646225944",
+    "name": "software engineer",
+    "requiredSkills": [],
+    "experienceRange": "",
+    "location": ""
+  }
+]
