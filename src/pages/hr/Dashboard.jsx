@@ -164,6 +164,12 @@ export default function HRDashboard(){
         formData.append('jobTitle', activeJob.name || '')
         formData.append('requiredSkills', JSON.stringify(activeJob.requiredSkills || []))
         formData.append('nameMethod', nameMethod)
+        if (activeJob.roadmapSteps && activeJob.roadmapSteps.length > 0) {
+          formData.append('jobDescription', activeJob.name + '. ' + activeJob.roadmapSteps.join('. '))
+        }
+        if (activeJob.location) {
+          formData.append('jobLocation', activeJob.location)
+        }
         
         // POST to /hr/resumes - the correct backend endpoint
         const res = await post('/hr/resumes', formData, true)

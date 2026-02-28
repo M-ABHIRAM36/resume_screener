@@ -29,20 +29,48 @@ exports.uploadResumes = async (req, res) => {
     job = jobs.find(j=>j.id===jobId);
   }
   
-  // If job not found in jobs.json, try to use jobData from frontend
-  if(!job && req.body && req.body.jobData) {
-    try {
-      const jobData = typeof req.body.jobData === 'string' ? JSON.parse(req.body.jobData) : req.body.jobData;
+  // If job not found in jobs.json, build it from individual form fields sent by frontend
+  if(!job && req.body) {
+    const bodyTitle = req.body.jobTitle;
+    let bodySkills = req.body.requiredSkills;
+
+    // Frontend may also send jobData as a JSON blob — try that too
+    if(!bodyTitle && req.body.jobData) {
+      try {
+        const jobData = typeof req.body.jobData === 'string' ? JSON.parse(req.body.jobData) : req.body.jobData;
+        if(jobData.name || jobData.requiredSkills) {
+          job = {
+            id: jobId || `role_${Date.now()}`,
+            name: jobData.name || 'Unknown Job',
+            requiredSkills: jobData.requiredSkills || [],
+            description: jobData.description || '',
+            location: jobData.location || ''
+          };
+          console.log('Using jobData blob from frontend:', job.name);
+        }
+      } catch(e) {
+        console.warn('Failed to parse jobData:', e);
+      }
+    }
+
+    // Build from individual form fields (jobTitle + requiredSkills)
+    if(!job && bodyTitle) {
+      let skills = [];
+      if(bodySkills) {
+        try {
+          skills = typeof bodySkills === 'string' ? JSON.parse(bodySkills) : bodySkills;
+        } catch(e) {
+          skills = [];
+        }
+      }
       job = {
         id: jobId || `role_${Date.now()}`,
-        name: jobData.name || 'Unknown Job',
-        requiredSkills: jobData.requiredSkills || [],
-        description: jobData.description || '',
-        location: jobData.location || ''
+        name: bodyTitle,
+        requiredSkills: Array.isArray(skills) ? skills : [],
+        description: req.body.jobDescription || '',
+        location: req.body.jobLocation || ''
       };
-      console.log('Using job data from frontend:', job.name);
-    } catch(e) {
-      console.warn('Failed to parse jobData:', e);
+      console.log('Using job from form fields:', job.name, 'Skills:', job.requiredSkills.length);
     }
   }
   
