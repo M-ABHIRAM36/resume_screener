@@ -1404,7 +1404,7 @@ After: ...
   <tr>
     <td align="center">
       <a href="https://github.com/your-username">
-        <img src="https://github.com/your-username.png" width="80px;" alt="Your Name"/>
+        <img src="https://github.com/M-ABHIRAM36.png" width="80px;" alt="abhiram"/>
         <br /><sub><b>M.Abhiram</b></sub>
       </a>
       <br />
