@@ -4,9 +4,14 @@ import CandidateCard from "../../components/CandidateCard"
 import ResumeUpload from "../../components/ResumeUpload"
 import ScoreBadge from "../../components/ScoreBadge"
 import { get, post } from "../../api"
+import { useAuth } from "../../context/AuthContext"
+import { useNavigate } from "react-router-dom"
+import toast from "react-hot-toast"
 import jobRolesData from "../../data/job_roles.json"
 
 export default function HRDashboard(){
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [filters, setFilters] = useState({skill:"", location:"", college:"", minMatch:0, experience:""})
   const [sortBy, setSortBy] = useState("")
   const [view, setView] = useState('cards')
@@ -18,6 +23,8 @@ export default function HRDashboard(){
   const [candidatesList, setCandidatesList] = useState([])
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
+  const [activeSessionId, setActiveSessionId] = useState(null)
+  const [hrStats, setHrStats] = useState(null)
   
   const jobRoles = useMemo(() => {
     const uniqueRoles = []
@@ -34,6 +41,14 @@ export default function HRDashboard(){
   useEffect(() => {
     // initial candidates: empty until job selected
     setCandidatesList([])
+    // Fetch HR stats
+    async function fetchStats() {
+      try {
+        const s = await get('/api/hr/stats')
+        setHrStats(s)
+      } catch (e) { console.log('HR stats:', e.message) }
+    }
+    fetchStats()
   }, [])
 
   // Helper function to validate if a string is a valid location
@@ -73,6 +88,16 @@ export default function HRDashboard(){
       location: isValidLocation(c.location) ? c.location : null,
       experience: (c.experience && c.experience > 0 && c.experience < 50) ? c.experience : 0
     }))
+  }
+
+  // Save ML results to the active session
+  async function saveResultsToSession(sessionId, candidates) {
+    try {
+      await post('/api/hr/sessions/results', { sessionId, candidates })
+      toast.success(`${candidates.length} candidate(s) saved to session`)
+    } catch (e) {
+      console.log('Save session results:', e.message)
+    }
   }
 
   async function computeMatchesForJob(job) {
@@ -117,6 +142,21 @@ export default function HRDashboard(){
       return
     }
 
+    // Create a job session in DB
+    let sessionId = activeSessionId
+    try {
+      const session = await post('/api/hr/sessions', {
+        jobRole: activeJob.name || jobTitle,
+        jobDescription: jobDesc || '',
+        jobLocation: jobLocation || activeJob.location || '',
+        requiredSkills: activeJob.requiredSkills || []
+      })
+      sessionId = session._id
+      setActiveSessionId(session._id)
+    } catch (e) {
+      console.log('Session create:', e.message)
+    }
+
     // Process uploaded files with ML backend
     if (uploadedFiles.length > 0) {
       setIsProcessing(true)
@@ -136,10 +176,13 @@ export default function HRDashboard(){
         // Handle different response formats from backend and clean data
         if(res?.analyzed && Array.isArray(res.analyzed)) {
           setCandidatesList(cleanCandidateData(res.analyzed))
+          if (sessionId) saveResultsToSession(sessionId, res.analyzed)
         } else if(res?.candidates && Array.isArray(res.candidates)) {
           setCandidatesList(cleanCandidateData(res.candidates))
+          if (sessionId) saveResultsToSession(sessionId, res.candidates)
         } else if(Array.isArray(res)) {
           setCandidatesList(cleanCandidateData(res))
+          if (sessionId) saveResultsToSession(sessionId, res)
         } else {
           console.log('Response format:', res)
           // Try to fetch candidates after upload
@@ -237,19 +280,23 @@ export default function HRDashboard(){
   return (
     <div className="space-y-6 py-6">
       {/* Header */}
-      <div className="card flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-            🏢
+      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-white text-2xl font-bold border border-white/20">
+              🏢
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold">HR Dashboard</h2>
+              <p className="text-indigo-200 text-sm">{user?.companyName || user?.name || 'Company'} · {user?.email}</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-3xl font-bold">HR Dashboard</h2>
-            <p className="text-sm text-gray-600">Company: <span className="font-semibold text-indigo-600">Demo abhi Corp</span></p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50 rounded-lg border border-indigo-200">
-          <span className="text-sm text-gray-600">Logged in as</span>
-          <span className="font-semibold text-indigo-600">HR</span>
+          <button
+            onClick={() => navigate('/hr/sessions')}
+            className="px-5 py-2.5 bg-white/15 backdrop-blur-sm text-white rounded-xl font-medium text-sm hover:bg-white/25 transition-all border border-white/20"
+          >
+            View Sessions →
+          </button>
         </div>
       </div>
 

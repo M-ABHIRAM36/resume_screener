@@ -2,21 +2,32 @@ from typing import Tuple
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from sentence_transformers import SentenceTransformer
+
+try:
+    from sentence_transformers import SentenceTransformer
+    _HAS_SBERT = True
+except ImportError:
+    _HAS_SBERT = False
+    SentenceTransformer = None
 
 # load model at import time to reuse
 _bert_model = None
 
 def load_bert_model():
     global _bert_model
+    if not _HAS_SBERT:
+        return None
     if _bert_model is None:
         _bert_model = SentenceTransformer('all-MiniLM-L6-v2')
     return _bert_model
 
 
 def semantic_similarity(text1: str, text2: str) -> float:
-    """Compute semantic similarity with clipping to [0, 1]"""
+    """Compute semantic similarity with clipping to [0, 1]. Falls back to keyword similarity if SBERT unavailable."""
     model = load_bert_model()
+    if model is None:
+        # Fallback to keyword-based similarity when SBERT not installed
+        return keyword_similarity(text1, text2)
     a = model.encode([text1])[0]
     b = model.encode([text2])[0]
     sim = cosine_similarity([a], [b])[0][0]
