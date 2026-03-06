@@ -3,7 +3,7 @@ import FilterPanel from "../../components/FilterPanel"
 import CandidateCard from "../../components/CandidateCard"
 import ResumeUpload from "../../components/ResumeUpload"
 import ScoreBadge from "../../components/ScoreBadge"
-import { get, post } from "../../api"
+import { get, post, getUser } from "../../api"
 import jobRolesData from "../../data/job_roles.json"
 
 function TableSkillsCell({ skills = [] }) {
@@ -54,6 +54,7 @@ export default function HRDashboard(){
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [nameMethod, setNameMethod] = useState('filename')
+  const currentUser = getUser()
   
   const jobRoles = useMemo(() => {
     const uniqueRoles = []
@@ -364,12 +365,12 @@ export default function HRDashboard(){
           </div>
           <div>
             <h2 className="text-3xl font-bold">HR Dashboard</h2>
-            <p className="text-sm text-gray-600">Company: <span className="font-semibold text-indigo-600">Demo abhi Corp</span></p>
+            <p className="text-sm text-gray-600">Company: <span className="font-semibold text-indigo-600">{currentUser?.companyName || 'Not logged in'}</span></p>
           </div>
         </div>
         <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50 rounded-lg border border-indigo-200">
           <span className="text-sm text-gray-600">Logged in as</span>
-          <span className="font-semibold text-indigo-600">HR</span>
+          <span className="font-semibold text-indigo-600">{currentUser?.email || 'HR'}</span>
         </div>
       </div>
 

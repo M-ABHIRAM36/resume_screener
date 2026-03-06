@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { post } from '../../api'
 import { useNavigate, Link } from 'react-router-dom'
 
-export default function Login(){
+export default function CandidateLogin(){
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -15,10 +15,10 @@ export default function Login(){
     setLoading(true)
     setError('')
     try{
-      const res = await post('/hr/auth/login', { email, password })
+      const res = await post('/candidate/auth/login', { email, password })
       localStorage.setItem('token', res.token)
       localStorage.setItem('user', JSON.stringify(res.user))
-      navigate('/hr')
+      navigate('/candidate')
     }catch(err){
       const msg = err.message || String(err)
       try {
@@ -40,13 +40,13 @@ export default function Login(){
             <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             </div>
-            <h2 className="text-xl font-extrabold text-gray-900">Welcome back</h2>
-            <p className="text-sm text-gray-500 mt-1">Sign in to your HR account</p>
+            <h2 className="text-xl font-extrabold text-gray-900">Candidate Sign In</h2>
+            <p className="text-sm text-gray-500 mt-1">Sign in to analyze your resume</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-              <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com" type="email" className="input-field" required autoComplete="email" />
+              <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" className="input-field" required autoComplete="email" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
@@ -74,10 +74,10 @@ export default function Login(){
             </button>
           </form>
           <p className="text-center text-sm text-gray-500 mt-5">
-            Don't have an account? <Link to="/auth/signup" className="text-indigo-600 font-semibold hover:text-indigo-700">Sign up</Link>
+            Don't have an account? <Link to="/auth/candidate/signup" className="text-indigo-600 font-semibold hover:text-indigo-700">Sign up</Link>
           </p>
           <p className="text-center text-sm text-gray-400 mt-2">
-            Are you a candidate? <Link to="/auth/candidate/login" className="text-indigo-600 font-semibold hover:text-indigo-700">Candidate Login</Link>
+            Are you HR? <Link to="/auth/login" className="text-indigo-600 font-semibold hover:text-indigo-700">HR Login</Link>
           </p>
         </div>
       </div>

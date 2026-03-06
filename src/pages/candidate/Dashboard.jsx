@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react"
 import ResumeUpload from "../../components/ResumeUpload"
 import { useNavigate } from "react-router-dom"
-import { post } from "../../api"
+import { post, getUser } from "../../api"
 import jobRolesData from "../../data/job_roles.json"
 
 export default function CandidateDashboard() {
@@ -12,6 +12,7 @@ export default function CandidateDashboard() {
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const nav = useNavigate()
+  const currentUser = getUser()
 
   const jobRoles = useMemo(() => {
     const unique = []
@@ -135,7 +136,9 @@ export default function CandidateDashboard() {
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
             AI-Powered Analysis
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">Career Analysis</h1>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">
+            {currentUser?.name ? `Welcome, ${currentUser.name}` : 'Career Analysis'}
+          </h1>
           <p className="text-indigo-200 text-base max-w-lg">Get an industry-standard ATS score or build a personalized learning roadmap for your dream role.</p>
         </div>
       </div>
