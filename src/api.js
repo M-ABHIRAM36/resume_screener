@@ -1,27 +1,17 @@
 const BASE_URL = 'http://localhost:5000';
 
-function getToken() {
-  return localStorage.getItem('token');
-}
-
-function authHeaders(isFormData = false) {
-  const token = getToken();
-  const headers = {};
+function authHeaders(extra = {}) {
+  const token = localStorage.getItem('token');
+  const headers = { ...extra };
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  if (!isFormData) headers['Content-Type'] = 'application/json';
   return headers;
 }
 
 export async function get(endpoint) {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
-    headers: authHeaders()
+    headers: authHeaders(),
   });
-  if (!res.ok) {
-    const text = await res.text();
-    let msg = text;
-    try { msg = JSON.parse(text).error || text; } catch {}
-    throw new Error(msg);
-  }
+  if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
@@ -31,7 +21,13 @@ export async function post(endpoint, data, isFormData = false) {
     headers: authHeaders(isFormData),
     body: isFormData ? data : JSON.stringify(data),
   };
-  
+
+  if (!isFormData) {
+    options.headers = authHeaders({ 'Content-Type': 'application/json' });
+  } else {
+    options.headers = authHeaders();
+  }
+
   const res = await fetch(`${BASE_URL}${endpoint}`, options);
   if (!res.ok) {
     const text = await res.text();
@@ -69,4 +65,19 @@ export async function del(endpoint) {
     throw new Error(msg);
   }
   return res.json();
+}
+
+export function getUser() {
+  const raw = localStorage.getItem('user');
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+export function isLoggedIn() {
+  return !!localStorage.getItem('token');
+}
+
+export function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
 }

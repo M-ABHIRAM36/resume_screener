@@ -3,16 +3,59 @@ import FilterPanel from "../../components/FilterPanel"
 import CandidateCard from "../../components/CandidateCard"
 import ResumeUpload from "../../components/ResumeUpload"
 import ScoreBadge from "../../components/ScoreBadge"
+<<<<<<< HEAD
 import { get, post } from "../../api"
 import { useAuth } from "../../context/AuthContext"
 import { useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
+=======
+import { get, post, getUser } from "../../api"
+>>>>>>> development2
 import jobRolesData from "../../data/job_roles.json"
 
+function TableSkillsCell({ skills = [] }) {
+  const [expanded, setExpanded] = useState(false)
+  const PREVIEW = 4
+  const hasMore = skills.length > PREVIEW
+  const visible = expanded ? skills : skills.slice(0, PREVIEW)
+  return (
+    <div className="flex flex-wrap gap-1">
+      {visible.map((s, idx) => (
+        <span key={`${s}-${idx}`} className="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">{s}</span>
+      ))}
+      {hasMore && !expanded && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-full font-medium border border-indigo-200"
+        >
+          +{skills.length - PREVIEW} more
+        </button>
+      )}
+      {expanded && hasMore && (
+        <button
+          onClick={() => setExpanded(false)}
+          className="text-xs text-gray-500 hover:text-indigo-600 px-1 py-0.5 font-medium"
+        >
+          ▲ less
+        </button>
+      )}
+    </div>
+  )
+}
+
 export default function HRDashboard(){
+<<<<<<< HEAD
   const { user } = useAuth()
   const navigate = useNavigate()
   const [filters, setFilters] = useState({skill:"", location:"", college:"", minMatch:0, experience:""})
+=======
+  const [filters, setFilters] = useState({
+    skill:"", location:"", college:"", minMatch:0, experience:"",
+    searchText:"", minScore:"", maxScore:"", resumeStrength:"", jobFitLevel:"",
+    degree:"", hasPortfolio:false, hasInternships:false, minSkillsCount:"",
+    selectedSkills:[], keywords:[], maxExperience:""
+  })
+>>>>>>> development2
   const [sortBy, setSortBy] = useState("")
   const [view, setView] = useState('cards')
   const [selectedRoleId, setSelectedRoleId] = useState('')
@@ -23,8 +66,13 @@ export default function HRDashboard(){
   const [candidatesList, setCandidatesList] = useState([])
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
+<<<<<<< HEAD
   const [activeSessionId, setActiveSessionId] = useState(null)
   const [hrStats, setHrStats] = useState(null)
+=======
+  const [nameMethod, setNameMethod] = useState('filename')
+  const currentUser = getUser()
+>>>>>>> development2
   
   const jobRoles = useMemo(() => {
     const uniqueRoles = []
@@ -167,6 +215,13 @@ export default function HRDashboard(){
         formData.append('jobId', activeJob.id || '')
         formData.append('jobTitle', activeJob.name || '')
         formData.append('requiredSkills', JSON.stringify(activeJob.requiredSkills || []))
+        formData.append('nameMethod', nameMethod)
+        if (activeJob.roadmapSteps && activeJob.roadmapSteps.length > 0) {
+          formData.append('jobDescription', activeJob.name + '. ' + activeJob.roadmapSteps.join('. '))
+        }
+        if (activeJob.location) {
+          formData.append('jobLocation', activeJob.location)
+        }
         
         // POST to /hr/resumes - the correct backend endpoint
         const res = await post('/hr/resumes', formData, true)
@@ -214,15 +269,87 @@ export default function HRDashboard(){
 
   const filtered = useMemo(() => {
     let list = candidatesList.slice()
+
+    // --- Text search ---
+    if (filters.searchText) {
+      const q = filters.searchText.toLowerCase()
+      list = list.filter(c =>
+        (c.name || '').toLowerCase().includes(q) ||
+        (c.email || '').toLowerCase().includes(q)
+      )
+    }
+
+    // --- Core filters ---
     if (filters.skill) list = list.filter(c => c.skills?.map(s => s.toLowerCase()).includes(filters.skill.toLowerCase()))
     if (filters.location) list = list.filter(c => c.location?.toLowerCase() === filters.location.toLowerCase())
     if (filters.college) list = list.filter(c => c.college?.toLowerCase() === filters.college.toLowerCase())
-    if (filters.experience) list = list.filter(c => c.experience >= Number(filters.experience))
-    if (filters.minMatch) list = list.filter(c => c.matchPercentage >= Number(filters.minMatch))
+    if (filters.experience) list = list.filter(c => (c.experience || 0) >= Number(filters.experience))
+    if (filters.maxExperience) list = list.filter(c => (c.experience || 0) <= Number(filters.maxExperience))
+    if (filters.minMatch) list = list.filter(c => (c.matchPercentage || 0) >= Number(filters.minMatch))
 
-    if (sortBy === 'highest_score') list.sort((a, b) => (b.score || 0) - (a.score || 0))
-    if (sortBy === 'most_experience') list.sort((a, b) => (b.experience || 0) - (a.experience || 0))
-    if (sortBy === 'top5') list = list.slice(0, 5)
+    // --- Score range ---
+    if (filters.minScore) list = list.filter(c => (c.score || 0) >= Number(filters.minScore))
+    if (filters.maxScore) list = list.filter(c => (c.score || 0) <= Number(filters.maxScore))
+
+    // --- Resume strength & job fit ---
+    if (filters.resumeStrength) list = list.filter(c => c.resumeStrength === filters.resumeStrength)
+    if (filters.jobFitLevel) list = list.filter(c => c.jobFitLevel === filters.jobFitLevel)
+
+    // --- Degree ---
+    if (filters.degree) list = list.filter(c => (c.branch || c.degree || '').toLowerCase() === filters.degree.toLowerCase())
+
+    // --- Boolean toggles ---
+    if (filters.hasPortfolio) list = list.filter(c => c.portfolioLinks && c.portfolioLinks.length > 0)
+    if (filters.hasInternships) list = list.filter(c => c.internships && c.internships.length > 0)
+
+    // --- Min skills count ---
+    if (filters.minSkillsCount) list = list.filter(c => (c.skills || []).length >= Number(filters.minSkillsCount))
+
+    // --- Must-have skills (multi-select, AND logic) ---
+    if (filters.selectedSkills && filters.selectedSkills.length > 0) {
+      list = list.filter(c => {
+        const cSkills = (c.skills || []).map(s => s.toLowerCase())
+        return filters.selectedSkills.every(rs => cSkills.includes(rs.toLowerCase()))
+      })
+    }
+
+    // --- Custom keywords (OR logic across all text fields) ---
+    if (filters.keywords && filters.keywords.length > 0) {
+      list = list.filter(c => {
+        const blob = [
+          c.name, c.email, c.college, c.location, c.branch, c.degree,
+          ...(c.skills || []), ...(c.internships || []), ...(c.portfolioLinks || [])
+        ].filter(Boolean).join(' ').toLowerCase()
+        return filters.keywords.some(kw => blob.includes(kw.toLowerCase()))
+      })
+    }
+
+    // --- Sorting ---
+    const sortKey = sortBy || ''
+    if (sortKey === 'highest_score' || sortKey.includes('top') && sortKey.includes('score')) {
+      list.sort((a, b) => (b.score || 0) - (a.score || 0))
+    } else if (sortKey === 'lowest_score') {
+      list.sort((a, b) => (a.score || 0) - (b.score || 0))
+    } else if (sortKey === 'highest_match' || sortKey.includes('top') && sortKey.includes('match')) {
+      list.sort((a, b) => (b.matchPercentage || 0) - (a.matchPercentage || 0))
+    } else if (sortKey === 'most_experience' || sortKey.includes('top') && sortKey.includes('exp')) {
+      list.sort((a, b) => (b.experience || 0) - (a.experience || 0))
+    } else if (sortKey === 'least_experience') {
+      list.sort((a, b) => (a.experience || 0) - (b.experience || 0))
+    } else if (sortKey === 'name_asc') {
+      list.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    } else if (sortKey === 'name_desc') {
+      list.sort((a, b) => (b.name || '').localeCompare(a.name || ''))
+    } else if (sortKey === 'most_skills') {
+      list.sort((a, b) => (b.skills || []).length - (a.skills || []).length)
+    }
+
+    // --- Top N slicing (after sort) ---
+    if (sortKey === 'top5_score' || sortKey === 'top5_match' || sortKey === 'top5_exp') {
+      list = list.slice(0, 5)
+    } else if (sortKey === 'top10_score' || sortKey === 'top10_match') {
+      list = list.slice(0, 10)
+    }
 
     return list
   }, [filters, sortBy, candidatesList])
@@ -233,7 +360,12 @@ export default function HRDashboard(){
     const avgExp = Math.round((candidatesList.reduce((s, c) => s + (c.experience || 0), 0) / total) || 0)
     const topSkills = Object.entries(candidatesList.flatMap(c => c.skills || []).reduce((acc, s) => { acc[s] = (acc[s] || 0) + 1; return acc }, {})).sort((a, b) => b[1] - a[1]).slice(0, 5).map(x => x[0])
     const matchedCount = candidatesList.filter(c => (c.matchPercentage || 0) >= 70).length
-    return { total, avgScore, avgExp, topSkills, matchedCount }
+    const strongCount = candidatesList.filter(c => c.resumeStrength === 'Strong').length
+    const avgCount = candidatesList.filter(c => c.resumeStrength === 'Average').length
+    const weakCount = candidatesList.filter(c => c.resumeStrength === 'Weak').length
+    const highFitCount = candidatesList.filter(c => c.jobFitLevel === 'High').length
+    const withPortfolio = candidatesList.filter(c => c.portfolioLinks && c.portfolioLinks.length > 0).length
+    return { total, avgScore, avgExp, topSkills, matchedCount, strongCount, avgCount, weakCount, highFitCount, withPortfolio }
   }, [candidatesList])
 
   function downloadCSV() {
@@ -245,7 +377,7 @@ export default function HRDashboard(){
     const rows = filtered.map(c => [
       c.name || '',
       c.email || '',
-      c.phone || '',
+      c.phone ? `="${c.phone}"` : '',
       isValidLocation(c.location) ? c.location : '',
       c.college || '',
       c.branch || c.degree || '',
@@ -291,12 +423,23 @@ export default function HRDashboard(){
               <p className="text-indigo-200 text-sm">{user?.companyName || user?.name || 'Company'} · {user?.email}</p>
             </div>
           </div>
+<<<<<<< HEAD
           <button
             onClick={() => navigate('/hr/sessions')}
             className="px-5 py-2.5 bg-white/15 backdrop-blur-sm text-white rounded-xl font-medium text-sm hover:bg-white/25 transition-all border border-white/20"
           >
             View Sessions →
           </button>
+=======
+          <div>
+            <h2 className="text-3xl font-bold">HR Dashboard</h2>
+            <p className="text-sm text-gray-600">Company: <span className="font-semibold text-indigo-600">{currentUser?.companyName || 'Not logged in'}</span></p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50 rounded-lg border border-indigo-200">
+          <span className="text-sm text-gray-600">Logged in as</span>
+          <span className="font-semibold text-indigo-600">{currentUser?.email || 'HR'}</span>
+>>>>>>> development2
         </div>
       </div>
 
@@ -317,15 +460,40 @@ export default function HRDashboard(){
               <div className="text-xs font-semibold text-gray-600 mb-1">Avg Experience</div>
               <div className="text-3xl font-bold text-purple-600">{stats.avgExp} yrs</div>
             </div>
+            <div className="card bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
+              <div className="text-xs font-semibold text-gray-600 mb-1">High Fit</div>
+              <div className="text-3xl font-bold text-emerald-600">{stats.highFitCount}</div>
+            </div>
+          </div>
+
+          {/* Resume Strength Breakdown */}
+          {stats.total > 0 && (
+            <div className="card">
+              <div className="text-xs font-semibold text-gray-600 mb-2">Resume Strength Distribution</div>
+              <div className="flex gap-1 h-3 rounded-full overflow-hidden bg-gray-100">
+                {stats.strongCount > 0 && <div className="bg-green-500 transition-all" style={{ width: `${(stats.strongCount / stats.total) * 100}%` }} title={`Strong: ${stats.strongCount}`} />}
+                {stats.avgCount > 0 && <div className="bg-yellow-400 transition-all" style={{ width: `${(stats.avgCount / stats.total) * 100}%` }} title={`Average: ${stats.avgCount}`} />}
+                {stats.weakCount > 0 && <div className="bg-red-400 transition-all" style={{ width: `${(stats.weakCount / stats.total) * 100}%` }} title={`Weak: ${stats.weakCount}`} />}
+              </div>
+              <div className="flex justify-between mt-1.5 text-xs text-gray-500">
+                <span>🟢 {stats.strongCount} Strong</span>
+                <span>🟡 {stats.avgCount} Avg</span>
+                <span>🔴 {stats.weakCount} Weak</span>
+              </div>
+            </div>
+          )}
+
+          {/* Top Skills */}
+          {stats.topSkills.length > 0 && (
             <div className="card bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200">
-              <div className="text-xs font-semibold text-gray-600 mb-1">Top Skills</div>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {stats.topSkills.slice(0, 3).map(s=> (
+              <div className="text-xs font-semibold text-gray-600 mb-2">🔥 Top Skills Across Candidates</div>
+              <div className="flex flex-wrap gap-1">
+                {stats.topSkills.map(s => (
                   <span key={s} className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">{s}</span>
                 ))}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Job Selection & Resume Upload Combined */}
           <div className="card">
@@ -404,6 +572,45 @@ export default function HRDashboard(){
                 />
               </div>
 
+              {/* Name Extraction Method */}
+              <div className="border-t pt-4">
+                <label className="text-sm font-semibold text-gray-700 mb-2 block">Name Extraction Method</label>
+                <div className="space-y-2 mb-3">
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                    nameMethod === 'filename' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="nameMethod"
+                      value="filename"
+                      checked={nameMethod === 'filename'}
+                      onChange={() => setNameMethod('filename')}
+                      className="mt-1 accent-indigo-600"
+                    />
+                    <div>
+                      <div className="font-semibold text-sm text-gray-800">Standard Resume Names <span className="text-xs text-green-600 font-normal">(Recommended)</span></div>
+                      <div className="text-xs text-gray-500 mt-0.5">Resume filename must be full name. e.g., <span className="font-mono bg-gray-100 px-1 rounded">Rahul Sharma.pdf</span></div>
+                    </div>
+                  </label>
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                    nameMethod === 'auto' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="nameMethod"
+                      value="auto"
+                      checked={nameMethod === 'auto'}
+                      onChange={() => setNameMethod('auto')}
+                      className="mt-1 accent-indigo-600"
+                    />
+                    <div>
+                      <div className="font-semibold text-sm text-gray-800">Automatic Extraction</div>
+                      <div className="text-xs text-gray-500 mt-0.5">Extract name from resume text using text analysis</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               {/* Resume Upload Section */}
               <div className="border-t pt-4">
                 <label className="text-sm font-semibold text-gray-700 mb-2 block">Upload Resumes</label>
@@ -456,11 +663,16 @@ export default function HRDashboard(){
 
           {/* Filters */}
           <div className="card">
-            <FilterPanel filters={filters} setFilters={setFilters} setSortBy={setSortBy} currentJob={currentJob} candidatesList={candidatesList} />
+            <FilterPanel filters={filters} setFilters={setFilters} setSortBy={setSortBy} sortBy={sortBy} currentJob={currentJob} candidatesList={candidatesList} />
             <div className="mt-4 pt-4 border-t">
               <button 
                 onClick={() => {
-                  setFilters({skill:"", location:"", college:"", minMatch:0, experience:""})
+                  setFilters({
+                    skill:"", location:"", college:"", minMatch:0, experience:"",
+                    searchText:"", minScore:"", maxScore:"", resumeStrength:"", jobFitLevel:"",
+                    degree:"", hasPortfolio:false, hasInternships:false, minSkillsCount:"",
+                    selectedSkills:[], keywords:[], maxExperience:""
+                  })
                   setSortBy("")
                 }}
                 className="btn-secondary w-full text-sm py-2"
@@ -478,13 +690,28 @@ export default function HRDashboard(){
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
                 <div className="text-sm text-gray-600">
-                  Results: <span className="font-bold text-indigo-600 text-lg">{filtered.length}</span>
+                  Showing: <span className="font-bold text-indigo-600 text-lg">{filtered.length}</span>
+                  {filtered.length !== candidatesList.length && (
+                    <span className="text-xs text-gray-400 ml-1">of {candidatesList.length}</span>
+                  )}
                 </div>
-                <select onChange={e=>setSortBy(e.target.value)} className="input-field text-sm py-2 max-w-[180px]">
+                {sortBy && (
+                  <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                    📊 {sortBy.replace(/_/g, ' ')}
+                    <button onClick={() => setSortBy('')} className="hover:text-red-500 ml-1">×</button>
+                  </span>
+                )}
+                <select value={sortBy || ''} onChange={e=>setSortBy(e.target.value)} className="input-field text-sm py-2 max-w-[220px]">
                   <option value="">Sort: Default</option>
-                  <option value="top5">Top 5</option>
-                  <option value="highest_score">Highest score</option>
-                  <option value="most_experience">Most experience</option>
+                  <option value="top5_score">Top 5 by Score</option>
+                  <option value="top10_score">Top 10 by Score</option>
+                  <option value="top5_match">Top 5 by Match %</option>
+                  <option value="highest_score">Highest Score</option>
+                  <option value="lowest_score">Lowest Score</option>
+                  <option value="highest_match">Highest Match %</option>
+                  <option value="most_experience">Most Experience</option>
+                  <option value="name_asc">Name A→Z</option>
+                  <option value="most_skills">Most Skills</option>
                 </select>
               </div>
 
@@ -546,10 +773,7 @@ export default function HRDashboard(){
                         <td className="px-4 py-4"><ScoreBadge score={c.score} /></td>
                         <td className="px-4 py-4 font-semibold text-indigo-600">{c.matchPercentage || 0}%</td>
                         <td className="px-4 py-4">
-                          <div className="flex flex-wrap gap-1">
-                            {(c.skills || []).slice(0, 4).map((s, idx) => <span key={`${s}-${idx}`} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{s}</span>)}
-                            {(c.skills || []).length > 4 && <span className="text-xs text-gray-500">+{c.skills.length - 4}</span>}
-                          </div>
+                          <TableSkillsCell skills={c.skills || []} />
                         </td>
                       </tr>
                     )) : (

@@ -6,14 +6,19 @@ import re
 
 
 def _clean_text(text: str) -> str:
-    """Clean text while preserving line structure"""
+    """Clean text while preserving layout structure (column gaps)"""
     if not text:
         return text
     
-    # Collapse multiple spaces into single space
-    text = re.sub(r' +', ' ', text)
+    # Normalize line endings
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
     
-    # Collapse more than 2 newlines into single newline
+    # Do NOT collapse multi-space gaps — they indicate column boundaries
+    # in layout-extracted PDFs and are critical for name extraction.
+    # Only collapse extreme padding (100+ spaces)
+    text = re.sub(r' {100,}', '   ', text)
+    
+    # Collapse more than 2 newlines into double newline
     text = re.sub(r'\n{3,}', '\n\n', text)
     
     return text

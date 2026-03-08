@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Flow Diagrams - Resume Screening and Career Guidance System</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+            border-bottom: 5px solid #3498db;
+        }
+        
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            font-size: 1.6em;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        h2:first-of-type {
+            margin-top: 0;
+        }
+        
+        h3 {
+            color: #34495e;
+            font-size: 1.3em;
+            margin: 30px 0 15px 0;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .diagram-box {
+            background: #fff;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            margin: 25px 0;
+            overflow: hidden;
+        }
+        
+        .diagram-header {
+            background: #3498db;
+            color: white;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .diagram-content {
+            padding: 25px;
+            background: #fafafa;
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .legend-section {
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .legend-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .symbol {
+            width: 50px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85em;
+            color: white;
+        }
+        
+        .symbol-entity {
+            background: #27ae60;
+            border-radius: 4px;
+        }
+        
+        .symbol-process {
+            background: #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+        
+        .symbol-datastore {
+            background: #7f8c8d;
+            border-left: 4px solid #2c3e50;
+            border-right: 4px solid #2c3e50;
+        }
+        
+        .symbol-flow {
+            background: none;
+            color: #e74c3c;
+            font-size: 1.5em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        
+        th {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .note {
+            background: #fff9e6;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .note strong {
+            color: #e67e22;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 0;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .diagram-box {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Data Flow Diagrams (DFD)</h1>
+            <p>Resume Screening and Career Guidance System</p>
+        </header>
+        
+        <div class="content">
+            <!-- Introduction -->
+            <h2>1. Introduction to Data Flow Diagrams</h2>
+            <p>
+                Data Flow Diagrams (DFDs) are graphical representations that illustrate how data moves 
+                through an information system. They show the flow of data between external entities, 
+                processes, and data stores. DFDs help in understanding the system's functionality 
+                without getting into technical implementation details.
+            </p>
+            
+            <div class="legend-section">
+                <div class="legend-title">DFD Notation Symbols</div>
+                <div class="legend-grid">
+                    <div class="legend-item">
+                        <div class="symbol symbol-entity">Entity</div>
+                        <div>
+                            <strong>External Entity</strong><br>
+                            <small>Source or destination of data (User, HR)</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="symbol symbol-process">1.0</div>
+                        <div>
+                            <strong>Process</strong><br>
+                            <small>Transforms input data to output</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="symbol symbol-datastore">D1</div>
+                        <div>
+                            <strong>Data Store</strong><br>
+                            <small>Repository where data is stored</small>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="symbol symbol-flow">→</div>
+                        <div>
+                            <strong>Data Flow</strong><br>
+                            <small>Direction of data movement</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DFD Level 0 -->
+            <h2>2. DFD Level 0 - Context Diagram</h2>
+            <p>
+                The Context Diagram (Level 0 DFD) provides the highest level view of the system. 
+                It shows the entire system as a single process and identifies all external entities 
+                that interact with it. This diagram establishes the system boundary and major data 
+                flows between the system and its environment.
+            </p>
+
+            <div class="diagram-box">
+                <div class="diagram-header">DFD Level 0: Context Diagram</div>
+                <div class="diagram-content">
+                    <div class="mermaid">
+flowchart LR
+    HR(["<b>HR User</b><br/>(External Entity)"])
+    CAND(["<b>Candidate</b><br/>(External Entity)"])
+    
+    SYSTEM(("<b>0</b><br/>Resume Screening<br/>and Career<br/>Guidance System"))
+    
+    HR -->|"Resume Files<br/>Job Requirements<br/>Filter Criteria"| SYSTEM
+    SYSTEM -->|"Ranked Candidates<br/>Match Scores<br/>Candidate Details"| HR
+    
+    CAND -->|"Resume File<br/>Target Job Role"| SYSTEM
+    SYSTEM -->|"Resume Score<br/>Skill Gap Report<br/>Career Roadmap"| CAND
+                    </div>
+                </div>
+            </div>
+
+            <h3>2.1 External Entities Description</h3>
+            <table>
+                <tr>
+                    <th>Entity</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><strong>HR User</strong></td>
+                    <td>External Entity</td>
+                    <td>Human Resource professional who uploads multiple resumes and evaluates candidates against job requirements</td>
+                </tr>
+                <tr>
+                    <td><strong>Candidate</strong></td>
+                    <td>External Entity</td>
+                    <td>Job seeker who uploads their resume to receive analysis, scores, and career guidance</td>
+                </tr>
+            </table>
+
+            <h3>2.2 Data Flow Description</h3>
+            <table>
+                <tr>
+                    <th>Flow</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Data Description</th>
+                </tr>
+                <tr>
+                    <td>Resume Files</td>
+                    <td>HR User</td>
+                    <td>System</td>
+                    <td>PDF/DOCX resume documents for analysis</td>
+                </tr>
+                <tr>
+                    <td>Job Requirements</td>
+                    <td>HR User</td>
+                    <td>System</td>
+                    <td>Job title, description, and required skills</td>
+                </tr>
+                <tr>
+                    <td>Filter Criteria</td>
+                    <td>HR User</td>
+                    <td>System</td>
+                    <td>Skills, location, experience filters</td>
+                </tr>
+                <tr>
+                    <td>Ranked Candidates</td>
+                    <td>System</td>
+                    <td>HR User</td>
+                    <td>Ordered list of candidates by match score</td>
+                </tr>
+                <tr>
+                    <td>Match Scores</td>
+                    <td>System</td>
+                    <td>HR User</td>
+                    <td>Percentage match for each candidate</td>
+                </tr>
+                <tr>
+                    <td>Resume File</td>
+                    <td>Candidate</td>
+                    <td>System</td>
+                    <td>Candidate's resume document</td>
+                </tr>
+                <tr>
+                    <td>Target Job Role</td>
+                    <td>Candidate</td>
+                    <td>System</td>
+                    <td>Desired job position for comparison</td>
+                </tr>
+                <tr>
+                    <td>Resume Score</td>
+                    <td>System</td>
+                    <td>Candidate</td>
+                    <td>Match percentage with target role</td>
+                </tr>
+                <tr>
+                    <td>Skill Gap Report</td>
+                    <td>System</td>
+                    <td>Candidate</td>
+                    <td>List of missing skills for the role</td>
+                </tr>
+                <tr>
+                    <td>Career Roadmap</td>
+                    <td>System</td>
+                    <td>Candidate</td>
+                    <td>Learning path and recommendations</td>
+                </tr>
+            </table>
+
+            <!-- DFD Level 1 -->
+            <h2 class="page-break">3. DFD Level 1 - System Decomposition</h2>
+            <p>
+                Level 1 DFD breaks down the single process from Level 0 into its major sub-processes. 
+                It shows the main functional areas of the system and how data flows between them 
+                through various data stores.
+            </p>
+
+            <div class="diagram-box">
+                <div class="diagram-header">DFD Level 1: Main System Processes</div>
+                <div class="diagram-content">
+                    <div class="mermaid">
+flowchart TB
+    %% External Entities
+    HR(["<b>HR User</b>"])
+    CAND(["<b>Candidate</b>"])
+    
+    %% Processes
+    P1(("<b>1.0</b><br/>Resume<br/>Upload"))
+    P2(("<b>2.0</b><br/>Resume<br/>Analysis"))
+    P3(("<b>3.0</b><br/>Scoring &<br/>Ranking"))
+    P4(("<b>4.0</b><br/>Career<br/>Guidance"))
+    
+    %% Data Stores
+    D1[("<b>D1</b> Resume Database")]
+    D2[("<b>D2</b> Skills Database")]
+    D3[("<b>D3</b> Job Roles Database")]
+    D4[("<b>D4</b> Score Records")]
+    
+    %% HR User flows
+    HR -->|"Resume Files"| P1
+    HR -->|"Job Requirements"| P3
+    HR -->|"Filter Criteria"| P3
+    
+    %% Candidate flows
+    CAND -->|"Resume File"| P1
+    CAND -->|"Target Role"| P4
+    
+    %% Process 1: Resume Upload
+    P1 -->|"Stored Resume"| D1
+    P1 -->|"Resume Data"| P2
+    
+    %% Process 2: Resume Analysis
+    D1 -->|"Resume Text"| P2
+    D2 -->|"Skills List"| P2
+    P2 -->|"Extracted Skills"| P3
+    P2 -->|"Candidate Info"| P3
+    P2 -->|"Extracted Skills"| P4
+    
+    %% Process 3: Scoring & Ranking
+    D3 -->|"Required Skills"| P3
+    P3 -->|"Match Score"| D4
+    P3 -->|"Ranked Candidates"| HR
+    P3 -->|"Match Scores"| HR
+    P3 -->|"Candidate Details"| HR
+    
+    %% Process 4: Career Guidance
+    D3 -->|"Role Requirements"| P4
+    D4 -->|"Current Score"| P4
+    P4 -->|"Resume Score"| CAND
+    P4 -->|"Skill Gap Report"| CAND
+    P4 -->|"Career Roadmap"| CAND
+                    </div>
+                </div>
+            </div>
+
+            <h3>3.1 Process Description</h3>
+            <table>
+                <tr>
+                    <th>Process ID</th>
+                    <th>Process Name</th>
+                    <th>Description</th>
+                    <th>Input</th>
+                    <th>Output</th>
+                </tr>
+                <tr>
+                    <td><strong>1.0</strong></td>
+                    <td>Resume Upload</td>
+                    <td>Receives resume files, validates format, stores in database</td>
+                    <td>Resume Files</td>
+                    <td>Stored Resume, Resume Data</td>
+                </tr>
+                <tr>
+                    <td><strong>2.0</strong></td>
+                    <td>Resume Analysis</td>
+                    <td>Extracts text, identifies skills, parses candidate information</td>
+                    <td>Resume Text, Skills List</td>
+                    <td>Extracted Skills, Candidate Info</td>
+                </tr>
+                <tr>
+                    <td><strong>3.0</strong></td>
+                    <td>Scoring & Ranking</td>
+                    <td>Calculates match scores, applies filters, ranks candidates</td>
+                    <td>Extracted Skills, Candidate Info, Required Skills, Filter Criteria</td>
+                    <td>Match Score, Ranked Candidates</td>
+                </tr>
+                <tr>
+                    <td><strong>4.0</strong></td>
+                    <td>Career Guidance</td>
+                    <td>Identifies skill gaps, generates learning roadmap</td>
+                    <td>Extracted Skills, Role Requirements, Current Score</td>
+                    <td>Skill Gap Report, Career Roadmap</td>
+                </tr>
+            </table>
+
+            <h3>3.2 Data Store Description</h3>
+            <table>
+                <tr>
+                    <th>Store ID</th>
+                    <th>Store Name</th>
+                    <th>Description</th>
+                    <th>Data Elements</th>
+                </tr>
+                <tr>
+                    <td><strong>D1</strong></td>
+                    <td>Resume Database</td>
+                    <td>Stores uploaded resume files and extracted text</td>
+                    <td>File path, filename, raw text, upload date</td>
+                </tr>
+                <tr>
+                    <td><strong>D2</strong></td>
+                    <td>Skills Database</td>
+                    <td>Master list of technical and professional skills</td>
+                    <td>Skill name, variations, category</td>
+                </tr>
+                <tr>
+                    <td><strong>D3</strong></td>
+                    <td>Job Roles Database</td>
+                    <td>Job positions with requirements</td>
+                    <td>Job title, description, required skills, roadmap steps</td>
+                </tr>
+                <tr>
+                    <td><strong>D4</strong></td>
+                    <td>Score Records</td>
+                    <td>Calculated match scores and analysis results</td>
+                    <td>Candidate ID, job ID, match score, timestamp</td>
+                </tr>
+            </table>
+
+            <!-- DFD Level 2 -->
+            <h2 class="page-break">4. DFD Level 2 - Resume Analysis Process</h2>
+            <p>
+                Level 2 DFD provides a detailed breakdown of Process 2.0 (Resume Analysis). 
+                This is the most complex process in the system and involves multiple sub-processes 
+                for text extraction, skill identification, and information parsing.
+            </p>
+
+            <div class="diagram-box">
+                <div class="diagram-header">DFD Level 2: Resume Analysis Process (2.0) Decomposition</div>
+                <div class="diagram-content">
+                    <div class="mermaid">
+flowchart TB
+    %% Input from Level 1
+    D1[("<b>D1</b> Resume Database")]
+    D2[("<b>D2</b> Skills Database")]
+    
+    %% Sub-processes of 2.0
+    P21(("<b>2.1</b><br/>Text<br/>Extraction"))
+    P22(("<b>2.2</b><br/>Text<br/>Cleaning"))
+    P23(("<b>2.3</b><br/>Contact<br/>Extraction"))
+    P24(("<b>2.4</b><br/>Skill<br/>Identification"))
+    P25(("<b>2.5</b><br/>Experience<br/>Detection"))
+    P26(("<b>2.6</b><br/>Entity<br/>Recognition"))
+    
+    %% Internal Data Store
+    D5[("<b>D5</b> Extracted Data")]
+    
+    %% Output to Level 1
+    OUT1["To Process 3.0:<br/>Extracted Skills"]
+    OUT2["To Process 3.0 & 4.0:<br/>Candidate Info"]
+    
+    %% Input flows
+    D1 -->|"PDF/DOCX File"| P21
+    
+    %% Process 2.1: Text Extraction
+    P21 -->|"Raw Text"| P22
+    P21 -->|"Table Data"| P22
+    
+    %% Process 2.2: Text Cleaning - distributes to all extraction processes
+    P22 -->|"Clean Text"| P23
+    P22 -->|"Clean Text"| P24
+    P22 -->|"Clean Text"| P25
+    P22 -->|"Clean Text"| P26
+    
+    %% Process 2.3: Contact Extraction
+    P23 -->|"Email, Phone,<br/>Portfolio Links"| D5
+    
+    %% Process 2.4: Skill Identification
+    D2 -->|"Skills List"| P24
+    D2 -->|"Skill Variations"| P24
+    P24 -->|"Matched Skills"| D5
+    P24 -->|"Matched Skills"| OUT1
+    
+    %% Process 2.5: Experience Detection
+    P25 -->|"Years of Experience"| D5
+    
+    %% Process 2.6: Entity Recognition (NLP)
+    P26 -->|"Name"| D5
+    P26 -->|"Location"| D5
+    P26 -->|"Education"| D5
+    P26 -->|"Organizations"| D5
+    
+    %% Output aggregation
+    D5 -->|"Complete Profile"| OUT2
+                    </div>
+                </div>
+            </div>
+
+            <h3>4.1 Sub-Process Description</h3>
+            <table>
+                <tr>
+                    <th>Process ID</th>
+                    <th>Process Name</th>
+                    <th>Description</th>
+                    <th>Technology Used</th>
+                </tr>
+                <tr>
+                    <td><strong>2.1</strong></td>
+                    <td>Text Extraction</td>
+                    <td>Extracts raw text content from PDF and DOCX files using layout-aware parsing. Handles tables separately.</td>
+                    <td>pdfplumber, python-docx</td>
+                </tr>
+                <tr>
+                    <td><strong>2.2</strong></td>
+                    <td>Text Cleaning</td>
+                    <td>Removes excessive whitespace, normalizes line breaks while preserving document structure.</td>
+                    <td>Python regex</td>
+                </tr>
+                <tr>
+                    <td><strong>2.3</strong></td>
+                    <td>Contact Extraction</td>
+                    <td>Identifies email addresses, phone numbers (multiple formats), GitHub/LinkedIn links.</td>
+                    <td>Regular expressions</td>
+                </tr>
+                <tr>
+                    <td><strong>2.4</strong></td>
+                    <td>Skill Identification</td>
+                    <td>Matches text against skills database using word boundaries. Normalizes skill variations to canonical names.</td>
+                    <td>Pattern matching, word boundaries</td>
+                </tr>
+                <tr>
+                    <td><strong>2.5</strong></td>
+                    <td>Experience Detection</td>
+                    <td>Extracts years of experience from various text patterns like "5+ years experience" or date ranges.</td>
+                    <td>Regular expressions</td>
+                </tr>
+                <tr>
+                    <td><strong>2.6</strong></td>
+                    <td>Entity Recognition</td>
+                    <td>Uses NLP to identify person names, organizations, educational institutions, and geographic locations.</td>
+                    <td>spaCy Named Entity Recognition</td>
+                </tr>
+            </table>
+
+            <h3>4.2 Data Flow Details</h3>
+            <table>
+                <tr>
+                    <th>Data Flow</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>PDF/DOCX File</td>
+                    <td>D1: Resume Database</td>
+                    <td>2.1: Text Extraction</td>
+                    <td>Binary file content for parsing</td>
+                </tr>
+                <tr>
+                    <td>Raw Text</td>
+                    <td>2.1: Text Extraction</td>
+                    <td>2.2: Text Cleaning</td>
+                    <td>Unprocessed text with layout preserved</td>
+                </tr>
+                <tr>
+                    <td>Table Data</td>
+                    <td>2.1: Text Extraction</td>
+                    <td>2.2: Text Cleaning</td>
+                    <td>Content from tables in the document</td>
+                </tr>
+                <tr>
+                    <td>Clean Text</td>
+                    <td>2.2: Text Cleaning</td>
+                    <td>2.3, 2.4, 2.5, 2.6</td>
+                    <td>Normalized text for analysis</td>
+                </tr>
+                <tr>
+                    <td>Skills List</td>
+                    <td>D2: Skills Database</td>
+                    <td>2.4: Skill Identification</td>
+                    <td>Master list of recognized skills</td>
+                </tr>
+                <tr>
+                    <td>Skill Variations</td>
+                    <td>D2: Skills Database</td>
+                    <td>2.4: Skill Identification</td>
+                    <td>Alternative names for skills (js → JavaScript)</td>
+                </tr>
+                <tr>
+                    <td>Matched Skills</td>
+                    <td>2.4: Skill Identification</td>
+                    <td>D5, Process 3.0</td>
+                    <td>List of identified skills</td>
+                </tr>
+                <tr>
+                    <td>Complete Profile</td>
+                    <td>D5: Extracted Data</td>
+                    <td>Process 3.0, 4.0</td>
+                    <td>Aggregated candidate information</td>
+                </tr>
+            </table>
+
+            <div class="note">
+                <strong>Note:</strong> Process 2.4 (Skill Identification) uses a canonical mapping system 
+                that normalizes skill variations. For example, "js", "javascript", "node", "nodejs" are 
+                all mapped to their canonical form "JavaScript" and "Node.js" respectively. This ensures 
+                consistent skill matching across different resume formats.
+            </div>
+
+            <!-- Summary -->
+            <h2 class="page-break">5. DFD Summary</h2>
+            
+            <h3>5.1 Levels Overview</h3>
+            <table>
+                <tr>
+                    <th>Level</th>
+                    <th>Name</th>
+                    <th>Purpose</th>
+                    <th>Processes Shown</th>
+                </tr>
+                <tr>
+                    <td><strong>Level 0</strong></td>
+                    <td>Context Diagram</td>
+                    <td>Shows system boundary and external interactions</td>
+                    <td>1 (Entire system as single process)</td>
+                </tr>
+                <tr>
+                    <td><strong>Level 1</strong></td>
+                    <td>System Decomposition</td>
+                    <td>Shows major functional processes</td>
+                    <td>4 (Upload, Analysis, Scoring, Guidance)</td>
+                </tr>
+                <tr>
+                    <td><strong>Level 2</strong></td>
+                    <td>Process Decomposition</td>
+                    <td>Detailed breakdown of Resume Analysis</td>
+                    <td>6 (Text Extraction to Entity Recognition)</td>
+                </tr>
+            </table>
+
+            <h3>5.2 Key System Characteristics</h3>
+            <ul>
+                <li><strong>Two User Types:</strong> HR Users and Candidates interact with the system differently</li>
+                <li><strong>Four Core Processes:</strong> Upload, Analysis, Scoring, and Guidance</li>
+                <li><strong>Four Data Stores:</strong> Resume, Skills, Job Roles, and Score Records</li>
+                <li><strong>Bidirectional Data Flow:</strong> Users both send and receive data</li>
+                <li><strong>Modular Processing:</strong> Analysis is decomposed into specialized sub-processes</li>
+            </ul>
+
+            <h3>5.3 Data Flow Principles Applied</h3>
+            <ul>
+                <li>Each process transforms input data into output data</li>
+                <li>Data stores provide persistent storage between processes</li>
+                <li>External entities exist outside the system boundary</li>
+                <li>All data flows are labeled with descriptive names</li>
+                <li>No data flow connects two data stores directly (must pass through a process)</li>
+                <li>No data flow connects two external entities directly</li>
+            </ul>
+        </div>
+        
+        <footer>
+            <p>Data Flow Diagrams - Resume Screening and Career Guidance System</p>
+            <p>Academic Year 2025-2026</p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#3498db',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#2980b9',
+                lineColor: '#34495e',
+                secondaryColor: '#ecf0f1',
+                tertiaryColor: '#f8f9fa',
+                fontFamily: 'Segoe UI, sans-serif',
+                fontSize: '14px'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 60,
+                rankSpacing: 60
+            }
+        });
+    </script>
+</body>
+</html>
