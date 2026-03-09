@@ -32,6 +32,12 @@ export async function post(endpoint, data, isFormData = false) {
   return res.json();
 }
 
+export function setAuth(token, user) {
+  localStorage.setItem('token', token);
+  localStorage.setItem('user', JSON.stringify(user));
+  window.dispatchEvent(new Event('auth-change'));
+}
+
 export function getUser() {
   const raw = localStorage.getItem('user');
   if (!raw) return null;
@@ -45,4 +51,5 @@ export function isLoggedIn() {
 export function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  window.dispatchEvent(new Event('auth-change'));
 }

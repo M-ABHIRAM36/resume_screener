@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { post } from '../../api'
+import { post, setAuth } from '../../api'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function Signup(){
@@ -26,8 +26,7 @@ export default function Signup(){
     setLoading(true)
     try{
       const res = await post('/hr/auth/signup', { companyName, email, password })
-      localStorage.setItem('token', res.token)
-      localStorage.setItem('user', JSON.stringify(res.user))
+      setAuth(res.token, res.user)
       navigate('/hr')
     }catch(err){
       const msg = err.message || String(err)

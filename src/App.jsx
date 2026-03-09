@@ -13,6 +13,22 @@ import CandidateSignup from "./pages/auth/CandidateSignup"
 import RoleSelect from "./pages/auth/RoleSelect"
 import { isLoggedIn, getUser, logout } from "./api"
 
+function RequireAuth({ children, role }) {
+  const user = getUser()
+  const loggedIn = isLoggedIn()
+  if (!loggedIn) {
+    return role === 'candidate'
+      ? <CandidateLogin />
+      : <Login />
+  }
+  if (role && user?.role !== role) {
+    return role === 'candidate'
+      ? <CandidateLogin />
+      : <Login />
+  }
+  return children
+}
+
 export default function App(){
   const [loggedIn, setLoggedIn] = useState(isLoggedIn())
   const [user, setUser] = useState(getUser())
@@ -25,7 +41,11 @@ export default function App(){
       setUser(getUser())
     }
     window.addEventListener('storage', check)
-    return () => window.removeEventListener('storage', check)
+    window.addEventListener('auth-change', check)
+    return () => {
+      window.removeEventListener('storage', check)
+      window.removeEventListener('auth-change', check)
+    }
   }, [])
 
   // Re-check auth state when route changes
@@ -70,11 +90,11 @@ export default function App(){
       <main className="max-w-7xl mx-auto p-4 md:p-6">
         <Routes>
           <Route path="/" element={<Landing/>} />
-          <Route path="/candidate" element={<CandidateDashboard/>} />
-          <Route path="/candidate/score" element={<ResumeScore/>} />
-          <Route path="/candidate/skill-gap" element={<SkillGap/>} />
-          <Route path="/candidate/roadmap" element={<Roadmap/>} />
-          <Route path="/hr" element={<HRDashboard/>} />
+          <Route path="/candidate" element={<RequireAuth role="candidate"><CandidateDashboard/></RequireAuth>} />
+          <Route path="/candidate/score" element={<RequireAuth role="candidate"><ResumeScore/></RequireAuth>} />
+          <Route path="/candidate/skill-gap" element={<RequireAuth role="candidate"><SkillGap/></RequireAuth>} />
+          <Route path="/candidate/roadmap" element={<RequireAuth role="candidate"><Roadmap/></RequireAuth>} />
+          <Route path="/hr" element={<RequireAuth role="hr"><HRDashboard/></RequireAuth>} />
           <Route path="/auth/login" element={<Login/>} />
           <Route path="/auth/signup" element={<Signup/>} />
           <Route path="/auth/candidate/login" element={<CandidateLogin/>} />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { post } from '../../api'
+import { post, setAuth } from '../../api'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function CandidateLogin(){
@@ -16,8 +16,7 @@ export default function CandidateLogin(){
     setError('')
     try{
       const res = await post('/candidate/auth/login', { email, password })
-      localStorage.setItem('token', res.token)
-      localStorage.setItem('user', JSON.stringify(res.user))
+      setAuth(res.token, res.user)
       navigate('/candidate')
     }catch(err){
       const msg = err.message || String(err)
