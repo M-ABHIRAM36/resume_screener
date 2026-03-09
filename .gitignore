@@ -19,6 +19,8 @@ yarn-debug.log*
 pnpm-debug.log*
 # Env files
 .env
+backend/.env
+frontend/.env
 .env.local
 .env.*.local
 # Editor folders

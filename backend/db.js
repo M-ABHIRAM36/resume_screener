@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/resume_screener';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/resume_screening_system';
 
 async function connectDB() {
   try {
