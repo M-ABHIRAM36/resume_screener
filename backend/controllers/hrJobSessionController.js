@@ -19,7 +19,7 @@ exports.createSession = async (req, res) => {
     const hrId = getUserIdFromToken(req);
     if (!hrId) return res.status(401).json({ error: 'Not authenticated' });
 
-    const { title, jobRole, college, batch, description } = req.body;
+    const { title, jobRole, college, batch, description, requiredSkills, jobLocation } = req.body;
     if (!title || !jobRole) {
       return res.status(400).json({ error: 'title and jobRole are required' });
     }
@@ -30,7 +30,9 @@ exports.createSession = async (req, res) => {
       jobRole: jobRole.trim(),
       college: (college || '').trim(),
       batch: (batch || '').trim(),
-      description: (description || '').trim()
+      description: (description || '').trim(),
+      requiredSkills: Array.isArray(requiredSkills) ? requiredSkills : [],
+      jobLocation: (jobLocation || '').trim()
     });
 
     res.json({ success: true, session });
@@ -51,19 +53,35 @@ exports.listSessions = async (req, res) => {
       .limit(100)
       .lean();
 
-    // Attach candidate count for each session
+    // Attach candidate count + stats for each session
     const sessionIds = sessions.map(s => s._id);
-    const counts = await SessionResult.aggregate([
+    const statsAgg = await SessionResult.aggregate([
       { $match: { sessionId: { $in: sessionIds } } },
-      { $group: { _id: '$sessionId', count: { $sum: 1 } } }
+      { $group: {
+        _id: '$sessionId',
+        count: { $sum: 1 },
+        avgScore: { $avg: '$score' },
+        avgMatch: { $avg: '$matchPercentage' },
+        maxScore: { $max: '$score' },
+        strongCount: { $sum: { $cond: [{ $eq: ['$resumeStrength', 'Strong'] }, 1, 0] } },
+        highFitCount: { $sum: { $cond: [{ $eq: ['$jobFitLevel', 'High'] }, 1, 0] } }
+      }}
     ]);
-    const countMap = {};
-    counts.forEach(c => { countMap[c._id.toString()] = c.count; });
+    const statsMap = {};
+    statsAgg.forEach(s => { statsMap[s._id.toString()] = s; });
 
-    const enriched = sessions.map(s => ({
-      ...s,
-      candidateCount: countMap[s._id.toString()] || 0
-    }));
+    const enriched = sessions.map(s => {
+      const st = statsMap[s._id.toString()] || {};
+      return {
+        ...s,
+        candidateCount: st.count || 0,
+        avgScore: Math.round(st.avgScore || 0),
+        avgMatch: Math.round(st.avgMatch || 0),
+        maxScore: st.maxScore || 0,
+        strongCount: st.strongCount || 0,
+        highFitCount: st.highFitCount || 0
+      };
+    });
 
     res.json(enriched);
   } catch (err) {
@@ -85,7 +103,14 @@ exports.getSession = async (req, res) => {
       .sort({ score: -1 })
       .lean();
 
-    res.json({ ...session, candidates });
+    // Map candidates to match master dashboard format
+    const mapped = candidates.map(c => ({
+      ...c,
+      name: c.candidateName,
+      id: c._id
+    }));
+
+    res.json({ ...session, candidates: mapped });
   } catch (err) {
     console.error('getSession error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -110,18 +135,20 @@ exports.uploadToSession = async (req, res) => {
     const job = {
       id: `session_${session._id}`,
       name: session.jobRole,
-      requiredSkills: [],
+      requiredSkills: session.requiredSkills || [],
       description: session.description || '',
-      location: ''
+      location: session.jobLocation || ''
     };
 
-    // Try to find matching job for required skills
-    const jobDoc = await Job.findOne({
-      name: { $regex: new RegExp(session.jobRole.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }
-    }).lean();
-    if (jobDoc) {
-      job.requiredSkills = jobDoc.requiredSkills || [];
-      job.location = jobDoc.location || '';
+    // Try to find matching job for required skills if session doesn't have them
+    if (!job.requiredSkills.length) {
+      const jobDoc = await Job.findOne({
+        name: { $regex: new RegExp(session.jobRole.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }
+      }).lean();
+      if (jobDoc) {
+        job.requiredSkills = jobDoc.requiredSkills || [];
+        if (!job.location) job.location = jobDoc.location || '';
+      }
     }
 
     // Call ML service
@@ -135,17 +162,29 @@ exports.uploadToSession = async (req, res) => {
       return res.status(500).json({ error: 'ML service error: ' + (e.message || String(e)) });
     }
 
-    // Save results to sessionResults collection
+    // Save results with ALL fields to sessionResults collection
     const results = [];
     for (const c of analyzed) {
       const result = await SessionResult.create({
         sessionId: session._id,
         candidateName: c.name || 'Unknown',
         email: c.email || '',
+        phone: c.phone || '',
+        location: c.location || '',
+        college: c.college || '',
+        branch: c.branch || c.degree || '',
+        experience: c.experience || 0,
         score: c.score || 0,
         matchPercentage: c.matchPercentage || 0,
-        skills: (c.skills || []).slice(0, 30),
-        missingSkills: (c.missingSkills || []).slice(0, 20)
+        skills: (c.skills || []).slice(0, 50),
+        missingSkills: (c.missingSkills || []).slice(0, 30),
+        matchedSkills: (c.matchedSkills || []).slice(0, 50),
+        resumeStrength: c.resumeStrength || '',
+        jobFitLevel: c.jobFitLevel || '',
+        categoryScores: c.categoryScores || null,
+        bonusFactors: c.bonusFactors || null,
+        internships: (c.internships || []).slice(0, 20),
+        portfolioLinks: (c.portfolioLinks || []).slice(0, 10)
       });
       results.push(result);
     }
@@ -171,7 +210,6 @@ exports.deleteSession = async (req, res) => {
     const session = await JobSession.findOneAndDelete({ _id: req.params.id, hrId });
     if (!session) return res.status(404).json({ error: 'Session not found' });
 
-    // Also delete all associated results
     await SessionResult.deleteMany({ sessionId: req.params.id });
 
     res.json({ success: true });

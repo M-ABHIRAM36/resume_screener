@@ -109,6 +109,36 @@ exports.getSession = async (req, res) => {
   }
 };
 
+// DELETE /chat/resume/session/:id
+exports.deleteSession = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const session = await ResumeChatSession.findOneAndDelete({ _id: req.params.id, userId });
+    if (!session) return res.status(404).json({ error: 'Chat session not found' });
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error('deleteSession error:', e);
+    res.status(500).json({ error: e.message });
+  }
+};
+
+// DELETE /chat/resume/history — delete all sessions for user
+exports.deleteAllSessions = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const result = await ResumeChatSession.deleteMany({ userId });
+    res.json({ success: true, deleted: result.deletedCount });
+  } catch (e) {
+    console.error('deleteAllSessions error:', e);
+    res.status(500).json({ error: e.message });
+  }
+};
+
 // GET /chat/resume/history
 exports.getHistory = async (req, res) => {
   try {

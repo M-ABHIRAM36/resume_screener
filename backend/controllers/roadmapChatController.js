@@ -109,6 +109,36 @@ exports.getSession = async (req, res) => {
   }
 };
 
+// DELETE /api/chat/roadmap/session/:id
+exports.deleteSession = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const session = await RoadmapChatSession.findOneAndDelete({ _id: req.params.id, userId });
+    if (!session) return res.status(404).json({ error: 'Chat session not found' });
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error('roadmap deleteSession error:', e);
+    res.status(500).json({ error: e.message });
+  }
+};
+
+// DELETE /api/chat/roadmap/history — delete all sessions for user
+exports.deleteAllSessions = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const result = await RoadmapChatSession.deleteMany({ userId });
+    res.json({ success: true, deleted: result.deletedCount });
+  } catch (e) {
+    console.error('roadmap deleteAllSessions error:', e);
+    res.status(500).json({ error: e.message });
+  }
+};
+
 // GET /api/chat/roadmap/history
 exports.getHistory = async (req, res) => {
   try {

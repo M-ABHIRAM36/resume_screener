@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { get, post } from '../../api'
+import { get, post, del } from '../../api'
 import { useNavigate } from 'react-router-dom'
 
 export default function RoadmapChat() {
@@ -107,6 +107,34 @@ export default function RoadmapChat() {
     setSelectedRole('')
   }
 
+  async function deleteSession(id) {
+    if (!window.confirm('Delete this chat session?')) return
+    try {
+      await del(`/api/chat/roadmap/session/${id}`)
+      setHistory(prev => prev.filter(h => h._id !== id))
+      if (sessionId === id) {
+        setSessionId(null)
+        setMessages([])
+        setActiveRoleName('')
+      }
+    } catch (e) {
+      console.error('Failed to delete session:', e)
+    }
+  }
+
+  async function deleteAllSessions() {
+    if (!window.confirm('Delete ALL roadmap chat history? This cannot be undone.')) return
+    try {
+      await del('/api/chat/roadmap/history')
+      setHistory([])
+      setSessionId(null)
+      setMessages([])
+      setActiveRoleName('')
+    } catch (e) {
+      console.error('Failed to delete history:', e)
+    }
+  }
+
   function formatDate(d) {
     const date = new Date(d)
     const now = new Date()
@@ -147,18 +175,33 @@ export default function RoadmapChat() {
 
         {showHistory ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50">
-            <div className="p-4 bg-gray-50 rounded-t-2xl">
+            <div className="p-4 bg-gray-50 rounded-t-2xl flex items-center justify-between">
               <h2 className="font-semibold text-gray-700 text-sm">Previous Sessions</h2>
+              {history.length > 0 && (
+                <button onClick={deleteAllSessions} className="text-xs text-gray-400 hover:text-rose-500 flex items-center gap-1 transition-colors" title="Delete all history">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  Clear All
+                </button>
+              )}
             </div>
             {history.map(s => (
-              <button key={s._id} onClick={() => loadSession(s._id)} className="w-full text-left px-5 py-4 hover:bg-indigo-50 transition-colors flex items-center justify-between">
-                <div>
+              <div key={s._id} className="group flex items-center justify-between px-5 py-4 hover:bg-indigo-50 transition-colors">
+                <button onClick={() => loadSession(s._id)} className="flex-1 text-left">
                   <span className="font-medium text-gray-800 text-sm">
                     {s.roadmapRole.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                   </span>
+                </button>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400">{formatDate(s.createdAt)}</span>
+                  <button
+                    onClick={() => deleteSession(s._id)}
+                    className="p-1 rounded text-gray-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
+                    title="Delete session"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
                 </div>
-                <span className="text-xs text-gray-400">{formatDate(s.createdAt)}</span>
-              </button>
+              </div>
             ))}
           </div>
         ) : (
