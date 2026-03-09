@@ -5,7 +5,12 @@ import CandidateDashboard from "./pages/candidate/Dashboard"
 import ResumeScore from "./pages/candidate/ResumeScore"
 import SkillGap from "./pages/candidate/SkillGap"
 import Roadmap from "./pages/candidate/Roadmap"
+import ResumeChat from "./pages/candidate/ResumeChat"
+import RoadmapChat from "./pages/candidate/RoadmapChat"
 import HRDashboard from "./pages/hr/Dashboard"
+import SessionList from "./pages/hr/SessionList"
+import CreateSession from "./pages/hr/CreateSession"
+import SessionDetail from "./pages/hr/SessionDetail"
 import Login from "./pages/auth/Login"
 import Signup from "./pages/auth/Signup"
 import CandidateLogin from "./pages/auth/CandidateLogin"
@@ -94,7 +99,12 @@ export default function App(){
           <Route path="/candidate/score" element={<RequireAuth role="candidate"><ResumeScore/></RequireAuth>} />
           <Route path="/candidate/skill-gap" element={<RequireAuth role="candidate"><SkillGap/></RequireAuth>} />
           <Route path="/candidate/roadmap" element={<RequireAuth role="candidate"><Roadmap/></RequireAuth>} />
+          <Route path="/candidate/chat" element={<RequireAuth role="candidate"><ResumeChat/></RequireAuth>} />
+          <Route path="/candidate/roadmap-chat" element={<RequireAuth role="candidate"><RoadmapChat/></RequireAuth>} />
           <Route path="/hr" element={<RequireAuth role="hr"><HRDashboard/></RequireAuth>} />
+          <Route path="/hr/sessions" element={<RequireAuth role="hr"><SessionList/></RequireAuth>} />
+          <Route path="/hr/sessions/create" element={<RequireAuth role="hr"><CreateSession/></RequireAuth>} />
+          <Route path="/hr/sessions/:id" element={<RequireAuth role="hr"><SessionDetail/></RequireAuth>} />
           <Route path="/auth/login" element={<Login/>} />
           <Route path="/auth/signup" element={<Signup/>} />
           <Route path="/auth/candidate/login" element={<CandidateLogin/>} />

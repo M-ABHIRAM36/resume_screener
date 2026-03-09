@@ -18,13 +18,21 @@ const hrResumeRoutes = require('./routes/hrResumeRoutes');
 const hrDashboardRoutes = require('./routes/hrDashboardRoutes');
 const candidateRoutes = require('./routes/candidateRoutes');
 const candidateAuthRoutes = require('./routes/candidateAuthRoutes');
+const hrSessionRoutes = require('./routes/hrSessionRoutes');
+const hrJobSessionRoutes = require('./routes/hrJobSessionRoutes');
+const resumeChatRoutes = require('./routes/resumeChatRoutes');
+const roadmapChatRoutes = require('./routes/roadmapChatRoutes');
 
 app.use('/hr/auth', hrAuthRoutes);
 app.use('/hr/jobs', hrJobRoutes);
 app.use('/hr/resumes', hrResumeRoutes);
 app.use('/hr/dashboard', hrDashboardRoutes);
+app.use('/hr/sessions', hrSessionRoutes);
+app.use('/hr/session', hrJobSessionRoutes);
 app.use('/candidate', candidateRoutes);
 app.use('/candidate/auth', candidateAuthRoutes);
+app.use('/chat/resume', resumeChatRoutes);
+app.use('/api/chat/roadmap', roadmapChatRoutes);
 const hrDebugRoutes = require('./routes/hrDebugRoutes');
 app.use('/hr/debug', hrDebugRoutes);
 

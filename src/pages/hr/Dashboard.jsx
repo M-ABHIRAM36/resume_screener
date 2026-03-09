@@ -3,7 +3,8 @@ import FilterPanel from "../../components/FilterPanel"
 import CandidateCard from "../../components/CandidateCard"
 import ResumeUpload from "../../components/ResumeUpload"
 import ScoreBadge from "../../components/ScoreBadge"
-import { get, post, getUser } from "../../api"
+import { get, post, put, del, getUser } from "../../api"
+import { Link } from "react-router-dom"
 import jobRolesData from "../../data/job_roles.json"
 
 function TableSkillsCell({ skills = [] }) {
@@ -54,7 +55,72 @@ export default function HRDashboard(){
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [nameMethod, setNameMethod] = useState('filename')
+  const [pastSessions, setPastSessions] = useState([])
+  const [loadingSessions, setLoadingSessions] = useState(false)
+  const [showPastSessions, setShowPastSessions] = useState(false)
+  const [loadedSession, setLoadedSession] = useState(null)
   const currentUser = getUser()
+
+  async function fetchPastSessions() {
+    setLoadingSessions(true)
+    try {
+      const sessions = await get('/hr/sessions')
+      setPastSessions(sessions)
+    } catch (e) {
+      console.error('fetchPastSessions error:', e)
+    } finally {
+      setLoadingSessions(false)
+    }
+  }
+
+  async function saveCurrentSession(job, candidates) {
+    try {
+      const payload = {
+        jobTitle: job.name || job.jobTitle || 'Untitled',
+        jobId: job.id || '',
+        jobLocation: job.location || '',
+        requiredSkills: job.requiredSkills || [],
+        candidates: candidates
+      }
+      if (loadedSession && loadedSession._id) {
+        const res = await put(`/hr/sessions/${loadedSession._id}`, payload)
+        setLoadedSession(res.session || loadedSession)
+      } else {
+        await post('/hr/sessions', payload)
+      }
+      fetchPastSessions()
+    } catch (e) {
+      console.error('saveSession error:', e)
+    }
+  }
+
+  async function loadSession(sessionId) {
+    try {
+      const session = await get(`/hr/sessions/${sessionId}`)
+      setLoadedSession(session)
+      setCandidatesList(cleanCandidateData(session.candidates || []))
+      setCurrentJob({ id: session.jobId, name: session.jobTitle, requiredSkills: session.requiredSkills || [], location: session.jobLocation })
+      setJobTitle(session.jobTitle)
+      setJobLocation(session.jobLocation || '')
+      setShowPastSessions(false)
+    } catch (e) {
+      console.error('loadSession error:', e)
+      alert('Failed to load session')
+    }
+  }
+
+  async function deleteSession(sessionId) {
+    try {
+      await del(`/hr/sessions/${sessionId}`)
+      setPastSessions(prev => prev.filter(s => s._id !== sessionId))
+    } catch (e) {
+      console.error('deleteSession error:', e)
+    }
+  }
+
+  useEffect(() => {
+    fetchPastSessions()
+  }, [])
   
   const jobRoles = useMemo(() => {
     const uniqueRoles = []
@@ -179,11 +245,17 @@ export default function HRDashboard(){
         
         // Handle different response formats from backend and clean data
         if(res?.analyzed && Array.isArray(res.analyzed)) {
-          setCandidatesList(cleanCandidateData(res.analyzed))
+          const cleaned = cleanCandidateData(res.analyzed)
+          setCandidatesList(cleaned)
+          saveCurrentSession(activeJob, cleaned)
         } else if(res?.candidates && Array.isArray(res.candidates)) {
-          setCandidatesList(cleanCandidateData(res.candidates))
+          const cleaned = cleanCandidateData(res.candidates)
+          setCandidatesList(cleaned)
+          saveCurrentSession(activeJob, cleaned)
         } else if(Array.isArray(res)) {
-          setCandidatesList(cleanCandidateData(res))
+          const cleaned = cleanCandidateData(res)
+          setCandidatesList(cleaned)
+          saveCurrentSession(activeJob, cleaned)
         } else {
           console.log('Response format:', res)
           // Try to fetch candidates after upload
@@ -368,10 +440,85 @@ export default function HRDashboard(){
             <p className="text-sm text-gray-600">Company: <span className="font-semibold text-indigo-600">{currentUser?.companyName || 'Not logged in'}</span></p>
           </div>
         </div>
-        <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50 rounded-lg border border-indigo-200">
-          <span className="text-sm text-gray-600">Logged in as</span>
-          <span className="font-semibold text-indigo-600">{currentUser?.email || 'HR'}</span>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/hr/sessions"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors shadow-sm text-sm"
+          >
+            📋 Hiring Sessions
+          </Link>
+          <div className="px-4 py-2 bg-indigo-50 rounded-lg border border-indigo-200">
+            <span className="text-sm text-gray-600">Logged in as </span>
+            <span className="font-semibold text-indigo-600">{currentUser?.email || 'HR'}</span>
+          </div>
         </div>
+      </div>
+
+      {/* Past Sessions Toggle */}
+      <div className="card">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => { setShowPastSessions(!showPastSessions); if (!showPastSessions) fetchPastSessions() }}
+            className="flex items-center gap-2 font-bold text-lg text-gray-800 hover:text-indigo-600 transition-colors"
+          >
+            <span>📂 Past Screening Sessions</span>
+            <svg className={`w-5 h-5 transition-transform ${showPastSessions ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {pastSessions.length > 0 && (
+            <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full font-medium">{pastSessions.length} sessions</span>
+          )}
+        </div>
+
+        {showPastSessions && (
+          <div className="mt-4 space-y-3">
+            {loadingSessions ? (
+              <div className="text-center py-6 text-gray-500 text-sm">Loading sessions...</div>
+            ) : pastSessions.length === 0 ? (
+              <div className="text-center py-6 text-gray-400 text-sm">No past sessions yet. Analyze resumes to create one.</div>
+            ) : (
+              <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+                {pastSessions.map(s => (
+                  <div key={s._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-sm text-gray-800 truncate">{s.jobTitle}</div>
+                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                        <span>{s.totalCandidates} candidates</span>
+                        <span>Avg: {s.avgScore}</span>
+                        <span className="text-green-600">{s.highFitCount} high-fit</span>
+                        {s.jobLocation && <span>📍 {s.jobLocation}</span>}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">
+                        {new Date(s.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 ml-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => loadSession(s._id)}
+                        className="px-3 py-1.5 text-xs font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                      >
+                        Load
+                      </button>
+                      <button
+                        onClick={() => { if(confirm('Delete this session?')) deleteSession(s._id) }}
+                        className="px-2 py-1.5 text-xs font-semibold text-rose-500 hover:bg-rose-50 rounded-lg border border-rose-200"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {loadedSession && (
+          <div className="mt-3 flex items-center gap-2 p-2 bg-amber-50 rounded-lg border border-amber-200 text-xs">
+            <span className="text-amber-700 font-semibold">📋 Viewing saved session:</span>
+            <span className="text-amber-600">{loadedSession.jobTitle} — {new Date(loadedSession.createdAt).toLocaleString()}</span>
+            <button onClick={() => { setLoadedSession(null); setCandidatesList([]); setCurrentJob(null) }} className="ml-auto text-amber-600 hover:text-amber-800 font-semibold">Clear</button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

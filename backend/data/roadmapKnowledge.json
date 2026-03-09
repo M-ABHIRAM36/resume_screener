@@ -1,0 +1,230 @@
+{
+  "backend": {
+    "title": "Backend Developer",
+    "steps": [
+      "Learn HTTP fundamentals, request/response lifecycle, status codes",
+      "Pick a language: Node.js (JavaScript) or Python",
+      "Learn a framework: Express.js or Django/Flask",
+      "Understand REST API design principles and best practices",
+      "Learn relational databases: PostgreSQL or MySQL with SQL",
+      "Learn NoSQL databases: MongoDB",
+      "Authentication & authorization: JWT, OAuth, session management",
+      "Input validation, rate limiting, and security best practices",
+      "Caching with Redis",
+      "Testing: unit tests, integration tests, API testing",
+      "Containerization with Docker",
+      "CI/CD pipelines and deployment strategies",
+      "Cloud basics: AWS, Azure, or GCP",
+      "Monitoring, logging, and observability"
+    ]
+  },
+  "frontend": {
+    "title": "Frontend Developer",
+    "steps": [
+      "HTML5 semantics and accessibility best practices",
+      "CSS3: Flexbox, Grid, responsive design, animations",
+      "JavaScript fundamentals: ES6+, async/await, DOM manipulation",
+      "TypeScript for type safety",
+      "Pick a framework: React, Vue, or Angular",
+      "State management: Redux, Zustand, or Pinia",
+      "Routing: React Router or Vue Router",
+      "CSS frameworks: Tailwind CSS or Bootstrap",
+      "API integration: REST, fetch, Axios",
+      "Testing: Jest, React Testing Library, Cypress",
+      "Build tools: Vite, Webpack",
+      "Performance optimization: lazy loading, code splitting",
+      "Progressive Web Apps (PWA)",
+      "Deployment: Vercel, Netlify, or cloud platforms"
+    ]
+  },
+  "full-stack": {
+    "title": "Full-Stack Developer",
+    "steps": [
+      "HTML, CSS, JavaScript fundamentals",
+      "Frontend framework: React or Vue",
+      "Backend language: Node.js with Express",
+      "Database: MongoDB and PostgreSQL",
+      "REST API design and implementation",
+      "Authentication: JWT, OAuth2",
+      "State management and frontend architecture",
+      "TypeScript across the stack",
+      "Testing: frontend and backend testing strategies",
+      "Docker and containerization",
+      "Version control: Git workflows",
+      "CI/CD and deployment pipelines",
+      "Cloud services: AWS or Azure basics",
+      "System design fundamentals"
+    ]
+  },
+  "data-analyst": {
+    "title": "Data Analyst",
+    "steps": [
+      "Learn SQL: queries, joins, aggregations, window functions",
+      "Excel/Google Sheets: pivot tables, VLOOKUP, formulas",
+      "Python basics for data analysis",
+      "Pandas and NumPy for data manipulation",
+      "Data visualization: Matplotlib, Seaborn",
+      "Business Intelligence tools: Power BI or Tableau",
+      "Statistics fundamentals: descriptive and inferential",
+      "Data cleaning and preprocessing techniques",
+      "Exploratory data analysis (EDA) methodology",
+      "Probability and hypothesis testing",
+      "Dashboard design and storytelling with data",
+      "ETL processes and data pipelines",
+      "A/B testing and experiment design",
+      "Communication and presentation skills"
+    ]
+  },
+  "machine-learning": {
+    "title": "Machine Learning Engineer",
+    "steps": [
+      "Python programming and data structures",
+      "Mathematics: linear algebra, calculus, probability",
+      "Statistics and data analysis with Pandas, NumPy",
+      "Data visualization: Matplotlib, Seaborn",
+      "Scikit-learn: classification, regression, clustering",
+      "Feature engineering and data preprocessing",
+      "Deep learning fundamentals: neural networks",
+      "TensorFlow or PyTorch framework",
+      "Natural language processing (NLP) basics",
+      "Computer vision fundamentals",
+      "Model evaluation: cross-validation, metrics, bias",
+      "MLOps: model deployment, monitoring, versioning",
+      "Cloud ML services: AWS SageMaker, GCP Vertex AI",
+      "Research papers and staying current with the field"
+    ]
+  },
+  "devops": {
+    "title": "DevOps Engineer",
+    "steps": [
+      "Linux fundamentals and shell scripting (Bash)",
+      "Networking: TCP/IP, DNS, HTTP, firewalls",
+      "Version control: Git and branching strategies",
+      "CI/CD: Jenkins, GitHub Actions, GitLab CI",
+      "Containerization: Docker",
+      "Container orchestration: Kubernetes",
+      "Infrastructure as Code: Terraform or Pulumi",
+      "Configuration management: Ansible",
+      "Cloud platforms: AWS, Azure, or GCP",
+      "Monitoring: Prometheus, Grafana",
+      "Logging: ELK Stack or similar",
+      "Security: secrets management, scanning, compliance",
+      "Automated testing in pipelines",
+      "Incident management and SRE practices"
+    ]
+  },
+  "android": {
+    "title": "Android Developer",
+    "steps": [
+      "Kotlin programming language fundamentals",
+      "Android Studio IDE and project structure",
+      "UI: XML layouts, ConstraintLayout, Material Design",
+      "Jetpack Compose for modern UI",
+      "Activity and Fragment lifecycle",
+      "Navigation component and deep linking",
+      "Networking: Retrofit, OkHttp",
+      "Local storage: Room database, SharedPreferences",
+      "MVVM architecture and ViewModel",
+      "Dependency injection: Hilt or Dagger",
+      "Coroutines and Flow for async programming",
+      "Testing: JUnit, Espresso, Mockito",
+      "App publishing: Google Play Store",
+      "Performance optimization and profiling"
+    ]
+  },
+  "react": {
+    "title": "React Developer",
+    "steps": [
+      "JavaScript ES6+ and TypeScript basics",
+      "React fundamentals: JSX, components, props, state",
+      "Hooks: useState, useEffect, useContext, useMemo, useCallback",
+      "Component patterns: composition, render props, HOCs",
+      "State management: Context API, Redux Toolkit, Zustand",
+      "React Router for navigation",
+      "Forms: controlled components, React Hook Form",
+      "API integration: fetch, Axios, React Query/TanStack Query",
+      "Styling: CSS Modules, Styled Components, Tailwind CSS",
+      "Testing: Jest, React Testing Library",
+      "Performance: React.memo, lazy loading, code splitting",
+      "Next.js for server-side rendering and full-stack React",
+      "Build tools: Vite, Create React App",
+      "Deployment and CI/CD for React apps"
+    ]
+  },
+  "python": {
+    "title": "Python Developer",
+    "steps": [
+      "Python fundamentals: data types, control flow, functions",
+      "Object-oriented programming in Python",
+      "Modules, packages, and virtual environments",
+      "File handling and working with JSON/CSV",
+      "Error handling and debugging techniques",
+      "Web frameworks: Django or Flask/FastAPI",
+      "Database: SQLAlchemy ORM, PostgreSQL",
+      "REST API design and implementation",
+      "Testing: pytest, unittest",
+      "Async programming: asyncio, aiohttp",
+      "Package management: pip, Poetry",
+      "Data libraries: Pandas, NumPy (for data tasks)",
+      "Deployment: Docker, cloud platforms",
+      "Code quality: linting, type hints, Black formatter"
+    ]
+  },
+  "cyber-security": {
+    "title": "Cyber Security Specialist",
+    "steps": [
+      "Networking fundamentals: TCP/IP, DNS, HTTP/S, TLS",
+      "Operating systems: Linux and Windows security",
+      "Security concepts: CIA triad, threat modeling",
+      "OWASP Top 10 web vulnerabilities",
+      "Cryptography: encryption, hashing, PKI",
+      "Network security: firewalls, IDS/IPS, VPNs",
+      "Penetration testing methodology and tools",
+      "Vulnerability assessment and scanning",
+      "Incident response and forensics basics",
+      "Identity and access management (IAM)",
+      "Cloud security: AWS/Azure security services",
+      "Security compliance: ISO 27001, SOC 2, GDPR",
+      "Scripting for security: Python, Bash",
+      "Security certifications: CompTIA Security+, CEH, OSCP"
+    ]
+  },
+  "nodejs": {
+    "title": "Node.js Developer",
+    "steps": [
+      "JavaScript ES6+ fundamentals",
+      "Node.js runtime: event loop, modules, npm",
+      "Express.js framework for building APIs",
+      "Middleware patterns and error handling",
+      "Database: MongoDB with Mongoose, PostgreSQL with Knex/Prisma",
+      "Authentication: JWT, Passport.js, OAuth",
+      "Input validation: Joi, express-validator",
+      "File handling: Multer, streams",
+      "Real-time: Socket.io, WebSockets",
+      "Testing: Jest, Mocha, Supertest",
+      "Performance: clustering, caching with Redis",
+      "TypeScript for Node.js",
+      "Docker and containerization",
+      "Deployment: PM2, cloud platforms, CI/CD"
+    ]
+  },
+  "java": {
+    "title": "Java Developer",
+    "steps": [
+      "Java fundamentals: OOP, data types, collections",
+      "Advanced Java: generics, streams, lambdas",
+      "Build tools: Maven or Gradle",
+      "Spring Framework and Spring Boot",
+      "REST API development with Spring Web",
+      "Database: JPA/Hibernate, PostgreSQL, MySQL",
+      "Spring Security: authentication and authorization",
+      "Testing: JUnit 5, Mockito, Spring Boot Test",
+      "Microservices architecture patterns",
+      "Message queues: RabbitMQ or Kafka",
+      "Docker and Kubernetes for Java apps",
+      "Performance: JVM tuning, profiling",
+      "CI/CD pipelines for Java projects",
+      "Design patterns and SOLID principles"
+    ]
+  }
+}

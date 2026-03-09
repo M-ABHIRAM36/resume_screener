@@ -48,6 +48,25 @@ export function isLoggedIn() {
   return !!localStorage.getItem('token');
 }
 
+export async function put(endpoint, data) {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function del(endpoint) {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 export function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
