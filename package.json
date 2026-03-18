@@ -3,11 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -n FRONTEND,BACKEND,ML -c green,blue,magenta \"npm run frontend\" \"npm run backend\" \"npm run ml\"",
+    "frontend": "vite",
+    "backend": "cd backend && npm run dev",
+    "ml": "cd ml-service && start.bat",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "concurrently": "^9.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.1"
@@ -20,3 +24,4 @@
     "vite": "^5.0.0"
   }
 }
+
