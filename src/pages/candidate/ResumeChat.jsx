@@ -151,6 +151,77 @@ export default function ResumeChat() {
     return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" })
   }
 
+  function renderInline(line) {
+    const parts = String(line).split(/(\*\*[^*]+\*\*)/g)
+    return parts.map((part, idx) => {
+      const isBold = /^\*\*[^*]+\*\*$/.test(part)
+      if (isBold) return <strong key={idx}>{part.slice(2, -2)}</strong>
+      return <React.Fragment key={idx}>{part}</React.Fragment>
+    })
+  }
+
+  function renderAssistantText(text) {
+    const lines = String(text || "").split("\n")
+    const blocks = []
+    let listItems = []
+
+    const flushList = () => {
+      if (!listItems.length) return
+      blocks.push(
+        <ul key={`list-${blocks.length}`} className="list-disc pl-5 space-y-1 my-2">
+          {listItems.map((item, idx) => (
+            <li key={idx}>{renderInline(item)}</li>
+          ))}
+        </ul>
+      )
+      listItems = []
+    }
+
+    lines.forEach((raw, idx) => {
+      const line = raw.trimEnd()
+      if (!line.trim()) {
+        flushList()
+        blocks.push(<div key={`sp-${idx}`} className="h-2" />)
+        return
+      }
+
+      const bullet = line.match(/^\s*[*-]\s+(.*)$/)
+      if (bullet) {
+        listItems.push(bullet[1])
+        return
+      }
+
+      flushList()
+
+      if (line.startsWith("### ")) {
+        blocks.push(
+          <h4 key={`h3-${idx}`} className="font-semibold text-slate-900 mt-1 mb-1">
+            {renderInline(line.slice(4))}
+          </h4>
+        )
+        return
+      }
+
+      if (line.startsWith("## ")) {
+        blocks.push(
+          <h3 key={`h2-${idx}`} className="font-bold text-slate-900 mt-1 mb-1">
+            {renderInline(line.slice(3))}
+          </h3>
+        )
+        return
+      }
+
+      blocks.push(
+        <p key={`p-${idx}`} className="my-0.5 text-slate-900">
+          {renderInline(line)}
+        </p>
+      )
+    })
+
+    flushList()
+    return blocks
+  }
+
   return (
     <div className="max-w-5xl mx-auto py-6 flex gap-4" style={{ height: "calc(100vh - 140px)" }}>
       {/* History Sidebar */}
@@ -281,7 +352,7 @@ export default function ResumeChat() {
               <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === "user"
                   ? "bg-indigo-600 text-white rounded-br-md"
-                  : "bg-gray-50 text-gray-800 border border-gray-200 rounded-bl-md"
+                  : "bg-slate-100 text-slate-900 border border-slate-300 rounded-bl-md"
               }`}>
                 {msg.role === "assistant" && (
                   <div className="flex items-center gap-1.5 mb-1.5">
@@ -290,10 +361,10 @@ export default function ResumeChat() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                     </span>
-                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">AI Assistant</span>
+                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">AI Assistant</span>
                   </div>
                 )}
-                {msg.text}
+                {msg.role === "assistant" ? renderAssistantText(msg.text) : msg.text}
               </div>
             </div>
           ))}
