@@ -146,12 +146,85 @@ export default function RoadmapChat() {
   }
 
   function renderInline(line) {
-    const parts = String(line).split(/(\*\*[^*]+\*\*)/g)
-    return parts.map((part, idx) => {
-      const isBold = /^\*\*[^*]+\*\*$/.test(part)
-      if (isBold) return <strong key={idx}>{part.slice(2, -2)}</strong>
-      return <React.Fragment key={idx}>{part}</React.Fragment>
-    })
+    const source = String(line || '')
+
+    function isSafeUrl(url) {
+      try {
+        const parsed = new URL(url)
+        return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+      } catch {
+        return false
+      }
+    }
+
+    function renderBold(text, keyPrefix) {
+      const parts = String(text).split(/(\*\*[^*]+\*\*)/g)
+      return parts.map((part, idx) => {
+        const isBold = /^\*\*[^*]+\*\*$/.test(part)
+        if (isBold) return <strong key={`${keyPrefix}-b-${idx}`}>{part.slice(2, -2)}</strong>
+        return <React.Fragment key={`${keyPrefix}-t-${idx}`}>{part}</React.Fragment>
+      })
+    }
+
+    function renderTextWithUrls(text, keyPrefix) {
+      const urlParts = String(text).split(/(https?:\/\/[^\s)]+)/g)
+      return urlParts.flatMap((part, idx) => {
+        const isUrl = /^https?:\/\//.test(part) && isSafeUrl(part)
+        if (isUrl) {
+          return [
+            <a
+              key={`${keyPrefix}-u-${idx}`}
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-700 underline hover:text-indigo-800"
+            >
+              {part}
+            </a>
+          ]
+        }
+        return renderBold(part, `${keyPrefix}-p-${idx}`)
+      })
+    }
+
+    const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g
+    const nodes = []
+    let lastIndex = 0
+    let match
+    let index = 0
+
+    while ((match = markdownLinkRegex.exec(source)) !== null) {
+      if (match.index > lastIndex) {
+        nodes.push(...renderTextWithUrls(source.slice(lastIndex, match.index), `m-${index}`))
+      }
+
+      const label = match[1]
+      const href = match[2]
+      if (isSafeUrl(href)) {
+        nodes.push(
+          <a
+            key={`md-link-${index}`}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo-700 underline hover:text-indigo-800"
+          >
+            {label}
+          </a>
+        )
+      } else {
+        nodes.push(...renderBold(match[0], `unsafe-${index}`))
+      }
+
+      lastIndex = markdownLinkRegex.lastIndex
+      index += 1
+    }
+
+    if (lastIndex < source.length) {
+      nodes.push(...renderTextWithUrls(source.slice(lastIndex), 'tail'))
+    }
+
+    return nodes.length ? nodes : renderBold(source, 'fallback')
   }
 
   function renderAssistantText(text) {
