@@ -8,10 +8,27 @@
 # if __name__ == '__main__':
 #     uvicorn.run('app.main:app', host='0.0.0.0', port=8000, reload=False)
 
+# for testing deployment it worked -2
+# from fastapi import FastAPI
+
+# app = FastAPI(title='Resume ML Service')
+
+# @app.get("/")
+# def home():
+#     return {"status": "ML service running"}
 from fastapi import FastAPI
 
 app = FastAPI(title='Resume ML Service')
 
+# Health check route (VERY IMPORTANT)
 @app.get("/")
 def home():
     return {"status": "ML service running"}
+
+# Import routes safely
+try:
+    from .routes import router as routes
+    app.include_router(routes)
+    print("✅ Routes loaded successfully")
+except Exception as e:
+    print("❌ Error loading routes:", str(e))
