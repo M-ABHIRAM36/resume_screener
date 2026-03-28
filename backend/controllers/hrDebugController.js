@@ -1,9 +1,9 @@
 exports.checkMl = async (req, res) => {
-  const jobsFile = require('path').join(__dirname, '..', 'data', 'jobs.json');
-  const fs = require('fs');
-  let jobs = [];
-  try{ jobs = JSON.parse(fs.readFileSync(jobsFile)); }catch(e){ jobs = []; }
-  const job = jobs[0] || { requiredSkills: ['React','Node.js','APIs'] };
+  const Job = require('../models/Job');
+  const firstJob = await Job.findOne().lean();
+  const job = firstJob
+    ? { id: firstJob.jobId, name: firstJob.name, requiredSkills: firstJob.requiredSkills }
+    : { requiredSkills: ['React','Node.js','APIs'] };
 
   try{
     const ml = require('../services/mlService');

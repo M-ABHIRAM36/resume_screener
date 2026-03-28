@@ -58,14 +58,14 @@ export default function Landing(){
           <p className="text-sm text-gray-500 mb-6">Choose your role to continue</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
             <button
-              onClick={() => nav("/candidate")}
+              onClick={() => nav("/auth/candidate/login")}
               className="inline-flex items-center justify-center gap-2 px-7 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold text-sm shadow-lg shadow-indigo-200 hover:shadow-xl transition-all sm:min-w-[220px]"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
               Login as Candidate
             </button>
             <button
-              onClick={() => nav('/hr')}
+              onClick={() => nav('/auth/login')}
               className="inline-flex items-center justify-center gap-2 px-7 py-3 border border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-800 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all sm:min-w-[220px]"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>

@@ -3,7 +3,10 @@ node_modules/
 backend/node_modules/
 frontend/node_modules/
 ml-service/venv/
+ml-service/env/
 ml-service/app/__pycache__/
+__pycache__/
+*.pyc
 # Vite / build
 dist/
 build/
@@ -16,6 +19,8 @@ yarn-debug.log*
 pnpm-debug.log*
 # Env files
 .env
+backend/.env
+frontend/.env
 .env.local
 .env.*.local
 # Editor folders

@@ -1,8 +1,5 @@
 const path = require('path');
-const fs = require('fs');
-const jobsFile = path.join(__dirname, '..', 'data', 'jobs.json');
-
-function readJobs(){ try{ return JSON.parse(fs.readFileSync(jobsFile)); }catch(e){ return []; } }
+const Job = require('../models/Job');
 
 function applyFilters(candidates, q){
   let list = candidates.slice();
@@ -23,10 +20,12 @@ exports.uploadResumes = async (req, res) => {
   const jobId = req.body && req.body.jobId ? req.body.jobId : (req.query && req.query.jobId);
   let job = null;
   
-  // First try to get job from jobs.json
-  const jobs = readJobs();
+  // First try to get job from MongoDB
   if(jobId) {
-    job = jobs.find(j=>j.id===jobId);
+    const jobDoc = await Job.findOne({ jobId }).lean();
+    if(jobDoc) {
+      job = { id: jobDoc.jobId, name: jobDoc.name, requiredSkills: jobDoc.requiredSkills, description: '', location: jobDoc.location };
+    }
   }
   
   // If job not found in jobs.json, build it from individual form fields sent by frontend
@@ -74,15 +73,14 @@ exports.uploadResumes = async (req, res) => {
     }
   }
   
-  // Fallback to first job or empty job
+  // Fallback to first job in DB or empty job
   if(!job) {
-    job = jobs[0] || { 
-      id: 'default',
-      name: 'Default Job',
-      requiredSkills: [],
-      description: '',
-      location: ''
-    };
+    const firstJob = await Job.findOne().lean();
+    if(firstJob) {
+      job = { id: firstJob.jobId, name: firstJob.name, requiredSkills: firstJob.requiredSkills, description: '', location: firstJob.location };
+    } else {
+      job = { id: 'default', name: 'Default Job', requiredSkills: [], description: '', location: '' };
+    }
     console.log('Using default/fallback job');
   }
 

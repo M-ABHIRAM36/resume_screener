@@ -16,7 +16,8 @@ Extraction methods:
 from fastapi import APIRouter, UploadFile, File, Form, Request
 from typing import List, Optional
 from . import resume_parser, skill_extractor, scorer
-
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 try:
     import spacy
     nlp = spacy.load('en_core_web_sm')

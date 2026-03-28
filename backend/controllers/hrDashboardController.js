@@ -1,15 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const jobsFile = path.join(__dirname, '..', 'data', 'jobs.json');
+const Job = require('../models/Job');
 const mock = require('../services/mockMlService');
 
-function readJobs(){ try{ return JSON.parse(fs.readFileSync(jobsFile)); }catch(e){ return []; } }
-
-exports.getDashboard = (req, res) => {
+exports.getDashboard = async (req, res) => {
+  try {
   const jobId = req.params.jobId;
-  const jobs = readJobs();
-  const job = jobs.find(j=>j.id===jobId);
-  if(!job) return res.status(404).json({error:'Job not found'});
+  const jobDoc = await Job.findOne({ jobId }).lean();
+  if(!jobDoc) return res.status(404).json({error:'Job not found'});
+  const job = { id: jobDoc.jobId, name: jobDoc.name, requiredSkills: jobDoc.requiredSkills, experienceRange: jobDoc.experienceRange, location: jobDoc.location };
 
   // params
   const { skill, location, college, experience, minMatchPercentage, topN } = req.query;
@@ -28,4 +25,8 @@ exports.getDashboard = (req, res) => {
   if(n < candidates.length) candidates = candidates.slice(0,n);
 
   res.json(candidates);
+  } catch(err) {
+    console.error('getDashboard error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 }

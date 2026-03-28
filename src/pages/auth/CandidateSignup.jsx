@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { post, setAuth } from '../../api'
 import { useNavigate, Link } from 'react-router-dom'
 
-export default function Signup(){
-  const [companyName, setCompanyName] = useState('')
+export default function CandidateSignup(){
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -25,9 +25,9 @@ export default function Signup(){
     }
     setLoading(true)
     try{
-      const res = await post('/hr/auth/signup', { companyName, email, password })
+      const res = await post('/candidate/auth/signup', { name, email, password })
       setAuth(res.token, res.user)
-      navigate('/hr')
+      navigate('/candidate')
     }catch(err){
       const msg = err.message || String(err)
       try {
@@ -49,17 +49,17 @@ export default function Signup(){
             <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
             </div>
-            <h2 className="text-xl font-extrabold text-gray-900">Create Account</h2>
-            <p className="text-sm text-gray-500 mt-1">Set up your HR organization account</p>
+            <h2 className="text-xl font-extrabold text-gray-900">Candidate Sign Up</h2>
+            <p className="text-sm text-gray-500 mt-1">Create your candidate account</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Company Name</label>
-              <input value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Acme Corp" className="input-field" required autoComplete="organization" />
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+              <input value={name} onChange={e=>setName(e.target.value)} placeholder="John Doe" className="input-field" required autoComplete="name" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-              <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com" type="email" className="input-field" required autoComplete="email" />
+              <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" className="input-field" required autoComplete="email" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
@@ -91,10 +91,10 @@ export default function Signup(){
             </button>
           </form>
           <p className="text-center text-sm text-gray-500 mt-5">
-            Already have an account? <Link to="/auth/login" className="text-indigo-600 font-semibold hover:text-indigo-700">Sign in</Link>
+            Already have an account? <Link to="/auth/candidate/login" className="text-indigo-600 font-semibold hover:text-indigo-700">Sign in</Link>
           </p>
           <p className="text-center text-sm text-gray-400 mt-2">
-            Are you a candidate? <Link to="/auth/candidate/signup" className="text-indigo-600 font-semibold hover:text-indigo-700">Candidate Sign Up</Link>
+            Are you HR? <Link to="/auth/signup" className="text-indigo-600 font-semibold hover:text-indigo-700">HR Sign Up</Link>
           </p>
         </div>
       </div>

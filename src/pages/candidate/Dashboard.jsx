@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react"
 import ResumeUpload from "../../components/ResumeUpload"
 import { useNavigate } from "react-router-dom"
-import { post } from "../../api"
+import { post, getUser } from "../../api"
 import jobRolesData from "../../data/job_roles.json"
 
 export default function CandidateDashboard() {
@@ -12,6 +12,7 @@ export default function CandidateDashboard() {
   const [uploadedFiles, setUploadedFiles] = useState([])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const nav = useNavigate()
+  const currentUser = getUser()
 
   const jobRoles = useMemo(() => {
     const unique = []
@@ -135,8 +136,20 @@ export default function CandidateDashboard() {
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
             AI-Powered Analysis
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">Career Analysis</h1>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">
+            {currentUser?.name ? `Welcome, ${currentUser.name}` : 'Career Analysis'}
+          </h1>
           <p className="text-indigo-200 text-base max-w-lg">Get an industry-standard ATS score or build a personalized learning roadmap for your dream role.</p>
+          <div className="mt-4 flex gap-3 flex-wrap">
+            <button onClick={() => nav('/candidate/roadmap-chat')} className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+              Roadmap Learning Assistant
+            </button>
+            <button onClick={() => nav('/candidate/chat')} className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+              Chat History
+            </button>
+          </div>
         </div>
       </div>
 
