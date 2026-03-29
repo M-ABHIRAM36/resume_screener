@@ -20,15 +20,15 @@ from fastapi import FastAPI
 
 app = FastAPI(title='Resume ML Service')
 
-# Health check route (VERY IMPORTANT)
 @app.get("/")
 def home():
     return {"status": "ML service running"}
 
-# Import routes safely
-try:
-    from .routes import router as routes
-    app.include_router(routes)
-    print("✅ Routes loaded successfully")
-except Exception as e:
-    print("❌ Error loading routes:", str(e))
+@app.on_event("startup")
+def load_routes():
+    try:
+        from .routes import router as routes
+        app.include_router(routes)
+        print("✅ Routes loaded successfully")
+    except Exception as e:
+        print("❌ Routes failed:", str(e))
