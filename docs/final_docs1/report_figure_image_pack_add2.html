@@ -420,32 +420,32 @@ flowchart LR
         <p class="canvas-subtitle">Public auth pages, candidate module routes, and HR module routes.</p>
         <div class="mermaid">
 flowchart TD
-    ROOT[/]
-    AUTH[/auth/*]
-    CAND[/candidate/*]
-    HR[/hr/*]
+      ROOT["/"]
+      AUTH["/auth/*"]
+      CAND["/candidate/*"]
+      HR["/hr/*"]
 
     ROOT --> AUTH
     ROOT --> CAND
     ROOT --> HR
 
-    AUTH --> A1[/auth/role]
-    AUTH --> A2[/auth/login]
-    AUTH --> A3[/auth/signup]
-    AUTH --> A4[/auth/candidate/login]
-    AUTH --> A5[/auth/candidate/signup]
+    AUTH --> A1["/auth/role"]
+    AUTH --> A2["/auth/login"]
+    AUTH --> A3["/auth/signup"]
+    AUTH --> A4["/auth/candidate/login"]
+    AUTH --> A5["/auth/candidate/signup"]
 
-    CAND --> C1[/candidate]
-    CAND --> C2[/candidate/score]
-    CAND --> C3[/candidate/skill-gap]
-    CAND --> C4[/candidate/roadmap]
-    CAND --> C5[/candidate/chat]
-    CAND --> C6[/candidate/roadmap-chat]
+    CAND --> C1["/candidate"]
+    CAND --> C2["/candidate/score"]
+    CAND --> C3["/candidate/skill-gap"]
+    CAND --> C4["/candidate/roadmap"]
+    CAND --> C5["/candidate/chat"]
+    CAND --> C6["/candidate/roadmap-chat"]
 
-    HR --> H1[/hr]
-    HR --> H2[/hr/sessions]
-    HR --> H3[/hr/sessions/create]
-    HR --> H4[/hr/sessions/:id]
+    HR --> H1["/hr"]
+    HR --> H2["/hr/sessions"]
+    HR --> H3["/hr/sessions/create"]
+    HR --> H4["/hr/sessions/:id"]
         </div>
       </div>
     </section>
@@ -501,14 +501,14 @@ flowchart TD
         <div class="mermaid" style="margin-top:12px;">
 flowchart LR
     APP[Express App]
-    APP --> R1[/hr/auth]
-    APP --> R2[/hr/jobs]
-    APP --> R3[/hr/resumes]
-    APP --> R4[/hr/sessions and /hr/session]
-    APP --> R5[/candidate and /candidate/auth]
-    APP --> R6[/chat/resume]
-    APP --> R7[/api/chat/roadmap]
-    APP --> R8[/hr/debug]
+    APP --> R1["/hr/auth"]
+    APP --> R2["/hr/jobs"]
+    APP --> R3["/hr/resumes"]
+    APP --> R4["/hr/sessions and /hr/session"]
+    APP --> R5["/candidate and /candidate/auth"]
+    APP --> R6["/chat/resume"]
+    APP --> R7["/api/chat/roadmap"]
+    APP --> R8["/hr/debug"]
         </div>
       </div>
     </section>
@@ -732,10 +732,10 @@ flowchart TB
         <h3 class="canvas-title">Role-Based Authentication Flow</h3>
         <div class="mermaid">
 flowchart LR
-  ROLE[/auth/role] --> A1[/auth/login]
-  ROLE --> A2[/auth/signup]
-  ROLE --> C1[/auth/candidate/login]
-  ROLE --> C2[/auth/candidate/signup]
+  ROLE["/auth/role"] --> A1["/auth/login"]
+  ROLE --> A2["/auth/signup"]
+  ROLE --> C1["/auth/candidate/login"]
+  ROLE --> C2["/auth/candidate/signup"]
 
   A1 --> HRAPI[POST /hr/auth/login]
   A2 --> HRAPI2[POST /hr/auth/signup]
@@ -745,8 +745,8 @@ flowchart LR
   HRAPI --> LS[localStorage token and user]
   CAPI --> LS
   LS --> GUARD[RequireAuth in App.jsx]
-  GUARD --> HRROUTES[/hr/*]
-  GUARD --> CANDROUTES[/candidate/*]
+  GUARD --> HRROUTES["/hr/*"]
+  GUARD --> CANDROUTES["/candidate/*"]
         </div>
       </div>
     </section>
