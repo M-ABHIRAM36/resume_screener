@@ -1,0 +1,177 @@
+Project: Resume Screening and Career Guidance System
+Status Date: 2026-04-24
+
+CURRENT PROJECT STATE
+- The project is in advanced MVP stage with end-to-end flows implemented across Frontend (React), Backend (Node/Express), and ML service (FastAPI).
+- Core user journeys are working for both Candidate and HR personas.
+- MongoDB persistence is integrated for auth, sessions, results, and chat history.
+- AI-assisted chat and resume analysis are integrated, with fallback behavior where needed.
+
+ARCHITECTURE SNAPSHOT
+1) Frontend
+- Tech: React + Vite + React Router + Tailwind.
+- Main app routes are defined in src/App.jsx.
+- Candidate pages: dashboard, resume score, skill gap, roadmap, resume chat, roadmap chat.
+- HR pages: dashboard, create session, session list, session detail.
+- Auth pages: HR login/signup, candidate login/signup, role selection.
+
+2) Backend
+- Tech: Node.js + Express + Mongoose.
+- Entry files: backend/server.js, backend/app.js.
+- DB startup: backend/db.js.
+- Job seeding on startup: backend/seedJobs.js.
+- Route groups implemented:
+  - /candidate/*
+  - /candidate/auth/*
+  - /hr/auth/*
+  - /hr/jobs/*
+  - /hr/resumes/*
+  - /hr/dashboard/*
+  - /hr/sessions/*
+  - /hr/session/*
+  - /chat/resume/*
+  - /api/chat/roadmap/*
+  - /hr/debug/*
+
+3) ML Service
+- Tech: FastAPI + spaCy + sentence-transformers + scikit-learn.
+- Main endpoint: POST /analyze-resumes.
+- Handles multipart resume uploads and JSON fallback mode.
+- Extracts fields from PDF/DOCX:
+  - name
+  - email
+  - phone
+  - skills
+  - experience
+  - internships
+  - college
+  - branch/degree
+  - location
+  - portfolio links
+- Scoring output includes:
+  - score
+  - matchPercentage
+  - matchedSkills
+  - missingSkills
+  - categoryScores
+  - bonusFactors
+  - resumeStrength
+  - jobFitLevel
+
+COMPLETED FEATURES (VERIFIED IN CODE)
+
+A) Candidate side
+- Candidate signup/login with JWT token response.
+- Candidate dashboard with:
+  - preset role selection from src/data/job_roles.json
+  - custom job description input and keyword extraction
+  - single resume upload
+- Resume analysis request to backend /candidate/analyze.
+- Resume Score page with detailed section breakdown and bonus factors.
+- Skill Gap page with priority classification.
+- Roadmap page with phased learning plan and roadmap image mapping.
+- Resume Chat assistant:
+  - start session
+  - send message
+  - history list
+  - load/delete session
+  - clear all history
+- Roadmap Chat assistant:
+  - role discovery
+  - start session
+  - send message
+  - history list
+  - load/delete session
+  - clear all history
+
+B) HR side
+- HR signup/login with JWT token response.
+- HR dashboard supports:
+  - role/job selection
+  - resume upload for batch analysis (up to 200)
+  - advanced filtering and sorting
+  - card/table views
+  - CSV export
+  - session save/load/delete behavior
+- Session management (new system):
+  - create hiring session
+  - list sessions with aggregate stats
+  - session detail page
+  - upload resumes directly to a session
+  - delete session and linked results
+- Additional session APIs (legacy/parallel):
+  - /hr/sessions endpoints for saved screening snapshots
+
+C) Backend data persistence
+- Implemented models:
+  - Candidate
+  - HrUser
+  - Job
+  - JobSession
+  - SessionResult
+  - ScreeningSession
+  - ResumeChatSession
+  - RoadmapChatSession
+
+D) AI integration
+- Resume chat uses Gemini API via backend/services/geminiService.js.
+- Roadmap chat uses Gemini API via backend/services/roadmapService.js.
+- Fallback responses are implemented when AI calls fail.
+
+E) Project run scripts
+- Root package.json can start all services concurrently via npm run dev.
+- Backend dev script exists (nodemon).
+- ML service start script exists (ml-service/start.bat).
+
+PARTIALLY COMPLETE OR NEEDS HARDENING
+
+1) Security hardening pending
+- Passwords are stored and queried in plain text (no bcrypt hashing yet).
+- JWT auth checks are repeated inside controllers, no centralized auth middleware pattern.
+- No refresh-token/session invalidation strategy.
+
+2) Mixed old/new flows
+- Both /hr/sessions and /hr/session endpoint families exist (possible overlap and future confusion).
+- /hr/dashboard/:jobId currently generates mock candidates from mockMlService for that endpoint path.
+- Main HR upload flow uses real ML analysis, but one dashboard route still uses synthetic generation.
+
+3) Frontend integration cleanup pending
+- src/components/ResumeUpload.jsx contains a legacy submit target (/hr/upload-resumes), while current pages mostly submit via page-level logic to active routes.
+- BASE_URL is hardcoded to http://localhost:5000 in src/api.js (no environment-based API URL yet).
+
+4) Testing and QA
+- No automated test suite found for frontend/backend/ml-service.
+- No CI pipeline scripts found for test/build verification.
+
+5) Production readiness items pending
+- No rate limiting seen in backend.
+- No formal input validation library usage across all routes.
+- Error handling is present but not fully standardized.
+- No Docker/container setup in this workspace.
+
+KNOWN DATA/QUALITY NOTES
+- backend/data/jobs.json contains many "Custom Job" entries and at least one odd location value (example: "abhirama"), which may affect seeded data quality.
+- Some role/session behaviors likely evolved over time; cleanup/refactor will improve maintainability.
+
+WHAT IS ALREADY WORKING END-TO-END TODAY
+- Candidate can sign up/login, upload resume, get ATS-like analysis, open skill-gap + roadmap pages, and use chat assistants.
+- HR can sign up/login, create sessions, upload many resumes, view ranked candidates, apply filters, and export CSV.
+- Backend can persist users, sessions, chat history, and candidate analysis results in MongoDB.
+- ML service can parse resumes and return structured, scored candidate outputs.
+
+RECOMMENDED NEXT IMPLEMENTATION PRIORITY
+1) Implement bcrypt password hashing and secure login comparison.
+2) Introduce shared JWT auth middleware and role-based guard middleware.
+3) Consolidate session APIs (choose one path family and migrate).
+4) Remove or isolate mock candidate generation from production HR flow.
+5) Add environment-based API URL handling in frontend.
+6) Add automated tests:
+   - backend route tests
+   - frontend component/page smoke tests
+   - ML service endpoint tests
+7) Add CI checks for build + tests.
+
+HANDOFF NOTE FOR ANOTHER CODING TOOL
+- This is not a blank project. It is a functioning full-stack MVP with production-like behavior.
+- Continue by hardening security, reducing duplicate flows, and adding tests/CI rather than rewriting core modules.
+- Preserve existing route contracts first, then refactor with migration steps to avoid UI breakage.

@@ -1,0 +1,88 @@
+Resume Screening Project - Figure Details Catalog (Add3)
+Generated on: 2026-03-30
+Source image pack: docs/final_docs1/report_figure_image_pack_add2.html
+
+================================================================
+A) FULL FIGURE LIST (ALL KEPT IMAGES - 21)
+================================================================
+Figure 4.1: System Architecture
+PNG: fig_4_1_system_architecture.png
+
+Figure 4.2: Frontend Screens
+PNG: fig_4_2_frontend_screens.png
+
+Figure 4.3: Backend API Structure
+PNG: fig_4_3_backend_api_structure.png
+
+Figure 4.4: Processing Pipeline
+PNG: fig_4_4_processing_pipeline.png
+
+Figure 4.5: Database Model Snapshot
+PNG: fig_4_5_database_model_snapshot.png
+
+Figure 4.6: DFD Set
+PNG: fig_4_6_dfd_set.png
+
+Figure 5.1: Project Structure
+PNG: fig_5_1_project_structure.png
+
+Figure 5.2: Authentication Screens
+PNG: fig_5_2_authentication_screens.png
+
+Figure 5.3: Resume Upload Flow
+PNG: fig_5_3_resume_upload_flow.png
+
+Figure 5.4: Extraction Output
+PNG: fig_5_4_extraction_output.png
+
+Figure 5.5: Scoring Output
+PNG: fig_5_5_scoring_output.png
+
+Figure 5.6: Candidate Module Screens
+PNG: fig_5_6_candidate_module_screens.png
+
+Figure 5.7: HR Module Screens
+PNG: fig_5_7_hr_module_screens.png
+
+Figure 6.1: Frontend Test Evidence
+PNG: fig_6_1_frontend_test_evidence.png
+
+Figure 6.2: API Test Evidence
+PNG: fig_6_2_api_test_evidence.png
+
+Figure 6.3: ML Validation Screens
+PNG: fig_6_3_ml_validation_screens.png
+
+Figure 6.4: Security Test Screens
+PNG: fig_6_4_security_test_screens.png
+
+Figure 7.1: Deployment Topology
+PNG: fig_7_1_deployment_topology.png
+
+Figure A.1: System Architecture Screens
+PNG: fig_a_1_system_architecture_screens.png
+
+Figure A.2: Candidate and HR Module Screens
+PNG: fig_a_2_candidate_hr_module_screens.png
+
+Figure A.3: Testing and Deployment Evidence
+PNG: fig_a_3_testing_deployment_evidence.png
+
+================================================================
+B) SHORT STYLE LIST (AS REQUESTED FORMAT)
+================================================================
+Figure 4.1 System Architecture
+Figure 4.2 DFD Level 0
+Figure 4.3 DFD Level 1
+Figure 4.4 DFD Level 2
+Figure 5.1 Candidate Dashboard
+Figure 5.2 HR Dashboard
+Figure 5.3 Resume Chat
+Figure 5.4 Roadmap Chat
+Figure 7.1 Deployment Topology
+
+================================================================
+C) NOTE
+================================================================
+Section A is the exact complete list of figures currently kept in the add2 image pack.
+Section B is the short naming format you requested.

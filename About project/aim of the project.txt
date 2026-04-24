@@ -1,0 +1,40 @@
+Project Aim: Resume Screening and Career Guidance System
+
+ACTUAL AIM OF THIS PROJECT
+Build one AI-powered platform that solves both sides of the hiring journey:
+- For HR teams: reduce manual resume screening effort and shortlist better candidates faster.
+- For candidates: provide realistic resume evaluation, skill-gap visibility, and a practical learning path to become job-ready.
+
+PRIMARY PROBLEM THIS PROJECT TARGETS
+- HR screening is slow, repetitive, and hard to standardize across many resumes.
+- Candidates do not know how close they are to a target role, what skills are missing, or what to learn next.
+
+CORE OBJECTIVES
+1) Automated resume analysis
+- Parse uploaded resumes (PDF/DOCX), extract profile details, detect skills, and compute role-match metrics.
+
+2) Transparent scoring
+- Give understandable scoring outputs (overall score, match percent, category-wise breakdown, strengths/weaknesses).
+
+3) HR decision support
+- Allow recruiters to upload in bulk, filter/rank candidates, and export shortlisted data quickly.
+
+4) Candidate growth guidance
+- Show personalized skill gaps and actionable roadmap steps from foundation to job-ready.
+
+5) AI mentor experience
+- Add contextual chat assistants that help candidates improve resumes and plan learning progress.
+
+EXPECTED OUTCOME
+- Faster and more consistent hiring shortlisting for HR.
+- Better preparation and clearer upskilling direction for candidates.
+- A shared data-driven workflow where both stakeholders use the same analysis signals.
+
+SUCCESS CRITERIA (BUSINESS + PRODUCT)
+- HR can screen a large batch and identify top candidates in minutes, not hours.
+- Candidate receives clear, actionable feedback after one upload.
+- The platform gives stable, explainable outputs (score, matched/missing skills, categories, recommendations).
+- Session history and chat context are saved so progress can be tracked over time.
+
+LONG-TERM VISION
+Evolve this MVP into a reliable hiring intelligence and career readiness platform with stronger security, testing, analytics, and production deployment standards.
