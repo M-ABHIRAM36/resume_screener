@@ -9,7 +9,9 @@ const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemi
  * Returns array of { slug, name, image, hasKnowledge }.
  */
 function scanRoadmaps() {
-  const roadmapDir = path.join(__dirname, '..', '..', 'public', 'roadmaps');
+  const frontendRoadmapDir = path.join(__dirname, '..', '..', 'frontend', 'public', 'roadmaps');
+  const legacyRoadmapDir = path.join(__dirname, '..', '..', 'public', 'roadmaps');
+  const roadmapDir = fs.existsSync(frontendRoadmapDir) ? frontendRoadmapDir : legacyRoadmapDir;
   let files = [];
   try {
     files = fs.readdirSync(roadmapDir).filter(f => f.endsWith('.png'));

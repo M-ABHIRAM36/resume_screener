@@ -4,14 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -n FRONTEND,BACKEND,ML -c green,blue,magenta \"npm run frontend\" \"npm run backend\" \"npm run ml\"",
-    "frontend": "vite",
+    "frontend": "cd frontend && vite",
     "backend": "cd backend && npm run dev",
     "ml": "cd ml-service && start.bat",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "cd frontend && vite build",
+    "preview": "cd frontend && vite preview"
   },
   "dependencies": {
-    "concurrently": "^9.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.1"
@@ -19,9 +18,9 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.14",
+    "concurrently": "^9.2.1",
     "postcss": "^8.4.23",
     "tailwindcss": "^3.4.7",
     "vite": "^5.0.0"
   }
 }
-

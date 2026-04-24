@@ -57,7 +57,7 @@ export default function ResumeUpload({ single = false, currentJob, filters, onUp
       if (filters?.skill) formData.append('skill', filters.skill)
       if (filters?.location) formData.append('location', filters.location)
       
-      const res = await post('/hr/upload-resumes', formData, true)
+      const res = await post('/hr/resumes', formData, true)
       
       if (onUploaded) {
         onUploaded(res)
